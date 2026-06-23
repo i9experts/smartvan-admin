@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Account - SmartVan</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #F0F3FF; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .card { background: white; max-width: 500px; width: 100%; border-radius: 20px; padding: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo-circle { width: 80px; height: 80px; background: #1B2B6B; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+        .logo-circle span { color: white; font-size: 32px; }
+        .logo h1 { color: #1B2B6B; font-size: 24px; }
+        .logo p { color: #FFB800; font-size: 13px; }
+        h2 { color: #1A1A2E; font-size: 20px; margin-bottom: 8px; }
+        .subtitle { color: #8A94A6; font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+        .warning { background: #FFF3F3; border: 1px solid #FFD0D0; border-radius: 12px; padding: 16px; margin-bottom: 24px; }
+        .warning p { color: #FF4B4B; font-size: 13px; line-height: 1.5; }
+        .warning strong { display: block; margin-bottom: 4px; }
+        label { display: block; font-size: 13px; font-weight: 600; color: #1A1A2E; margin-bottom: 8px; }
+        input, textarea { width: 100%; padding: 12px 16px; border: 1px solid #EAECF0; border-radius: 12px; font-size: 14px; font-family: Arial; margin-bottom: 16px; outline: none; }
+        input:focus, textarea:focus { border-color: #1B2B6B; border-width: 2px; }
+        textarea { height: 100px; resize: none; }
+        button { width: 100%; padding: 16px; background: #FF4B4B; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #e03e3e; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .success { display: none; text-align: center; padding: 20px; }
+        .success-icon { width: 64px; height: 64px; background: #E8F8F0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 28px; }
+        .success h3 { color: #1A1A2E; margin-bottom: 8px; }
+        .success p { color: #8A94A6; font-size: 14px; line-height: 1.5; }
+        .divider { border: none; border-top: 1px solid #EAECF0; margin: 24px 0; }
+        .info-list { list-style: none; }
+        .info-list li { font-size: 13px; color: #8A94A6; padding: 4px 0; padding-left: 20px; position: relative; }
+        .info-list li::before { content: "•"; position: absolute; left: 0; color: #1B2B6B; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo">
+            <div class="logo-circle"><span>🚌</span></div>
+            <h1>SmartVan</h1>
+            <p>Safe Ride, Every Side</p>
+        </div>
+
+        <div id="form-section">
+            <h2>Delete Your Account</h2>
+            <p class="subtitle">We're sorry to see you go. Please fill in the form below to request account deletion. Your request will be processed within 7 business days.</p>
+
+            <div class="warning">
+                <strong>⚠️ This action cannot be undone!</strong>
+                <p>Deleting your account will permanently remove all your data including your profile, children's information, trip history, and alerts.</p>
+            </div>
+
+            <label>Email Address *</label>
+            <input type="email" id="email" placeholder="Enter your registered email" required>
+
+            <label>Reason for Deletion (Optional)</label>
+            <textarea id="reason" placeholder="Please tell us why you want to delete your account..."></textarea>
+
+            <label>Type "DELETE" to confirm *</label>
+            <input type="text" id="confirm" placeholder="Type DELETE to confirm">
+
+            <button id="submit-btn" onclick="submitRequest()">Delete My Account</button>
+        </div>
+
+        <div class="success" id="success-section">
+            <div class="success-icon">✅</div>
+            <h3>Request Submitted!</h3>
+            <p>Your account deletion request has been received. We will process it within 7 business days and send a confirmation to your email.</p>
+        </div>
+
+        <hr class="divider">
+
+        <p style="font-size: 13px; color: #8A94A6; margin-bottom: 8px;">What will be deleted:</p>
+        <ul class="info-list">
+            <li>Your profile and personal information</li>
+            <li>Children's profiles and school details</li>
+            <li>Trip history and tracking data</li>
+            <li>All alerts and notifications</li>
+            <li>Account credentials</li>
+        </ul>
+
+        <p style="font-size: 12px; color: #8A94A6; margin-top: 20px; text-align: center;">
+            Questions? Contact us at <a href="mailto:info@smartvan.pk" style="color: #1B2B6B;">info@smartvan.pk</a>
+        </p>
+    </div>
+
+    <script>
+        function submitRequest() {
+            const email = document.getElementById('email').value;
+            const confirm = document.getElementById('confirm').value;
+            const btn = document.getElementById('submit-btn');
+
+            if (!email) {
+                alert('Please enter your email address');
+                return;
+            }
+            if (confirm !== 'DELETE') {
+                alert('Please type DELETE to confirm');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Submitting...';
+
+            setTimeout(() => {
+                document.getElementById('form-section').style.display = 'none';
+                document.getElementById('success-section').style.display = 'block';
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

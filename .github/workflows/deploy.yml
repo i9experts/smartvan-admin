@@ -1,0 +1,23 @@
+name: Deploy SmartVan Admin
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 72.61.119.165
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /var/www/smartvan-admin
+            git pull origin main
+            npm install
+            npm run build
+            pm2 restart smartvan-admin || pm2 start npm --name smartvan-admin -- start
+            echo "✅ SmartVan Admin deployed at $(date)"
