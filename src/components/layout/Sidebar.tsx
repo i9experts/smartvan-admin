@@ -20,6 +20,7 @@ const navItems = [
   { label: "Billing", href: "/billing", icon: Receipt, superadminOnly: true },
   { label: "Fleet Management", href: "/fleet", icon: Wrench },
   { label: "Attendance", href: "/attendance", icon: Users },
+  { label: "Fee Management", href: "/fees", icon: Users },
   { label: "School Leads", href: "/leads", icon: Users, superadminOnly: true },
 ];
 
