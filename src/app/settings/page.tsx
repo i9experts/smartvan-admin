@@ -213,17 +213,24 @@ export default function SettingsPage() {
   }, [school]);
 
   const saveMutation = useMutation({
-    mutationFn: () => api.post('/Admin/edit-admin-school', {
-      schoolId: school?._id,
-      schoolInfo: {
-        ...schoolForm,
-        startTime: tripForm.startTime || undefined,
-        endTime: tripForm.endTime || undefined,
-        maxTripDuration: tripForm.maxTripDuration ? Number(tripForm.maxTripDuration) : undefined,
-        bufferTime: tripForm.bufferTime ? Number(tripForm.bufferTime) : undefined,
-      },
-      adminInfo: adminForm,
-    }),
+    mutationFn: () => {
+      const user = JSON.parse(localStorage.getItem('smartvan_user') ?? '{}');
+      const isSuperAdmin = user.role === 'superadmin';
+      const payload = {
+        schoolInfo: {
+          ...schoolForm,
+          startTime: tripForm.startTime || undefined,
+          endTime: tripForm.endTime || undefined,
+          maxTripDuration: tripForm.maxTripDuration ? Number(tripForm.maxTripDuration) : undefined,
+          bufferTime: tripForm.bufferTime ? Number(tripForm.bufferTime) : undefined,
+        },
+        adminInfo: adminForm,
+      };
+      if (isSuperAdmin) {
+        return api.post('/Admin/edit-admin-school', { schoolId: school?._id, ...payload });
+      }
+      return api.post('/Admin/editSchoolProfile', payload);
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['settings-profile'] });
       setIsDirty(false);

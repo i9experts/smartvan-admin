@@ -2,11 +2,11 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  Plus, Search, Pencil, Trash2, X, AlertCircle,
+  Plus, Search, Pencil, Trash2, X, AlertCircle, RefreshCw,
   Bus, Filter, ChevronLeft, ChevronRight,
   CheckCircle2, XCircle, UserCheck, MapPin, Cpu, User, Phone,
 } from 'lucide-react';
-import { vanApi } from '@/lib/api';
+import { vanApi, api } from '@/lib/api';
 
 interface VanItem {
   _id: string;
@@ -229,12 +229,216 @@ function DeleteConfirm({ van, onConfirm, onCancel, loading }: { van: VanItem; on
   );
 }
 
+function AddDriverModal({ onClose }: { onClose: () => void }) {
+  const qc = useQueryClient();
+  const [step, setStep] = useState(1);
+  const [form, setForm] = useState({
+    fullname: '', email: '', phoneNo: '', alternatePhoneNo: '',
+    password: '', NIC: '', address: '',
+    expiryDateLicense: '', expiryDateVehicleCard: '',
+  });
+  const [error, setError] = useState('');
+  const f = (k: string, v: string) => setForm(prev => ({ ...prev, [k]: v }));
+
+  const mutation = useMutation({
+    mutationFn: () => api.post('/van/addDriverByAdmin', form),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['drivers-list'] }); onClose(); },
+    onError: (e: any) => setError(e?.response?.data?.message ?? 'Failed to add driver'),
+  });
+
+  function handleNext() {
+    if (!form.fullname || !form.email || !form.password) { setError('Name, email and password are required.'); return; }
+    if (form.password.length < 6) { setError('Password must be at least 6 characters.'); return; }
+    setError(''); setStep(2);
+  }
+
+  function handleSubmit() {
+    if (!form.NIC) { setError('CNIC number is required.'); return; }
+    setError(''); mutation.mutate();
+  }
+
+  const inputClass = "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white";
+  const labelClass = "block text-xs font-medium text-gray-600 mb-1";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">Add New Driver</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Complete driver profile with legal documents</p>
+            </div>
+            <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"><X size={16} /></button>
+          </div>
+          {/* Step indicator */}
+          <div className="flex items-center gap-3">
+            {[{ n: 1, label: 'Personal Info' }, { n: 2, label: 'Legal Documents' }].map((s, i) => (
+              <div key={s.n} className="flex items-center gap-2 flex-1">
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${step >= s.n ? 'bg-[#1B2B6B] text-white' : 'bg-gray-100 text-gray-400'}`}>{s.n}</div>
+                <span className={`text-xs font-medium ${step >= s.n ? 'text-[#1B2B6B]' : 'text-gray-400'}`}>{s.label}</span>
+                {i < 1 && <div className={`flex-1 h-0.5 ${step > s.n ? 'bg-[#1B2B6B]' : 'bg-gray-200'}`} />}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-6 space-y-4">
+          {step === 1 && (
+            <>
+              {/* Personal Info */}
+              <div className="p-3 bg-gray-50 rounded-xl">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Personal Information</p>
+                <div className="space-y-3">
+                  <div>
+                    <label className={labelClass}>Full Name *</label>
+                    <input value={form.fullname} onChange={e => f('fullname', e.target.value)} className={inputClass} placeholder="e.g. Muhammad Ahmed Khan" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className={labelClass}>Phone Number</label>
+                      <input value={form.phoneNo} onChange={e => f('phoneNo', e.target.value)} className={inputClass} placeholder="+92300..." />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Alternate Phone</label>
+                      <input value={form.alternatePhoneNo} onChange={e => f('alternatePhoneNo', e.target.value)} className={inputClass} placeholder="+92301..." />
+                    </div>
+                  </div>
+                  <div>
+                    <label className={labelClass}>Home Address</label>
+                    <input value={form.address} onChange={e => f('address', e.target.value)} className={inputClass} placeholder="Street, Area, City" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Account Info */}
+              <div className="p-3 bg-gray-50 rounded-xl">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">App Account</p>
+                <div className="space-y-3">
+                  <div>
+                    <label className={labelClass}>Email Address *</label>
+                    <input type="email" value={form.email} onChange={e => f('email', e.target.value)} className={inputClass} placeholder="driver@example.com" />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Password *</label>
+                    <input type="password" value={form.password} onChange={e => f('password', e.target.value)} className={inputClass} placeholder="Min 6 characters" />
+                    <p className="text-xs text-gray-400 mt-1">Driver uses this to log into the SmartVan Driver App</p>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              {/* CNIC */}
+              <div className="p-3 bg-gray-50 rounded-xl">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">CNIC / National ID</p>
+                <div className="space-y-3">
+                  <div>
+                    <label className={labelClass}>CNIC Number * <span className="text-gray-400 font-normal">(e.g. 42101-1234567-1)</span></label>
+                    <input value={form.NIC} onChange={e => f('NIC', e.target.value)} className={inputClass} placeholder="XXXXX-XXXXXXX-X" />
+                  </div>
+                  <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl">
+                    <p className="text-xs text-blue-700 font-medium">📎 CNIC Document Upload</p>
+                    <p className="text-xs text-blue-500 mt-1">CNIC image upload coming soon. For now the driver can upload it from the Driver App.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Driving Licence */}
+              <div className="p-3 bg-gray-50 rounded-xl">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Driving Licence</p>
+                <div className="space-y-3">
+                  <div>
+                    <label className={labelClass}>Licence Expiry Date</label>
+                    <input type="date" value={form.expiryDateLicense} onChange={e => f('expiryDateLicense', e.target.value)} className={inputClass} />
+                    {form.expiryDateLicense && new Date(form.expiryDateLicense) < new Date() && (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><AlertCircle size={11} /> This licence has expired!</p>
+                    )}
+                    {form.expiryDateLicense && new Date(form.expiryDateLicense) > new Date() && (() => {
+                      const days = Math.floor((new Date(form.expiryDateLicense).getTime() - Date.now()) / 86400000);
+                      return days < 90 ? <p className="text-xs text-amber-500 mt-1">⚠ Expires in {days} days</p> : null;
+                    })()}
+                  </div>
+                  <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl">
+                    <p className="text-xs text-blue-700 font-medium">📎 Licence Image Upload</p>
+                    <p className="text-xs text-blue-500 mt-1">Front & back licence images can be uploaded from the Driver App or via document upload section.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Vehicle Card */}
+              <div className="p-3 bg-gray-50 rounded-xl">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Vehicle Registration Card</p>
+                <div className="space-y-3">
+                  <div>
+                    <label className={labelClass}>Vehicle Card Expiry Date</label>
+                    <input type="date" value={form.expiryDateVehicleCard} onChange={e => f('expiryDateVehicleCard', e.target.value)} className={inputClass} />
+                    {form.expiryDateVehicleCard && new Date(form.expiryDateVehicleCard) < new Date() && (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><AlertCircle size={11} /> Vehicle card has expired!</p>
+                    )}
+                  </div>
+                  <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl">
+                    <p className="text-xs text-blue-700 font-medium">📎 Vehicle Card Upload</p>
+                    <p className="text-xs text-blue-500 mt-1">Vehicle registration card images can be uploaded from the Driver App.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Compliance Summary */}
+              <div className="p-3 bg-[#1B2B6B]/5 border border-[#1B2B6B]/10 rounded-xl">
+                <p className="text-xs font-semibold text-[#1B2B6B] mb-2">Compliance Checklist</p>
+                <div className="space-y-1.5">
+                  {[
+                    { label: 'CNIC provided', ok: !!form.NIC },
+                    { label: 'Licence expiry set', ok: !!form.expiryDateLicense },
+                    { label: 'Vehicle card expiry set', ok: !!form.expiryDateVehicleCard },
+                    { label: 'Licence not expired', ok: !form.expiryDateLicense || new Date(form.expiryDateLicense) > new Date() },
+                  ].map(c => (
+                    <div key={c.label} className="flex items-center gap-2">
+                      {c.ok ? <CheckCircle2 size={13} className="text-emerald-500 shrink-0" /> : <XCircle size={13} className="text-gray-300 shrink-0" />}
+                      <span className={`text-xs ${c.ok ? 'text-gray-700' : 'text-gray-400'}`}>{c.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {error && <div className="flex items-center gap-2 p-3 bg-red-50 text-red-600 rounded-xl text-xs"><AlertCircle size={14} />{error}</div>}
+        </div>
+
+        <div className="px-6 pb-6 flex gap-3">
+          {step === 1 ? (
+            <>
+              <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">Cancel</button>
+              <button onClick={handleNext} className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356]">Next: Documents →</button>
+            </>
+          ) : (
+            <>
+              <button onClick={() => { setStep(1); setError(''); }} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">← Back</button>
+              <button onClick={handleSubmit} disabled={mutation.isPending}
+                className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] disabled:opacity-50 flex items-center justify-center gap-2">
+                {mutation.isPending ? <RefreshCw size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
+                {mutation.isPending ? 'Adding Driver…' : 'Add Driver'}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function VansPage() {
   const qc = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [modal, setModal] = useState<'add'|'edit'|'assign'|null>(null);
+  const [showAddDriver, setShowAddDriver] = useState(false);
   const [target, setTarget] = useState<VanItem|null>(null);
   const [deleteTarget, setDeleteTarget] = useState<VanItem|null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -275,6 +479,7 @@ export default function VansPage() {
 
   return (
     <>
+      {showAddDriver && <AddDriverModal onClose={() => setShowAddDriver(false)} />}
       {modal === 'add' && <VanModal mode="add" onClose={() => setModal(null)} onSuccess={() => qc.invalidateQueries({ queryKey: ['vans'] })} />}
       {modal === 'edit' && target && <VanModal mode="edit" van={target} onClose={() => setModal(null)} onSuccess={() => qc.invalidateQueries({ queryKey: ['vans'] })} />}
       {modal === 'assign' && target && <AssignDriverModal van={target} drivers={driversData ?? []} onClose={() => setModal(null)} onSuccess={() => {}} />}
@@ -286,6 +491,7 @@ export default function VansPage() {
             <h1 className="text-2xl font-bold text-gray-900">Fleet</h1>
             <p className="text-sm text-gray-400 mt-0.5">{total} van{total !== 1 ? 's' : ''} registered</p>
           </div>
+          <button onClick={() => setShowAddDriver(true)} className="flex items-center gap-2 px-4 py-2.5 border border-[#1B2B6B] text-[#1B2B6B] text-sm font-medium rounded-xl hover:bg-[#1B2B6B]/5 transition"><Plus size={16} /> Add Driver</button>
           <button onClick={() => setModal('add')} className="flex items-center gap-2 px-4 py-2.5 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"><Plus size={16} /> Add Van</button>
         </div>
 
