@@ -352,6 +352,7 @@ export default function FeesPage() {
     staleTime: 300_000,
   });
   const schoolId = profileData?._id ?? '';
+  const isProfileLoading = !profileData;
 
   const { data: summaryData, isLoading: loadingSummary, refetch: refetchAll } = useQuery({
     queryKey: ['fees', 'summary', month],
@@ -466,8 +467,10 @@ export default function FeesPage() {
               <RefreshCw size={14} /> Refresh
             </button>
             <button onClick={() => { setEditingFee(null); setShowFeeConfig(true); }}
-              className="flex items-center gap-2 px-4 py-2 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition">
-              <Plus size={16} /> Configure Fee
+              className="flex items-center gap-2 px-4 py-2 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition disabled:opacity-50"
+              disabled={isProfileLoading}>
+              {isProfileLoading ? <RefreshCw size={16} className="animate-spin" /> : <Plus size={16} />}
+              {isProfileLoading ? 'Loading…' : 'Configure Fee'}
             </button>
           </div>
         </div>
@@ -747,7 +750,8 @@ export default function FeesPage() {
             <div className="flex items-center justify-between">
               <p className="text-sm text-gray-500">{(feeConfigs ?? []).length} fee structure{(feeConfigs ?? []).length !== 1 ? 's' : ''} configured</p>
               <button onClick={() => { setEditingFee(null); setShowFeeConfig(true); }}
-                className="flex items-center gap-2 px-4 py-2 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition">
+                className="flex items-center gap-2 px-4 py-2 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition disabled:opacity-50"
+                disabled={isProfileLoading}>
                 <Plus size={15} /> Add Fee Structure
               </button>
             </div>
