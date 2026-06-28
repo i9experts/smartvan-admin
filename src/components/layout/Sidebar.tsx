@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import {
   LayoutDashboard, MapPin, School, Bus, Users, Route,
   Bell, BarChart3, Receipt, Wrench, Settings, LogOut,
@@ -31,14 +32,8 @@ export function Sidebar() {
   return (
     <aside className="w-[190px] bg-white border-r border-sv-border flex flex-col flex-shrink-0 h-screen sticky top-0">
       {/* Logo */}
-      <div className="px-4 py-[18px] border-b border-sv-border flex items-center gap-2.5">
-        <div className="w-[38px] h-[38px] rounded-[10px] bg-sv-yellow flex items-center justify-center flex-shrink-0">
-          <Bus size={22} className="text-sv-text" />
-        </div>
-        <div>
-          <div className="text-[13px] font-medium text-sv-text">SmartVan</div>
-          <div className="text-[9px] text-sv-muted">Safe Kids, Every Ride</div>
-        </div>
+      <div className="px-4 py-[14px] border-b border-sv-border flex items-center justify-center">
+        <Image src="/smartvan-logo.png" alt="SmartVan" width={140} height={56} className="object-contain" />
       </div>
 
       {/* Nav */}

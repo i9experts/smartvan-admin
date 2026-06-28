@@ -103,7 +103,7 @@ export function useAuth() {
 
   const logout = useCallback(() => {
     clearAuth();
-    router.push('/login');
+    router.push('/auth/login');
   }, [router]);
 
   const refreshProfile = useCallback(async () => {

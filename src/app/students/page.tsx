@@ -63,7 +63,27 @@ async function fetchStudents(page: number, search: string, status: string) {
     ...(status ? { status } : {}),
   });
   const res = await api.get(`/Admin/Get-Students?${params}`);
-  return res.data;
+  const raw = res.data;
+  const students = (raw.data ?? []).map((item: any) => ({
+    _id: item.student?.id,
+    fullname: item.student?.fullname,
+    grade: item.student?.grade,
+    gender: item.student?.gender,
+    age: item.student?.age,
+    dob: item.student?.dob,
+    status: item.student?.status,
+    verifiedBySchool: item.student?.verifiedBySchool ?? false,
+    VanId: item.van?.id,
+    parentId: item.parent?.id,
+    parentName: item.parent?.fullname,
+    parentEmail: item.parent?.email,
+    image: item.student?.image,
+    createdAt: item.student?.createdAt ?? item.student?.dob,
+  }));
+  return {
+    data: students,
+    total: raw.pagination?.total ?? 0,
+  };
 }
 
 async function addStudent(form: AddStudentForm) {
@@ -582,7 +602,7 @@ export default function StudentsPage() {
                             <p className="text-sm font-medium text-gray-900">
                               {student.fullname ?? '—'}
                             </p>
-                            <p className="text-xs text-gray-400">Age {student.age ?? '?'}</p>
+                            <p className="text-xs text-gray-400">{student.age ? `Age ${student.age}` : ''}</p>
                           </div>
                         </div>
                       </td>

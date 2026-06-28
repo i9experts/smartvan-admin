@@ -187,7 +187,28 @@ export default function ParentsPage() {
     queryKey: ['students-all-for-parents'],
     queryFn: async () => {
       const res = await studentApi.getAll({ page: 1, limit: 1000 });
-      return res.data?.data ?? [];
+      const raw = res.data;
+      return (raw.data ?? []).map((item: any) => ({
+        _id: item.student?.id,
+        fullname: item.student?.fullname,
+        grade: item.student?.grade,
+        gender: item.student?.gender,
+        age: item.student?.age,
+        status: item.student?.status,
+        verifiedBySchool: item.student?.verifiedBySchool ?? false,
+        VanId: item.van?.id,
+        parentId: item.parent?.id,
+        createdAt: item.student?.createdAt ?? '',
+        parent: {
+          _id: item.parent?.id,
+          fullname: item.parent?.fullname,
+          email: item.parent?.email,
+          phoneNo: item.parent?.phoneNo,
+          address: item.parent?.address,
+          image: item.parent?.image,
+        },
+      }));
+
     },
     staleTime: 60_000,
   });

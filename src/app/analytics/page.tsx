@@ -76,13 +76,27 @@ function SkeletonCard() {
 export default function AnalyticsPage() {
   const { data: students = [], isLoading: ls } = useQuery({
     queryKey: ['analytics-students'],
-    queryFn: async () => { const r = await studentApi.getAll({ page: 1, limit: 1000 }); return r.data?.data ?? []; },
+    queryFn: async () => {
+      const r = await studentApi.getAll({ page: 1, limit: 1000 });
+      return (r.data?.data ?? []).map((item: any) => ({
+        status: item.student?.status ?? 'inactive',
+        grade: item.student?.grade,
+        VanId: item.van?.id,
+        verifiedBySchool: item.student?.verifiedBySchool ?? false,
+      }));
+    },
     staleTime: 120_000,
   });
 
   const { data: vans = [], isLoading: lv } = useQuery({
     queryKey: ['analytics-vans'],
-    queryFn: async () => { const r = await vanApi.getByAdmin({ page: 1, limit: 1000 }); return r.data?.data ?? []; },
+    queryFn: async () => {
+      const r = await vanApi.getByAdmin({ page: 1, limit: 1000 });
+      return (r.data?.data ?? []).map((item: any) => ({
+        status: item.van?.status ?? 'inactive',
+        driverId: item.driver?.id,
+      }));
+    },
     staleTime: 120_000,
   });
 

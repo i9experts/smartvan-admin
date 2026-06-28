@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Eye, EyeOff, Bus, AlertCircle, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -39,11 +39,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex bg-gray-50">
       <div className="hidden lg:flex lg:w-1/2 bg-[#1B2B6B] flex-col items-center justify-center p-12 relative overflow-hidden">
         <div className="relative z-10 text-center">
-          <div className="w-20 h-20 bg-[#FFB800] rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
-            <Bus size={40} className="text-white" />
-          </div>
-          <h1 className="text-4xl font-bold text-white mb-4">SmartVan</h1>
-          <p className="text-blue-200 text-lg max-w-sm leading-relaxed">School transport management made simple.</p>
+          <div className="w-80 h-80 bg-white rounded-full flex items-center justify-center shadow-xl"><img src="/smartvan-logo.png" alt="SmartVan" className="w-64 object-contain" /></div>
         </div>
       </div>
       <div className="flex-1 flex items-center justify-center p-6">

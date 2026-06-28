@@ -56,12 +56,17 @@ interface StudentStatusData {
 
 async function fetchStudents() {
   const res = await api.get('/Admin/Get-Students?page=1&limit=1000');
-  return res.data?.data ?? [];
+  return (res.data?.data ?? []).map((item: any) => ({
+    status: item.student?.status ?? 'inactive',
+    verifiedBySchool: item.student?.verifiedBySchool ?? false,
+  }));
 }
 
 async function fetchVans() {
-  const res = await api.get('/Admin/Get-Vans-By-SchoolAdmin?page=1&limit=1000');
-  return res.data?.data ?? [];
+  const res = await api.get('/van/GetVansByAdmin?page=1&limit=1000');
+  return (res.data?.data ?? []).map((item: any) => ({
+    status: item.van?.status ?? 'inactive',
+  }));
 }
 
 async function fetchDrivers() {

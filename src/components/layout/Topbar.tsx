@@ -1,5 +1,5 @@
 "use client";
-import { Bell, Search, ChevronDown } from "lucide-react";
+import { Bell, Search } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 
@@ -36,11 +36,7 @@ export function Topbar({ title }: TopbarProps) {
           </span>
         </Link>
 
-        {/* Language */}
-        <button className="flex items-center gap-1 text-[12px] text-sv-text px-2 py-1 border border-sv-border rounded-md">
-          🇬🇧
-          <ChevronDown size={11} />
-        </button>
+
 
         {/* Avatar */}
         <div className="w-[30px] h-[30px] rounded-full bg-sv-navy flex items-center justify-center text-[11px] font-medium text-white">
