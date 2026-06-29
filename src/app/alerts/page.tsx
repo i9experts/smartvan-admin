@@ -60,7 +60,11 @@ function SendAlertModal({ onClose, onSuccess }: { onClose: () => void; onSuccess
   const { data: vansData } = useQuery({
     queryKey: ['vans-list'],
     queryFn: () => vanApi.getByAdmin({ page: 1, limit: 100 }),
-    select: r => r.data?.data ?? [],
+    select: (r: any) => (r.data?.data ?? []).map((item: any) => ({
+      _id: item.van?.id || item._id,
+      carNumber: item.van?.carNumber || item.carNumber || '',
+      vehicleType: item.van?.vehicleType || item.vehicleType || '',
+    })),
     staleTime: 60_000,
   });
 
@@ -282,12 +286,18 @@ export default function AlertsPage() {
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ['alerts', page],
     queryFn: () => alertApi.getAll({ page, limit: 12 }),
-    select: r => r.data,
+    select: (r: any) => ({
+      ...r.data,
+      data: (r.data?.data ?? []).map((a: any) => ({
+        ...a,
+        createdAt: a.createdAt || a.date || new Date().toISOString(),
+      })),
+    }),
     staleTime: 30_000,
   });
 
   const alerts: Alert[] = data?.data ?? [];
-  const total: number = data?.total ?? 0;
+  const total: number = data?.total ?? alerts.length ?? 0;
   const totalPages = Math.ceil(total / 12);
 
   const deleteMutation = useMutation({
