@@ -66,10 +66,10 @@ const EMPTY_FORM: RouteForm = {
 };
 
 const routeApi = {
-  getAll: (params?: any) => api.get('/Route/getRoutes', { params }),
-  create: (data: any) => api.post('/Route/createRoute', data),
-  edit: (routeId: string, data: any) => api.post('/Route/editRoute', { routeId, ...data }),
-  delete: (routeId: string) => api.post('/Route/deleteRouteByAdmin', { routeId }),
+  getAll: (params?: any) => api.get('/route/getRoutes', { params }),
+  create: (data: any) => api.post('/route/createRoute', data),
+  edit: (routeId: string, data: any) => api.post('/route/editRoute', { routeId, ...data }),
+  delete: (routeId: string) => api.post('/route/deleteRouteByAdmin', { routeId }),
 };
 
 // ─── Map Trigger Button ───────────────────────────────────────────────────────
@@ -358,10 +358,10 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
   }
 
   function addStop(student: any) {
-    if (form.kidLocations.find(k => k.kidId === student._id)) return;
+    const sId = student._id || student.id; if (form.kidLocations.find(k => k.kidId === sId)) return;
     setForm(f => ({
       ...f,
-      kidLocations: [...f.kidLocations, { kidId: student._id, lat: 0, long: 0, kidName: student.fullname }],
+      kidLocations: [...f.kidLocations, { kidId: student._id || student.id, lat: 0, long: 0, kidName: student.fullname }],
     }));
   }
 
@@ -383,7 +383,7 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
     mode === 'add' ? createMutation.mutate() : editMutation.mutate();
   }
 
-  const availableStudents = students.filter(s => !form.kidLocations.find(k => k.kidId === s._id));
+  const availableStudents = students.filter(s => !form.kidLocations.find(k => k.kidId === (s._id || s.id)));
   const TABS = [
     { key: 'basic' as const, label: 'Basic Info', icon: <Route size={13} /> },
     { key: 'schedule' as const, label: 'Schedule', icon: <Calendar size={13} /> },
@@ -651,14 +651,47 @@ export default function RoutesPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['routes', typeFilter],
     queryFn: () => routeApi.getAll({ tripType: typeFilter || undefined }),
-    select: r => r.data?.data ?? r.data ?? [],
+    select: (r: any) => {
+      const raw = r.data?.data ?? [];
+      // API returns array of { routes: [...], van: {...}, createdAt }
+      // Flatten all routes from all van groups
+      const allRoutes: any[] = [];
+      raw.forEach((group: any) => {
+        if (group.routes) {
+          group.routes.forEach((route: any) => {
+            allRoutes.push({
+              _id: route.id,
+              title: route.title || 'Untitled Route',
+              tripType: route.tripType,
+              startTime: route.startTime,
+              tripDays: route.tripDays,
+              startPoint: route.startPoint,
+              endPoint: route.endPoint,
+              kidLocations: route.kidLocations ?? [],
+              createdAt: group.createdAt,
+              van: group.van,
+              vanId: group.van?.id,
+            });
+          });
+        }
+      });
+      return allRoutes;
+    },
     staleTime: 30_000,
   });
 
   const { data: vans = [] } = useQuery({
     queryKey: ['vans-for-routes'],
     queryFn: () => vanApi.getByAdmin({ page: 1, limit: 100 }),
-    select: r => r.data?.data ?? [],
+    select: (r: any) => {
+      const raw = r.data?.data ?? [];
+      return raw.map((item: any) => ({
+        _id: item.van?.id,
+        carNumber: item.van?.carNumber ?? '',
+        vehicleType: item.van?.vehicleType ?? '',
+        status: item.van?.status ?? 'inactive',
+      }));
+    },
     staleTime: 120_000,
   });
 
@@ -672,6 +705,7 @@ export default function RoutesPage() {
   const deleteMutation = useMutation({
     mutationFn: (routeId: string) => routeApi.delete(routeId),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['routes'] }); setDeleteTarget(null); },
+    onError: (e: any) => alert(e?.response?.data?.message ?? 'Failed to delete route. Please try again.'),
   });
 
   const routes: RouteData[] = Array.isArray(data) ? data : [];
