@@ -152,11 +152,11 @@ function RecordPaymentModal({ payment, onClose }: { payment: any; onClose: () =>
 }
 
 // ─── Fee Config Modal ─────────────────────────────────────────────────────────
-function FeeConfigModal({ existing, schoolId, onClose }: { existing?: any; schoolId: string; onClose: () => void }) {
+function FeeConfigModal({ existing, schoolId, defaultCurrency = 'PKR', onClose }: { existing?: any; schoolId: string; defaultCurrency?: string; onClose: () => void }) {
   const qc = useQueryClient();
   const [form, setForm] = useState({
     amount: existing?.amount ? String(existing.amount) : '',
-    currency: existing?.currency || 'PKR',
+    currency: existing?.currency || defaultCurrency,
     billingCycle: existing?.billingCycle || 'monthly',
     serviceType: existing?.serviceType || 'both',
     pickOnlyAmount: existing?.pickOnlyAmount ? String(existing.pickOnlyAmount) : '',
@@ -352,6 +352,7 @@ export default function FeesPage() {
     staleTime: 300_000,
   });
   const schoolId = profileData?._id ?? '';
+  const schoolCurrency = profileData?.currency ?? 'PKR';
   const isProfileLoading = !profileData;
 
   const { data: summaryData, isLoading: loadingSummary, refetch: refetchAll } = useQuery({
@@ -449,7 +450,7 @@ export default function FeesPage() {
   return (
     <>
       {selectedPayment && <RecordPaymentModal payment={selectedPayment} onClose={() => setSelectedPayment(null)} />}
-      {showFeeConfig && <FeeConfigModal schoolId={schoolId} onClose={() => { setShowFeeConfig(false); setEditingFee(null); }} existing={editingFee} />}
+      {showFeeConfig && <FeeConfigModal schoolId={schoolId} defaultCurrency={schoolCurrency} onClose={() => { setShowFeeConfig(false); setEditingFee(null); }} existing={editingFee} />}
 
       <div className="p-6 space-y-5">
         {/* Header */}

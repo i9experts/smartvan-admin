@@ -36,6 +36,8 @@ interface SchoolProfile {
   long?: number;
   autoRenew?: boolean;
   status?: string;
+  currency?: string;
+  country?: string;
 }
 
 interface AdminProfile {
@@ -185,6 +187,19 @@ export default function SettingsPage() {
 
   // Local editable copies
   const [schoolForm, setSchoolForm] = useState<Partial<SchoolProfile>>({});
+  const CURRENCIES = [
+    { code: 'PKR', label: 'Pakistani Rupee (PKR)', symbol: '₨', flag: '🇵🇰' },
+    { code: 'SAR', label: 'Saudi Riyal (SAR)', symbol: '﷼', flag: '🇸🇦' },
+    { code: 'AED', label: 'UAE Dirham (AED)', symbol: 'د.إ', flag: '🇦🇪' },
+    { code: 'QAR', label: 'Qatari Riyal (QAR)', symbol: 'ر.ق', flag: '🇶🇦' },
+    { code: 'USD', label: 'US Dollar (USD)', symbol: '$', flag: '🇺🇸' },
+  ];
+  const COUNTRIES = [
+    { code: 'PK', label: 'Pakistan', flag: '🇵🇰' },
+    { code: 'SA', label: 'Saudi Arabia', flag: '🇸🇦' },
+    { code: 'AE', label: 'United Arab Emirates', flag: '🇦🇪' },
+    { code: 'QA', label: 'Qatar', flag: '🇶🇦' },
+  ];
   const [adminForm, setAdminForm] = useState<{ name: string; email: string }>({ name: '', email: '' });
   const [tripForm, setTripForm] = useState({
     startTime: '', endTime: '', maxTripDuration: '', bufferTime: '',
@@ -200,6 +215,8 @@ export default function SettingsPage() {
         contactNumber: school.contactNumber ?? '',
         address: school.address ?? '',
         branchName: school.branchName ?? '',
+        currency: school.currency ?? 'PKR',
+        country: school.country ?? 'PK',
       });
       setTripForm({
         startTime: school.startTime ?? '',
@@ -405,6 +422,18 @@ export default function SettingsPage() {
                     </div>
                   </Field>
 
+                  <div className="grid grid-cols-2 gap-4">
+                    <Field label="Country">
+                      <select value={schoolForm.country ?? 'PK'} onChange={e => { setSchoolForm(f => ({ ...f, country: e.target.value })); markDirty(); }} className={inputClass}>
+                        {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.flag} {c.label}</option>)}
+                      </select>
+                    </Field>
+                    <Field label="Default Currency">
+                      <select value={schoolForm.currency ?? 'PKR'} onChange={e => { setSchoolForm(f => ({ ...f, currency: e.target.value })); markDirty(); }} className={inputClass}>
+                        {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.flag} {c.label}</option>)}
+                      </select>
+                    </Field>
+                  </div>
                   <Field label="Address">
                     <div className="relative">
                       <MapPin size={15} className="absolute left-3 top-3.5 text-gray-400" />
