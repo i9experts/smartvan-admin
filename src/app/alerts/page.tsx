@@ -313,12 +313,40 @@ export default function AlertsPage() {
 
   async function sendAlertViaWhatsApp(alert: any) {
     try {
-      await api.post('/whatsapp/send-test', {
-        to: '+923002517280', // Will be dynamic per school
-        message: `*SmartVan Alert*\n\n*Type:* ${alert.alertType || 'General'}\n*Message:* ${alert.message}\n\n_Safe Ride, Every Side 🚐_`,
+      // Get all students with parent phone numbers
+      const studentsRes = await api.get('/Admin/Get-Students?page=1&limit=500');
+      const students = studentsRes.data?.data ?? [];
+      
+      // Extract unique parent phone numbers
+      const phoneNumbers = new Set<string>();
+      students.forEach((item: any) => {
+        const phone = item.parent?.phoneNo || item.parent?.phone;
+        if (phone && phone.trim() !== '') phoneNumbers.add(phone.trim());
       });
-      setWaMsg('✓ Alert sent via WhatsApp!');
-      setTimeout(() => setWaMsg(''), 3000);
+
+      const message = `*SmartVan Alert* 🚐
+
+*Type:* ${alert.alertType || 'General'}
+*Message:* ${alert.message}
+
+_Safe Ride, Every Side_`;
+
+      if (phoneNumbers.size === 0) {
+        setWaMsg('✗ No parent phone numbers found');
+        setTimeout(() => setWaMsg(''), 3000);
+        return;
+      }
+
+      let sent = 0;
+      for (const phone of Array.from(phoneNumbers)) {
+        try {
+          await api.post('/whatsapp/send-test', { to: phone, message });
+          sent++;
+        } catch {}
+      }
+
+      setWaMsg(`✓ Alert sent via WhatsApp to ${sent} parent(s)!`);
+      setTimeout(() => setWaMsg(''), 4000);
     } catch (e: any) {
       setWaMsg('✗ Failed: ' + (e?.response?.data?.message ?? 'Error'));
       setTimeout(() => setWaMsg(''), 3000);
