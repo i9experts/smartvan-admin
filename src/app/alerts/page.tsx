@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Bell, Plus, Trash2, X, AlertCircle, Users,
-  Bus, User, Send, ChevronLeft, ChevronRight, Megaphone,
+  Bus, User, Send, ChevronLeft, ChevronRight, Megaphone, Smartphone,
 } from 'lucide-react';
-import { alertApi, vanApi } from '@/lib/api';
+import { alertApi, vanApi, api } from '@/lib/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -230,7 +230,7 @@ function DeleteConfirm({ onConfirm, onCancel, loading }: { onConfirm: () => void
 
 // ─── Alert Card ───────────────────────────────────────────────────────────────
 
-function AlertCard({ alert, onDelete }: { alert: Alert; onDelete: (id: string) => void }) {
+function AlertCard({ alert, onDelete, onWhatsApp }: { alert: Alert; onDelete: (id: string) => void; onWhatsApp: (alert: Alert) => void }) {
   const cfg = RECIPIENT_CONFIG[alert.recipientType] ?? RECIPIENT_CONFIG.ALL_PARENTS;
   const timeAgo = (date: string) => {
     const diff = Date.now() - new Date(date).getTime();
@@ -264,12 +264,21 @@ function AlertCard({ alert, onDelete }: { alert: Alert; onDelete: (id: string) =
             <p className="text-xs text-gray-400 mt-1.5">{timeAgo(alert.createdAt)}</p>
           </div>
         </div>
-        <button
-          onClick={() => onDelete(alert._id)}
-          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition shrink-0"
-        >
-          <Trash2 size={14} />
-        </button>
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            onClick={() => onWhatsApp(alert)}
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition"
+            title="Send via WhatsApp"
+          >
+            <Smartphone size={14} />
+          </button>
+          <button
+            onClick={() => onDelete(alert._id)}
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition"
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -299,6 +308,22 @@ export default function AlertsPage() {
   const alerts: Alert[] = data?.data ?? [];
   const total: number = data?.total ?? alerts.length ?? 0;
   const totalPages = Math.ceil(total / 12);
+
+  const [waMsg, setWaMsg] = useState('');
+
+  async function sendAlertViaWhatsApp(alert: any) {
+    try {
+      await api.post('/whatsapp/send-test', {
+        to: '+923002517280', // Will be dynamic per school
+        message: `*SmartVan Alert*\n\n*Type:* ${alert.alertType || 'General'}\n*Message:* ${alert.message}\n\n_Safe Ride, Every Side 🚐_`,
+      });
+      setWaMsg('✓ Alert sent via WhatsApp!');
+      setTimeout(() => setWaMsg(''), 3000);
+    } catch (e: any) {
+      setWaMsg('✗ Failed: ' + (e?.response?.data?.message ?? 'Error'));
+      setTimeout(() => setWaMsg(''), 3000);
+    }
+  }
 
   const deleteMutation = useMutation({
     mutationFn: (alertId: string) => alertApi.delete(alertId),
@@ -330,6 +355,11 @@ export default function AlertsPage() {
       )}
 
       <div className="p-6 space-y-5">
+        {waMsg && (
+          <div className={`p-3 rounded-xl text-sm font-medium ${waMsg.startsWith('✓') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+            {waMsg}
+          </div>
+        )}
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -396,6 +426,7 @@ export default function AlertsPage() {
                 key={alert._id}
                 alert={alert}
                 onDelete={id => setDeleteTarget(id)}
+                onWhatsApp={sendAlertViaWhatsApp}
               />
             ))}
           </div>

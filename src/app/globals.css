@@ -37,3 +37,27 @@
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 }
+
+/* ── RTL Support ─────────────────────────────────────────── */
+[dir="rtl"] {
+  font-family: 'Tajawal', 'Cairo', 'Segoe UI', sans-serif;
+}
+
+[dir="rtl"] .sidebar-item {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .ml-auto { margin-left: 0; margin-right: auto; }
+[dir="rtl"] .mr-auto { margin-right: 0; margin-left: auto; }
+[dir="rtl"] .pl-9 { padding-left: 0; padding-right: 2.25rem; }
+[dir="rtl"] .pr-11 { padding-right: 0; padding-left: 2.75rem; }
+[dir="rtl"] .left-3 { left: auto; right: 0.75rem; }
+[dir="rtl"] .right-3 { right: auto; left: 0.75rem; }
+[dir="rtl"] .border-l { border-left: none; border-right-width: 1px; }
+[dir="rtl"] .border-r { border-right: none; border-left-width: 1px; }
+[dir="rtl"] .rounded-l-xl { border-radius: 0 0.75rem 0.75rem 0; }
+[dir="rtl"] .rounded-r-xl { border-radius: 0.75rem 0 0 0.75rem; }
+[dir="rtl"] .text-left { text-align: right; }
+[dir="rtl"] .items-start { align-items: flex-end; }
+[dir="rtl"] table { direction: rtl; }
+[dir="rtl"] th, [dir="rtl"] td { text-align: right; }

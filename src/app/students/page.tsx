@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Search,
@@ -14,8 +14,9 @@ import {
   CheckCircle2,
   Clock,
   Filter,
-} from 'lucide-react';
-import { api } from '@/lib/api';
+  Bus,
+} from "lucide-react";
+import { api, vanApi } from '@/lib/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -178,6 +179,23 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
 
   const isLoading = addMutation.isPending || editMutation.isPending;
 
+  async function sendWhatsAppCredentials() {
+    if (!form.parentEmail || !form.fullname) return;
+    try {
+      await api.post('/whatsapp/send-credentials', {
+        to: form.parentEmail,
+        parentName: 'Parent',
+        email: form.parentEmail,
+        password: 'SmartVan@123',
+        schoolName: 'Your School',
+      });
+      setError('');
+      alert('WhatsApp credentials sent!');
+    } catch (e: any) {
+      setError('WhatsApp send failed: ' + (e?.response?.data?.message ?? 'Error'));
+    }
+  }
+
   function handleSubmit() {
     if (!form.fullname || !form.grade || !form.gender) {
       setError('Name, grade and gender are required.');
@@ -317,6 +335,193 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
 
 // ─── Delete Confirm ───────────────────────────────────────────────────────────
 
+// ─── Assign Route Modal ───────────────────────────────────────────────────────
+function AssignVanModal({ student, onClose, onSuccess }: { student: any; onClose: () => void; onSuccess: () => void }) {
+  const [selectedRouteId, setSelectedRouteId] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [studentRoutes, setStudentRoutes] = useState<any[]>([]);
+  const [tab, setTab] = useState<'assign' | 'current'>('current');
+
+  const { data: routes = [], isLoading: routesLoading } = useQuery({
+    queryKey: ['routes-for-assign'],
+    queryFn: () => api.get('/route/getRoutes'),
+    select: (r: any) => {
+      const raw = r.data?.data ?? [];
+      const allRoutes: any[] = [];
+      raw.forEach((group: any) => {
+        if (group.routes) {
+          group.routes.forEach((route: any) => {
+            allRoutes.push({
+              _id: route.id,
+              title: route.title || 'Untitled Route',
+              tripType: route.tripType,
+              startTime: route.startTime,
+              van: group.van,
+            });
+          });
+        }
+      });
+      return allRoutes;
+    },
+  });
+
+  useEffect(() => {
+    api.get(`/route/student-routes/${student._id}`)
+      .then(r => setStudentRoutes(r.data?.data ?? []))
+      .catch(() => setStudentRoutes([]));
+  }, [student._id]);
+
+  async function handleAssign() {
+    if (!selectedRouteId) { setError('Please select a route'); return; }
+    setLoading(true);
+    try {
+      await api.post('/route/assignStudentToRoute', {
+        routeId: selectedRouteId,
+        kidId: student._id,
+        lat: 0,
+        long: 0,
+      });
+      onSuccess();
+    } catch (e: any) {
+      setError(e?.response?.data?.message ?? 'Failed to assign route');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleUnassign(routeId: string) {
+    try {
+      await api.post('/route/removeStudentFromRoute', {
+        routeId,
+        kidId: student._id,
+      });
+      setStudentRoutes(prev => prev.filter((r: any) => r._id !== routeId));
+    } catch (e: any) {
+      setError(e?.response?.data?.message ?? 'Failed to remove from route');
+    }
+  }
+
+  const tripTypeLabel = (t: string) => t === 'pick' ? '🌅 Pick Up' : t === 'drop' ? '🌆 Drop Off' : '🔄 Pick & Drop';
+  const formatTime = (t: string) => t ? new Date(t).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '—';
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl mx-4 overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-[#1B2B6B]/10 rounded-xl flex items-center justify-center">
+              <Bus size={18} className="text-[#1B2B6B]" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">Route Assignment</h2>
+              <p className="text-xs text-gray-400">{student.fullname}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100">
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex border-b border-gray-100 px-6">
+          {(['current', 'assign'] as const).map(t => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition ${tab === t ? 'border-[#1B2B6B] text-[#1B2B6B]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+            >
+              {t === 'current' ? `Current Routes (${studentRoutes.length})` : 'Assign New Route'}
+            </button>
+          ))}
+        </div>
+
+        <div className="p-6 space-y-4 max-h-96 overflow-y-auto">
+          {tab === 'current' ? (
+            studentRoutes.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">
+                <Bus size={32} className="mx-auto mb-2 opacity-30" />
+                <p className="text-sm">No routes assigned yet</p>
+                <button onClick={() => setTab('assign')} className="mt-3 text-xs text-[#1B2B6B] font-medium hover:underline">
+                  Assign to a route →
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {studentRoutes.map((route: any) => (
+                  <div key={route._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{route.title || 'Untitled Route'}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">{tripTypeLabel(route.tripType)} · {formatTime(route.startTime)}</p>
+                    </div>
+                    <button
+                      onClick={() => handleUnassign(route._id)}
+                      className="px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition"
+                    >
+                      Unassign
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">Select Route</label>
+                {routesLoading ? (
+                  <div className="text-xs text-gray-400 py-2">Loading routes...</div>
+                ) : routes.length === 0 ? (
+                  <div className="text-xs text-gray-400 py-2">No routes found. Create a route first in Route Planner.</div>
+                ) : (
+                  <div className="space-y-2">
+                    {routes.map((route: any) => (
+                      <div
+                        key={route._id}
+                        onClick={() => setSelectedRouteId(route._id)}
+                        className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition ${
+                          selectedRouteId === route._id
+                            ? 'border-[#1B2B6B] bg-[#1B2B6B]/5'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{route.title}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            {tripTypeLabel(route.tripType)} · {route.van?.carNumber || 'No van'} · {formatTime(route.startTime)}
+                          </p>
+                        </div>
+                        {selectedRouteId === route._id && (
+                          <div className="w-5 h-5 rounded-full bg-[#1B2B6B] flex items-center justify-center shrink-0">
+                            <CheckCircle2 size={12} className="text-white" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {error && <p className="text-xs text-red-500">{error}</p>}
+              <div className="flex gap-3">
+                <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition">
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAssign}
+                  disabled={loading || !selectedRouteId}
+                  className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
+                >
+                  {loading ? 'Assigning...' : 'Assign to Route'}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function DeleteConfirm({
   count,
   onConfirm,
@@ -367,6 +572,7 @@ export default function StudentsPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [modal, setModal] = useState<'add' | 'edit' | null>(null);
+  const [assignVanTarget, setAssignVanTarget] = useState<Student | null>(null);
   const [editTarget, setEditTarget] = useState<Student | null>(null);
   const [showDelete, setShowDelete] = useState(false);
 
@@ -423,6 +629,13 @@ export default function StudentsPage() {
 
   return (
     <>
+      {assignVanTarget && (
+        <AssignVanModal
+          student={assignVanTarget}
+          onClose={() => setAssignVanTarget(null)}
+          onSuccess={() => { qc.invalidateQueries({ queryKey: ['students'] }); setAssignVanTarget(null); }}
+        />
+      )}
       {modal === 'add' && (
         <StudentModal
           mode="add"
@@ -636,6 +849,13 @@ export default function StudentsPage() {
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => setAssignVanTarget(student)}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition"
+                            title="Assign Van"
+                          >
+                            <Bus size={14} />
+                          </button>
                           <button
                             onClick={() => openEdit(student)}
                             className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition"

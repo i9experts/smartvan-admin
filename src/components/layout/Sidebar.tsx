@@ -8,26 +8,28 @@ import {
   Bell, BarChart3, Receipt, Wrench, Settings, LogOut,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/i18n/LanguageContext";
 
-const navItems = [
-  { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Live Tracking", href: "/tracking", icon: MapPin },
-  { label: "Student Management", href: "/students", icon: School },
-  { label: "Van & Driver Mgmt", href: "/vans", icon: Bus },
-  { label: "Parent Management", href: "/parents", icon: Users },
-  { label: "Route Planner", href: "/routes", icon: Route },
-  { label: "Alerts Overview", href: "/alerts", icon: Bell, badge: 3 },
-  { label: "Analytics", href: "/analytics", icon: BarChart3 },
-  { label: "Billing", href: "/billing", icon: Receipt, superadminOnly: true },
-  { label: "Fleet Management", href: "/fleet", icon: Wrench },
-  { label: "Attendance", href: "/attendance", icon: Users },
-  { label: "Fee Management", href: "/fees", icon: Users },
-  { label: "School Leads", href: "/leads", icon: Users, superadminOnly: true },
+const navItems: { labelKey: string; href: string; icon: any; badge?: number; superadminOnly?: boolean }[] = [
+  { labelKey: "nav.overview", href: "/dashboard", icon: LayoutDashboard },
+  { labelKey: "nav.liveTracking", href: "/tracking", icon: MapPin },
+  { labelKey: "nav.studentManagement", href: "/students", icon: School },
+  { labelKey: "nav.vanDriverMgmt", href: "/vans", icon: Bus },
+  { labelKey: "nav.parentManagement", href: "/parents", icon: Users },
+  { labelKey: "nav.routePlanner", href: "/routes", icon: Route },
+  { labelKey: "nav.alertsOverview", href: "/alerts", icon: Bell, badge: 3 },
+  { labelKey: "nav.analytics", href: "/analytics", icon: BarChart3 },
+  { labelKey: "nav.billing", href: "/billing", icon: Receipt, superadminOnly: true },
+  { labelKey: "nav.fleetManagement", href: "/fleet", icon: Wrench },
+  { labelKey: "nav.attendance", href: "/attendance", icon: Users },
+  { labelKey: "nav.feeManagement", href: "/fees", icon: Users },
+  { labelKey: "nav.schoolLeads", href: "/leads", icon: Users, superadminOnly: true },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
   const { user: admin, logout } = useAuth();
+  const { t, isRTL } = useLanguage();
 
   return (
     <aside className="w-[190px] bg-white border-r border-sv-border flex flex-col flex-shrink-0 h-screen sticky top-0">
@@ -52,7 +54,7 @@ export function Sidebar() {
               )}
             >
               <item.icon size={16} className="flex-shrink-0" />
-              <span className="flex-1 truncate">{item.label}</span>
+              <span className="flex-1 truncate">{t(item.labelKey)}</span>
               {item.badge && !active && (
                 <span className="bg-sv-red text-white text-[9px] font-medium px-1.5 py-0.5 rounded-full">
                   {item.badge}

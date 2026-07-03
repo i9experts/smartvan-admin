@@ -1,6 +1,7 @@
 "use client";
 import { Bell, Search } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/i18n/LanguageContext";
 import Link from "next/link";
 
 interface TopbarProps {
@@ -9,6 +10,7 @@ interface TopbarProps {
 
 export function Topbar({ title }: TopbarProps) {
   const { user: admin } = useAuth();
+  const { language, setLanguage } = useLanguage();
 
   return (
     <header className="h-[50px] bg-white border-b border-sv-border flex items-center px-5 gap-3 flex-shrink-0 sticky top-0 z-20">
@@ -22,6 +24,13 @@ export function Topbar({ title }: TopbarProps) {
       )}
 
       <div className="ml-auto flex items-center gap-2.5">
+        {/* Language Switcher */}
+        <button
+          onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+          className="flex items-center gap-1.5 px-2.5 py-1 border border-gray-200 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50 transition"
+        >
+          {language === 'en' ? '🇸🇦 العربية' : '🇬🇧 English'}
+        </button>
         {/* Live indicator */}
         <div className="flex items-center gap-1.5 text-[11px] text-sv-muted">
           <span className="w-[7px] h-[7px] rounded-full bg-sv-green animate-pulse" />

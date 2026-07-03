@@ -414,6 +414,24 @@ export default function FeesPage() {
     } finally { setGenerating(false); }
   }
 
+  async function sendWhatsAppReminder(payment: any) {
+    try {
+      await api.post('/whatsapp/send-fee-reminder', {
+        to: payment.parentPhone,
+        parentName: payment.parentName || 'Parent',
+        studentName: payment.studentName || 'Student',
+        amount: payment.amount,
+        currency: payment.currency || schoolCurrency,
+        month: payment.month,
+      });
+      setGenMsg('✓ WhatsApp reminder sent to ' + (payment.parentName || 'parent'));
+      setTimeout(() => setGenMsg(''), 4000);
+    } catch (e: any) {
+      setGenMsg('✗ Failed to send WhatsApp: ' + (e?.response?.data?.message ?? 'Error'));
+      setTimeout(() => setGenMsg(''), 4000);
+    }
+  }
+
   async function sendReminders() {
     setSendingReminders(true);
     try {
@@ -723,11 +741,11 @@ export default function FeesPage() {
                         <td className="p-4"><StatusBadge status={u.status} /></td>
                         <td className="p-4">
                           {u.parentPhone && (
-                            <a href={`https://wa.me/${u.parentPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Dear Parent, this is a reminder that the transport fee of ${formatCurrency(u.amount, u.currency)} for ${u.studentName} is due for ${u.month}. Please contact the school to arrange payment. Thank you.`)}`}
-                              target="_blank" rel="noopener noreferrer"
+                            <button
+                              onClick={() => sendWhatsAppReminder(u)}
                               className="flex items-center gap-1 px-2.5 py-1.5 bg-green-50 text-green-700 border border-green-200 rounded-lg text-xs font-medium hover:bg-green-100 transition">
                               <Smartphone size={12} /> WhatsApp
-                            </a>
+                            </button>
                           )}
                         </td>
                         <td className="p-4">
