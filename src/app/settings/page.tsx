@@ -7,7 +7,7 @@ import {
   Save, Camera, MapPin, Phone, Mail, Globe,
   ChevronRight, CheckCircle2, AlertCircle, Eye, EyeOff,
   Sun, Moon, Monitor, Zap, Bus, Users, Route,
-  Info, Lock, LogOut, Loader2,
+  Info, Lock, LogOut, Loader2, MessageSquare,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 
@@ -38,6 +38,10 @@ interface SchoolProfile {
   status?: string;
   currency?: string;
   country?: string;
+  waConnected?: boolean;
+  waPhoneNumber?: string;
+  waPhoneNumberId?: string;
+  wabaId?: string;
 }
 
 interface AdminProfile {
@@ -164,6 +168,39 @@ export default function SettingsPage() {
   const [showCurrentPw, setShowCurrentPw] = useState(false);
   const [showNewPw, setShowNewPw] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('light');
+  const [waForm, setWaForm] = useState({ wabaId: '', waPhoneNumberId: '', waAccessToken: '', waPhoneNumber: '' });
+  const [waConnecting, setWaConnecting] = useState(false);
+  const [waMsg, setWaMsg] = useState('');
+
+  async function connectWhatsApp() {
+    if (!waForm.waPhoneNumberId || !waForm.waAccessToken) {
+      setWaMsg('Please fill in Phone Number ID and Access Token');
+      return;
+    }
+    setWaConnecting(true);
+    try {
+      await api.post('/Admin/connectWhatsApp', waForm);
+      setWaMsg('✓ WhatsApp connected successfully!');
+      qc.invalidateQueries({ queryKey: ['school-profile'] });
+      setTimeout(() => setWaMsg(''), 4000);
+    } catch (e: any) {
+      setWaMsg('✗ ' + (e?.response?.data?.message ?? 'Connection failed'));
+    } finally {
+      setWaConnecting(false);
+    }
+  }
+
+  async function disconnectWhatsApp() {
+    try {
+      await api.post('/Admin/disconnectWhatsApp', {});
+      setWaMsg('WhatsApp disconnected');
+      qc.invalidateQueries({ queryKey: ['school-profile'] });
+      setTimeout(() => setWaMsg(''), 3000);
+    } catch (e: any) {
+      setWaMsg('✗ ' + (e?.response?.data?.message ?? 'Failed to disconnect'));
+    }
+  }
+
   const [notifPrefs, setNotifPrefs] = useState<NotifPrefs>(DEFAULT_NOTIF);
 
   // Password form
@@ -640,6 +677,106 @@ export default function SettingsPage() {
                 </div>
                 <p className="text-xs text-gray-400 mt-3">* SOS alerts cannot be disabled for safety reasons.</p>
               </div>
+            </div>
+          )}
+
+          {/* ── WhatsApp Business ── */}
+          {activeSection === 'notifications' && (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-5">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
+                  <MessageSquare size={20} className="text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900">WhatsApp Business API</h3>
+                  <p className="text-xs text-gray-400">Connect your school's WhatsApp number to send alerts and fee reminders</p>
+                </div>
+                {profileData?.waConnected && (
+                  <span className="ml-auto px-3 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full flex items-center gap-1">
+                    <span className="w-2 h-2 bg-green-500 rounded-full"></span> Connected
+                  </span>
+                )}
+              </div>
+
+              {profileData?.waConnected ? (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 p-4 bg-green-50 rounded-xl border border-green-100">
+                    <MessageSquare size={20} className="text-green-600 shrink-0" />
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">{profileData?.waPhoneNumber || 'Connected'}</p>
+                      <p className="text-xs text-gray-500">WhatsApp Business number is active and sending messages</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={disconnectWhatsApp}
+                    className="px-4 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-xl hover:bg-red-50 transition"
+                  >
+                    Disconnect WhatsApp
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 text-xs text-blue-700">
+                    <p className="font-semibold mb-1">How to get these credentials:</p>
+                    <ol className="list-decimal list-inside space-y-1">
+                      <li>Go to developers.facebook.com → Your App → WhatsApp</li>
+                      <li>Register your school's phone number</li>
+                      <li>Copy the Phone Number ID and Access Token</li>
+                      <li>Paste them below and click Connect</li>
+                    </ol>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">WhatsApp Phone Number</label>
+                      <input
+                        value={waForm.waPhoneNumber}
+                        onChange={e => setWaForm(f => ({ ...f, waPhoneNumber: e.target.value }))}
+                        placeholder="+923001234567"
+                        className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">WABA ID (WhatsApp Business Account ID)</label>
+                      <input
+                        value={waForm.wabaId}
+                        onChange={e => setWaForm(f => ({ ...f, wabaId: e.target.value }))}
+                        placeholder="174423462430305"
+                        className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Phone Number ID</label>
+                      <input
+                        value={waForm.waPhoneNumberId}
+                        onChange={e => setWaForm(f => ({ ...f, waPhoneNumberId: e.target.value }))}
+                        placeholder="1114306941775163"
+                        className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Access Token</label>
+                      <input
+                        type="password"
+                        value={waForm.waAccessToken}
+                        onChange={e => setWaForm(f => ({ ...f, waAccessToken: e.target.value }))}
+                        placeholder="Your WhatsApp API access token"
+                        className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30"
+                      />
+                    </div>
+                  </div>
+                  {waMsg && (
+                    <p className={`text-xs font-medium ${waMsg.startsWith('✓') ? 'text-green-600' : 'text-red-500'}`}>{waMsg}</p>
+                  )}
+                  <button
+                    onClick={connectWhatsApp}
+                    disabled={waConnecting}
+                    className="w-full py-3 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    <MessageSquare size={16} />
+                    {waConnecting ? 'Connecting...' : 'Connect WhatsApp'}
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
