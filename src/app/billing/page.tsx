@@ -1,416 +1,330 @@
 'use client';
-
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
-  Plus, Search, Pencil, X, AlertCircle,
-  ChevronLeft, ChevronRight, FileText,
-  CheckCircle2, Clock, XCircle, DollarSign,
-  Building2, Calendar, CreditCard,
+  CreditCard, CheckCircle2, Clock, AlertCircle,
+  DollarSign, Bus, FileText, ExternalLink,
+  Zap, Shield, TrendingUp, Building2, Users,
+  XCircle, RefreshCw,
 } from 'lucide-react';
-import { invoiceApi, schoolApi } from '@/lib/api';
 import { api } from '@/lib/api';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface Invoice {
-  _id: string;
-  schoolId: string;
-  billingCycle?: string;
-  planType?: string;
-  startDate?: string;
-  paymentMethod?: string;
-  amount?: string;
-  invoiceStatus?: string;
-  notes?: string;
-  createdAt: string;
-  school?: { name?: string; email?: string };
+function formatCurrency(amount: number, currency: string) {
+  if (currency === 'PKR') return `PKR ${amount.toLocaleString()}`;
+  return `$${amount.toLocaleString()} ${currency}`;
 }
 
-interface InvoiceForm {
-  schoolId: string;
-  billingCycle: string;
-  planType: string;
-  startDate: string;
-  paymentMethod: string;
-  amount: string;
-  invoiceStatus: string;
-  notes: string;
+function formatDate(date: string) {
+  return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-const EMPTY_FORM: InvoiceForm = {
-  schoolId: '',
-  billingCycle: 'Monthly',
-  planType: 'Per Student',
-  startDate: '',
-  paymentMethod: 'Stripe',
-  amount: '',
-  invoiceStatus: 'Pending',
-  notes: '',
-};
-
-const BILLING_CYCLES = ['Monthly', 'Quarterly', 'Annually'];
-const PLAN_TYPES = ['Per Student', 'Flat Rate', 'Per Van', 'Enterprise'];
-const PAYMENT_METHODS = ['Stripe', 'Bank Transfer', 'Cash', 'Cheque'];
-const INVOICE_STATUSES = ['Pending', 'Paid', 'Overdue', 'Cancelled'];
-
-// ─── Status Badge ─────────────────────────────────────────────────────────────
-
-function InvoiceStatusBadge({ status }: { status?: string }) {
-  const s = status?.toLowerCase() ?? 'pending';
-  if (s === 'paid') return <span className="flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-full"><CheckCircle2 size={11} /> Paid</span>;
-  if (s === 'overdue') return <span className="flex items-center gap-1 px-2.5 py-1 bg-red-50 text-red-600 text-xs font-medium rounded-full"><XCircle size={11} /> Overdue</span>;
-  if (s === 'cancelled') return <span className="flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full"><X size={11} /> Cancelled</span>;
-  return <span className="flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-medium rounded-full"><Clock size={11} /> Pending</span>;
+function useRole() {
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem('smartvan_token');
+      if (!token) return;
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      setIsSuperAdmin(payload.role === 'superadmin');
+    } catch {}
+  }, []);
+  return isSuperAdmin;
 }
 
-// ─── Invoice Modal ────────────────────────────────────────────────────────────
-
-interface InvoiceModalProps {
-  mode: 'add' | 'edit';
-  invoice?: Invoice | null;
-  schools: any[];
-  onClose: () => void;
-  onSuccess: () => void;
-}
-
-function InvoiceModal({ mode, invoice, schools, onClose, onSuccess }: InvoiceModalProps) {
-  const [form, setForm] = useState<InvoiceForm>(
-    invoice
-      ? {
-          schoolId: invoice.schoolId ?? '',
-          billingCycle: invoice.billingCycle ?? 'Monthly',
-          planType: invoice.planType ?? 'Per Student',
-          startDate: invoice.startDate ?? '',
-          paymentMethod: invoice.paymentMethod ?? 'Stripe',
-          amount: invoice.amount ?? '',
-          invoiceStatus: invoice.invoiceStatus ?? 'Pending',
-          notes: invoice.notes ?? '',
-        }
-      : EMPTY_FORM
-  );
+// ─── School Admin Billing View ────────────────────────────────────────────────
+function SchoolBillingView() {
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const addMutation = useMutation({
-    mutationFn: () => api.post('/Invoice/createInvoice', form),
-    onSuccess: () => { onSuccess(); onClose(); },
-    onError: (e: any) => setError(e?.response?.data?.message ?? 'Failed to create invoice'),
-  });
-
-  const editMutation = useMutation({
-    mutationFn: () => api.post('/Invoice/editInvoice', { invoiceId: invoice!._id, ...form }),
-    onSuccess: () => { onSuccess(); onClose(); },
-    onError: (e: any) => setError(e?.response?.data?.message ?? 'Failed to update invoice'),
-  });
-
-  function handleSubmit() {
-    if (!form.schoolId) { setError('School is required.'); return; }
-    if (!form.amount) { setError('Amount is required.'); return; }
-    setError('');
-    mode === 'add' ? addMutation.mutate() : editMutation.mutate();
-  }
-
-  const isLoading = addMutation.isPending || editMutation.isPending;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#1B2B6B]/10 rounded-xl flex items-center justify-center">
-              <FileText size={18} className="text-[#1B2B6B]" />
-            </div>
-            <h2 className="text-lg font-bold text-gray-900">{mode === 'add' ? 'Create Invoice' : 'Edit Invoice'}</h2>
-          </div>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
-            <X size={16} />
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">School *</label>
-            <select
-              value={form.schoolId}
-              onChange={e => setForm(f => ({ ...f, schoolId: e.target.value }))}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
-            >
-              <option value="">Select school…</option>
-              {schools.map((s: any) => (
-                <option key={s._id} value={s._id}>{s.name ?? s.email ?? s._id}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Billing Cycle</label>
-              <select value={form.billingCycle} onChange={e => setForm(f => ({ ...f, billingCycle: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30">
-                {BILLING_CYCLES.map(c => <option key={c}>{c}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Plan Type</label>
-              <select value={form.planType} onChange={e => setForm(f => ({ ...f, planType: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30">
-                {PLAN_TYPES.map(p => <option key={p}>{p}</option>)}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Amount *</label>
-              <input
-                value={form.amount}
-                onChange={e => setForm(f => ({ ...f, amount: e.target.value }))}
-                placeholder="e.g. 450.00 USD"
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Start Date</label>
-              <input
-                type="date"
-                value={form.startDate}
-                onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Payment Method</label>
-              <select value={form.paymentMethod} onChange={e => setForm(f => ({ ...f, paymentMethod: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30">
-                {PAYMENT_METHODS.map(m => <option key={m}>{m}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Status</label>
-              <select value={form.invoiceStatus} onChange={e => setForm(f => ({ ...f, invoiceStatus: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30">
-                {INVOICE_STATUSES.map(s => <option key={s}>{s}</option>)}
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">Notes</label>
-            <textarea
-              value={form.notes}
-              onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-              rows={2}
-              placeholder="Optional notes…"
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 resize-none"
-            />
-          </div>
-
-          {error && (
-            <div className="flex items-center gap-2 p-3 bg-red-50 text-red-600 rounded-xl text-xs">
-              <AlertCircle size={14} /> {error}
-            </div>
-          )}
-        </div>
-
-        <div className="flex gap-3 mt-5">
-          <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition">Cancel</button>
-          <button onClick={handleSubmit} disabled={isLoading} className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50">
-            {isLoading ? 'Saving…' : mode === 'add' ? 'Create Invoice' : 'Save Changes'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Main Page ────────────────────────────────────────────────────────────────
-
-export default function BillingPage() {
-  const qc = useQueryClient();
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
-  const [modal, setModal] = useState<'add' | 'edit' | null>(null);
-  const [editTarget, setEditTarget] = useState<Invoice | null>(null);
-
-  const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['invoices', page, search],
-    queryFn: () => api.get('/Invoice/getAllInvoicesBySuperAdmin', { params: { page, limit: 10, search: search || undefined } }),
-    select: r => r.data,
+  const { data: status, isLoading: statusLoading } = useQuery({
+    queryKey: ['billing-status'],
+    queryFn: () => api.get('/billing/status').then(r => r.data),
     staleTime: 30_000,
   });
 
-  const { data: schools = [] } = useQuery({
-    queryKey: ['schools-list'],
-    queryFn: () => schoolApi.getAll({ page: 1, limit: 100 }),
-    select: r => r.data?.data ?? [],
-    staleTime: 120_000,
+  const { data: history = [], isLoading: historyLoading } = useQuery({
+    queryKey: ['billing-history'],
+    queryFn: () => api.get('/billing/history').then(r => r.data),
+    staleTime: 60_000,
   });
 
-  const invoices: Invoice[] = data?.data ?? [];
-  const total: number = data?.total ?? 0;
-  const totalPages = Math.ceil(total / 10);
+  async function handleSubscribe() {
+    setCheckoutLoading(true);
+    setError('');
+    try {
+      const res = await api.post('/billing/create-checkout', {});
+      if (res.data?.sessionUrl) window.location.href = res.data.sessionUrl;
+    } catch (e: any) {
+      setError(e?.response?.data?.message ?? 'Failed to create checkout session');
+    } finally {
+      setCheckoutLoading(false);
+    }
+  }
 
-  // Summary stats
-  const paid = invoices.filter(i => i.invoiceStatus?.toLowerCase() === 'paid').length;
-  const pending = invoices.filter(i => i.invoiceStatus?.toLowerCase() === 'pending').length;
-  const overdue = invoices.filter(i => i.invoiceStatus?.toLowerCase() === 'overdue').length;
+  const bill = status?.bill;
+  const subscription = status?.subscription;
+  const isActive = status?.status === 'active';
 
   return (
-    <>
-      {modal === 'add' && (
-        <InvoiceModal mode="add" schools={schools} onClose={() => setModal(null)} onSuccess={() => qc.invalidateQueries({ queryKey: ['invoices'] })} />
-      )}
-      {modal === 'edit' && editTarget && (
-        <InvoiceModal mode="edit" invoice={editTarget} schools={schools} onClose={() => setModal(null)} onSuccess={() => qc.invalidateQueries({ queryKey: ['invoices'] })} />
+    <div className="p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Billing & Subscription</h1>
+          <p className="text-sm text-gray-400 mt-0.5">Manage your SmartVan subscription</p>
+        </div>
+        {isActive && (
+          <span className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 text-sm font-semibold rounded-xl border border-green-200">
+            <CheckCircle2 size={16} /> Active Subscription
+          </span>
+        )}
+      </div>
+
+      {error && (
+        <div className="flex items-center gap-2 p-4 bg-red-50 text-red-600 rounded-xl border border-red-100 text-sm">
+          <AlertCircle size={16} /> {error}
+        </div>
       )}
 
-      <div className="p-6 space-y-5">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Billing</h1>
-            <p className="text-sm text-gray-400 mt-0.5">{total} invoice{total !== 1 ? 's' : ''} total</p>
+      {statusLoading ? (
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-pulse h-48" />
+      ) : bill && (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-gradient-to-r from-[#1B2B6B] to-[#2D4099] p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/70 text-sm">Monthly Bill</p>
+                <p className="text-4xl font-bold text-white mt-1">{formatCurrency(bill.totalAmount, bill.currency)}</p>
+                <p className="text-white/70 text-sm mt-1">{bill.totalVans} active van{bill.totalVans !== 1 ? 's' : ''}</p>
+              </div>
+              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
+                <CreditCard size={32} className="text-white" />
+              </div>
+            </div>
           </div>
-          <button
-            onClick={() => setModal('add')}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"
-          >
-            <Plus size={16} /> Create Invoice
-          </button>
+          <div className="p-6">
+            <h3 className="text-sm font-bold text-gray-900 mb-4">Van Breakdown</h3>
+            <div className="space-y-3">
+              {bill.breakdown.map((item: any, i: number) => (
+                <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-[#1B2B6B]/10 rounded-xl flex items-center justify-center">
+                      <Bus size={18} className="text-[#1B2B6B]" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{item.carNumber}</p>
+                      <p className="text-xs text-gray-400">{item.label}</p>
+                    </div>
+                  </div>
+                  <p className="text-sm font-semibold text-gray-900">{formatCurrency(item.amount, item.currency)}/mo</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isActive ? 'bg-green-50' : 'bg-amber-50'}`}>
+              {isActive ? <CheckCircle2 size={20} className="text-green-600" /> : <Clock size={20} className="text-amber-600" />}
+            </div>
+            <div>
+              <p className="text-sm font-bold text-gray-900">Subscription Status</p>
+              <p className={`text-xs font-medium ${isActive ? 'text-green-600' : 'text-amber-600'}`}>{status?.plan || 'No Plan'}</p>
+            </div>
+          </div>
+          {subscription && (
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Next billing date</span>
+                <span className="font-medium text-gray-900">{formatDate(subscription.currentPeriodEnd)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Auto-renew</span>
+                <span className={`font-medium ${subscription.cancelAtPeriodEnd ? 'text-red-500' : 'text-green-600'}`}>
+                  {subscription.cancelAtPeriodEnd ? 'Cancelled' : 'Active'}
+                </span>
+              </div>
+            </div>
+          )}
+          {!isActive && (
+            <button
+              onClick={handleSubscribe}
+              disabled={checkoutLoading}
+              className="mt-4 w-full py-3 bg-[#1B2B6B] text-white text-sm font-semibold rounded-xl hover:bg-[#162356] transition disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              <Zap size={16} />
+              {checkoutLoading ? 'Redirecting to payment...' : 'Subscribe Now'}
+            </button>
+          )}
         </div>
 
-        {/* Summary cards */}
-        {!isLoading && (
-          <div className="grid grid-cols-3 gap-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <p className="text-sm font-bold text-gray-900 mb-4">What&apos;s Included</p>
+          <div className="space-y-3">
             {[
-              { label: 'Paid', value: paid, icon: <CheckCircle2 size={18} />, color: '#10B981', bg: '#F0FDF4' },
-              { label: 'Pending', value: pending, icon: <Clock size={18} />, color: '#F59E0B', bg: '#FFFBEB' },
-              { label: 'Overdue', value: overdue, icon: <XCircle size={18} />, color: '#EF4444', bg: '#FEF2F2' },
-            ].map(item => (
-              <div key={item.label} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              { icon: <TrendingUp size={15} />, text: 'Real-time GPS tracking' },
+              { icon: <Shield size={15} />, text: 'Student attendance & safety' },
+              { icon: <Bus size={15} />, text: 'Fleet management' },
+              { icon: <CreditCard size={15} />, text: 'Fee collection & reports' },
+              { icon: <CheckCircle2 size={15} />, text: 'WhatsApp notifications' },
+              { icon: <DollarSign size={15} />, text: 'Parent mobile app access' },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 text-sm text-gray-600">
+                <span className="text-green-600">{item.icon}</span>
+                {item.text}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h3 className="text-sm font-bold text-gray-900 mb-4">Payment History</h3>
+        {historyLoading ? (
+          <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-12 bg-gray-100 rounded-xl" />)}</div>
+        ) : history.length === 0 ? (
+          <div className="text-center py-10 text-gray-400">
+            <FileText size={32} className="mx-auto mb-2 opacity-30" />
+            <p className="text-sm">No payment history yet</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {history.map((inv: any) => (
+              <div key={inv.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: item.bg }}>
-                    <span style={{ color: item.color }}>{item.icon}</span>
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${inv.status === 'paid' ? 'bg-green-50' : 'bg-red-50'}`}>
+                    {inv.status === 'paid' ? <CheckCircle2 size={16} className="text-green-600" /> : <AlertCircle size={16} className="text-red-500" />}
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">{item.label}</p>
-                    <p className="text-2xl font-bold text-gray-800">{item.value}</p>
+                    <p className="text-sm font-medium text-gray-900">{formatCurrency(inv.amount, inv.currency)}</p>
+                    <p className="text-xs text-gray-400">{formatDate(inv.date)}</p>
                   </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${inv.status === 'paid' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+                    {inv.status}
+                  </span>
+                  {inv.pdfUrl && (
+                    <a href={inv.pdfUrl} target="_blank" rel="noopener noreferrer"
+                      className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-200 text-gray-400 transition">
+                      <ExternalLink size={13} />
+                    </a>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
 
-        {/* Search */}
-        <div className="relative max-w-sm">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            value={search}
-            onChange={e => { setSearch(e.target.value); setPage(1); }}
-            placeholder="Search by school…"
-            className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
-          />
-        </div>
+// ─── Superadmin Billing Dashboard ─────────────────────────────────────────────
+function SuperAdminBillingView() {
+  const { data: schools = [], isLoading } = useQuery({
+    queryKey: ['all-schools-billing'],
+    queryFn: () => api.get('/billing/all-schools').then(r => r.data),
+    staleTime: 60_000,
+  });
 
-        {/* Table */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-100 bg-gray-50/50">
-                  <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">School</th>
-                  <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Plan</th>
-                  <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Amount</th>
-                  <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Payment</th>
-                  <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Start Date</th>
-                  <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
-                  <th className="p-4 w-16" />
-                </tr>
-              </thead>
-              <tbody>
-                {isLoading ? (
-                  Array.from({ length: 6 }).map((_, i) => (
-                    <tr key={i} className="border-b border-gray-50 animate-pulse">
-                      {Array.from({ length: 7 }).map((_, j) => (
-                        <td key={j} className="p-4"><div className="h-4 bg-gray-100 rounded" /></td>
-                      ))}
-                    </tr>
-                  ))
-                ) : invoices.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="p-12 text-center">
-                      <FileText size={32} className="mx-auto text-gray-200 mb-3" />
-                      <p className="text-sm text-gray-400">{search ? 'No invoices match your search.' : 'No invoices yet. Create one above.'}</p>
-                    </td>
-                  </tr>
-                ) : (
-                  invoices.map(invoice => (
-                    <tr key={invoice._id} className="border-b border-gray-50 hover:bg-gray-50/50 transition">
-                      <td className="p-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-[#1B2B6B]/10 rounded-lg flex items-center justify-center shrink-0">
-                            <Building2 size={14} className="text-[#1B2B6B]" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-gray-800">
-                              {invoice.school?.name ?? invoice.schoolId?.slice(-8) ?? '—'}
-                            </p>
-                            <p className="text-xs text-gray-400">{invoice.billingCycle ?? '—'}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4 text-sm text-gray-600">{invoice.planType ?? '—'}</td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-1 text-sm font-semibold text-gray-800">
-                          <DollarSign size={13} className="text-gray-400" />
-                          {invoice.amount ?? '—'}
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-1 text-sm text-gray-600">
-                          <CreditCard size={13} className="text-gray-400" />
-                          {invoice.paymentMethod ?? '—'}
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-1 text-xs text-gray-500">
-                          <Calendar size={12} className="text-gray-400" />
-                          {invoice.startDate ?? new Date(invoice.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <InvoiceStatusBadge status={invoice.invoiceStatus} />
-                      </td>
-                      <td className="p-4">
-                        <button
-                          onClick={() => { setEditTarget(invoice); setModal('edit'); }}
-                          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 transition"
-                        >
-                          <Pencil size={14} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+  const active = schools.filter((s: any) => s.subscriptionStatus === 'active').length;
+  const inactive = schools.filter((s: any) => s.subscriptionStatus !== 'active').length;
 
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
-              <span className="text-xs text-gray-400">Page {page} of {totalPages} · {total} total</span>
-              <div className="flex items-center gap-1">
-                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1 || isFetching} className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition">
-                  <ChevronLeft size={14} />
-                </button>
-                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages || isFetching} className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition">
-                  <ChevronRight size={14} />
-                </button>
+  return (
+    <div className="p-6 space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Billing Dashboard</h1>
+        <p className="text-sm text-gray-400 mt-0.5">Monitor all school subscriptions</p>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-3 gap-5">
+        {[
+          { label: 'Total Schools', value: schools.length, icon: <Building2 size={20} />, color: 'text-[#1B2B6B]', bg: 'bg-blue-50' },
+          { label: 'Active', value: active, icon: <CheckCircle2 size={20} />, color: 'text-green-600', bg: 'bg-green-50' },
+          { label: 'Inactive', value: inactive, icon: <XCircle size={20} />, color: 'text-red-500', bg: 'bg-red-50' },
+        ].map((kpi, i) => (
+          <div key={i} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 ${kpi.bg} rounded-xl flex items-center justify-center ${kpi.color}`}>
+                {kpi.icon}
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{kpi.value}</p>
+                <p className="text-xs text-gray-400">{kpi.label}</p>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        ))}
       </div>
-    </>
+
+      {/* Schools List */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="p-5 border-b border-gray-100">
+          <h3 className="text-sm font-bold text-gray-900">All School Subscriptions</h3>
+        </div>
+        {isLoading ? (
+          <div className="p-5 animate-pulse space-y-3">
+            {[1,2,3].map(i => <div key={i} className="h-14 bg-gray-100 rounded-xl" />)}
+          </div>
+        ) : schools.length === 0 ? (
+          <div className="text-center py-16 text-gray-400">
+            <Users size={40} className="mx-auto mb-3 opacity-30" />
+            <p className="text-sm font-medium">No subscribed schools yet</p>
+            <p className="text-xs mt-1">Schools will appear here once they subscribe</p>
+          </div>
+        ) : (
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-100">
+                {['School', 'Status', 'Next Billing', 'Actions'].map(h => (
+                  <th key={h} className="p-4 text-left text-xs font-semibold text-gray-500 uppercase">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {schools.map((school: any) => (
+                <tr key={school.schoolId} className="border-b border-gray-50 hover:bg-gray-50/50">
+                  <td className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-[#1B2B6B]/10 rounded-lg flex items-center justify-center text-[#1B2B6B] font-bold text-sm">
+                        {school.schoolName?.[0] || 'S'}
+                      </div>
+                      <p className="text-sm font-medium text-gray-900">{school.schoolName}</p>
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
+                      school.subscriptionStatus === 'active'
+                        ? 'bg-green-50 text-green-700'
+                        : 'bg-red-50 text-red-600'
+                    }`}>
+                      {school.subscriptionStatus === 'active' ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td className="p-4 text-sm text-gray-600">
+                    {school.currentPeriodEnd ? formatDate(school.currentPeriodEnd) : '—'}
+                  </td>
+                  <td className="p-4">
+                    <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 transition">
+                      <RefreshCw size={13} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
   );
+}
+
+// ─── Main Page ─────────────────────────────────────────────────────────────────
+export default function BillingPage() {
+  const isSuperAdmin = useRole();
+  return isSuperAdmin ? <SuperAdminBillingView /> : <SchoolBillingView />;
 }

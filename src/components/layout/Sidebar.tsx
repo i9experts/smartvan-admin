@@ -19,7 +19,7 @@ const navItems: { labelKey: string; href: string; icon: any; badge?: number; sup
   { labelKey: "nav.routePlanner", href: "/routes", icon: Route },
   { labelKey: "nav.alertsOverview", href: "/alerts", icon: Bell, badge: 3 },
   { labelKey: "nav.analytics", href: "/analytics", icon: BarChart3 },
-  { labelKey: "nav.billing", href: "/billing", icon: Receipt, superadminOnly: true },
+  { labelKey: "nav.billing", href: "/billing", icon: Receipt, superadminOnly: false },
   { labelKey: "nav.fleetManagement", href: "/fleet", icon: Wrench },
   { labelKey: "nav.attendance", href: "/attendance", icon: Users },
   { labelKey: "nav.feeManagement", href: "/fees", icon: Users },
