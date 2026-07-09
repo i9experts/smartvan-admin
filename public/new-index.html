@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartVan – School Transport Intelligence</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png">
+<meta name="theme-color" content="#1B2B6B">
+<meta property="og:title" content="SmartVan – School Transport Intelligence">
+<meta property="og:description" content="Live GPS tracking, real-time alerts, and smart fleet management for schools across Pakistan and the Gulf.">
+<meta property="og:image" content="https://www.smartvan.pk/SmartVan_web_logo.png">
+<meta property="og:url" content="https://www.smartvan.pk">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="description" content="Live GPS tracking, real-time alerts, and smart fleet management for schools across Pakistan and the Gulf. Know exactly where every child is, every moment.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B2B6B;
+  --navy-dark:#111d4a;
+  --navy-light:#243580;
+  --yellow:#FFB800;
+  --yellow-dark:#e6a600;
+  --teal:#00C48C;
+  --red:#FF4B4B;
+  --orange:#FF8C42;
+  --green:#27AE60;
+  --blue:#4A90E2;
+  --bg:#F8F9FC;
+  --white:#FFFFFF;
+  --text:#1a1a2e;
+  --text-muted:#6b7280;
+  --text-light:#9ca3af;
+  --border:#e5e7eb;
+  --border-light:#f3f4f6;
+  --radius:12px;
+  --radius-sm:8px;
+  --radius-lg:20px;
+  --shadow:0 4px 24px rgba(27,43,107,0.08);
+  --shadow-lg:0 12px 48px rgba(27,43,107,0.16);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;color:var(--text);background:var(--white);overflow-x:hidden}
+h1,h2,h3,h4,h5{font-family:'Sora',sans-serif;line-height:1.2}
+
+/* ───── NAV ───── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 2rem;height:68px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-logo{display:flex;align-items:center;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:2rem;list-style:none}
+.nav-links a{text-decoration:none;color:var(--text-muted);font-size:0.9rem;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--navy)}
+.nav-cta{display:flex;gap:0.75rem;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;text-decoration:none;border:none;transition:all .2s}
+.btn-outline{background:transparent;border:1.5px solid var(--navy);color:var(--navy)}
+.btn-outline:hover{background:var(--navy);color:var(--white)}
+.btn-primary{background:var(--navy);color:var(--white)}
+.btn-primary:hover{background:var(--navy-dark);transform:translateY(-1px);box-shadow:var(--shadow)}
+.btn-yellow{background:var(--yellow);color:var(--navy);font-weight:700}
+.btn-yellow:hover{background:var(--yellow-dark);transform:translateY(-1px)}
+.btn-lg{padding:14px 32px;font-size:1rem;border-radius:var(--radius)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.hamburger span{display:block;width:24px;height:2px;background:var(--navy);border-radius:2px;transition:all .3s}
+
+/* ───── HERO ───── */
+#hero{min-height:100vh;background:linear-gradient(135deg,var(--navy-dark) 0%,var(--navy) 60%,#1e3a8a 100%);display:flex;align-items:center;padding:100px 2rem 60px;position:relative;overflow:hidden}
+.hero-grid{max-width:1200px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,184,0,0.15);border:1px solid rgba(255,184,0,0.3);border-radius:100px;padding:6px 16px;font-size:0.8rem;font-weight:600;color:var(--yellow);margin-bottom:1.5rem}
+.hero-badge span{width:6px;height:6px;background:var(--yellow);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+.hero-content h1{font-size:clamp(2.2rem,4vw,3.4rem);font-weight:800;color:var(--white);line-height:1.15;margin-bottom:1.25rem}
+.hero-content h1 em{color:var(--yellow);font-style:normal}
+.hero-content p{font-size:1.1rem;color:rgba(255,255,255,0.72);line-height:1.7;margin-bottom:2rem;max-width:480px}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
+.hero-stats{display:flex;gap:2rem;margin-top:2.5rem}
+.hero-stat{text-align:left}
+.hero-stat .num{font-family:'Sora',sans-serif;font-size:1.6rem;font-weight:800;color:var(--yellow)}
+.hero-stat .lbl{font-size:0.78rem;color:rgba(255,255,255,0.55);font-weight:500}
+
+/* ── Map Illustration ── */
+.hero-visual{position:relative;height:440px}
+.map-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:1.5rem;height:100%;position:relative;overflow:hidden}
+.map-card::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='rgba(255,255,255,0.06)' fill='none'%3E%3Ccircle cx='200' cy='200' r='60'/%3E%3Ccircle cx='200' cy='200' r='110'/%3E%3Ccircle cx='200' cy='200' r='160'/%3E%3C/g%3E%3C/svg%3E") center/cover;opacity:0.5}
+.route-svg{width:100%;height:100%;position:relative;z-index:1}
+.van-popup{position:absolute;top:18px;right:18px;background:rgba(255,255,255,0.95);border-radius:12px;padding:10px 14px;min-width:170px;box-shadow:var(--shadow)}
+.van-popup .vp-head{font-family:'Sora',sans-serif;font-size:0.78rem;font-weight:700;color:var(--navy);margin-bottom:6px}
+.van-popup .vp-row{display:flex;justify-content:space-between;font-size:0.72rem;color:var(--text-muted);margin-bottom:3px}
+.van-popup .vp-val{font-weight:600;color:var(--text)}
+.live-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(0,196,140,0.15);border-radius:100px;padding:4px 10px;font-size:0.7rem;font-weight:700;color:var(--teal);margin-bottom:6px}
+.live-badge span{width:6px;height:6px;background:var(--teal);border-radius:50%;animation:pulse 1.5s ease-in-out infinite}
+
+/* floating cards */
+.float-card{position:absolute;background:var(--white);border-radius:10px;box-shadow:var(--shadow-lg);padding:10px 14px;font-size:0.78rem;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:8px;white-space:nowrap}
+.float-card .dot{width:8px;height:8px;border-radius:50%}
+.fc1{bottom:80px;left:-20px;animation:float1 4s ease-in-out infinite}
+.fc2{top:60px;left:10px;animation:float2 5s ease-in-out infinite}
+@keyframes float1{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes float2{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(0.85)}}
+/* van animation on SVG */
+@keyframes driveRoute{0%{offset-distance:0%}100%{offset-distance:100%}}
+
+/* ───── SECTION SHELL ───── */
+section{padding:80px 2rem}
+.section-inner{max-width:1200px;margin:0 auto}
+.section-tag{display:inline-block;background:rgba(27,43,107,0.08);color:var(--navy);font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:1rem}
+.section-title{font-size:clamp(1.7rem,3vw,2.5rem);font-weight:800;color:var(--navy);margin-bottom:0.75rem}
+.section-sub{font-size:1.05rem;color:var(--text-muted);line-height:1.7;max-width:580px}
+.text-center{text-align:center}
+.text-center .section-sub{margin:0 auto}
+
+/* ───── LOGOS BAR ───── */
+#logos{padding:32px 2rem;background:var(--bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.logos-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:0;justify-content:space-between;flex-wrap:wrap}
+.logos-label{font-size:0.8rem;color:var(--text-light);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;margin-right:1rem}
+.school-logo{font-family:'Sora',sans-serif;font-size:0.95rem;font-weight:700;color:var(--text-muted);opacity:0.6;padding:0 1.5rem}
+
+/* ───── FEATURES ───── */
+#features{background:var(--bg)}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem}
+.feat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;transition:all .25s;cursor:default}
+.feat-card:hover{border-color:var(--navy);box-shadow:var(--shadow-lg);transform:translateY(-4px)}
+.feat-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;font-size:1.5rem}
+.feat-icon.navy{background:rgba(27,43,107,0.1)}
+.feat-icon.yellow{background:rgba(255,184,0,0.15)}
+.feat-icon.teal{background:rgba(0,196,140,0.12)}
+.feat-icon.red{background:rgba(255,75,75,0.1)}
+.feat-icon.orange{background:rgba(255,140,66,0.1)}
+.feat-icon.green{background:rgba(39,174,96,0.1)}
+.feat-card h3{font-size:1.05rem;font-weight:700;color:var(--navy);margin-bottom:0.5rem}
+.feat-card p{font-size:0.875rem;color:var(--text-muted);line-height:1.65}
+
+/* ───── HOW IT WORKS ───── */
+.how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:3rem;position:relative}
+.how-grid::before{content:'';position:absolute;top:32px;left:12.5%;right:12.5%;height:2px;background:linear-gradient(90deg,var(--navy),var(--yellow));z-index:0}
+.how-step{text-align:center;padding:0 1rem;position:relative;z-index:1}
+.step-num{width:64px;height:64px;border-radius:50%;background:var(--navy);color:var(--white);font-family:'Sora',sans-serif;font-size:1.3rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;border:4px solid var(--white);box-shadow:0 0 0 2px var(--navy)}
+.how-step h3{font-size:0.95rem;font-weight:700;color:var(--navy);margin-bottom:0.4rem}
+.how-step p{font-size:0.8rem;color:var(--text-muted);line-height:1.6}
+
+/* ───── PRICING ───── */
+#pricing{background:var(--bg)}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem;align-items:start}
+.price-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:2rem;transition:all .25s;position:relative}
+.price-card.popular{border-color:var(--navy);box-shadow:var(--shadow-lg)}
+.popular-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--yellow);color:var(--navy);font-family:'Sora',sans-serif;font-size:0.72rem;font-weight:800;padding:4px 16px;border-radius:100px;white-space:nowrap;letter-spacing:0.04em}
+.price-plan{font-size:0.78rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.5rem}
+.price-amount{display:flex;align-items:baseline;gap:4px;margin:0.75rem 0}
+.price-amount .currency{font-size:1.1rem;font-weight:600;color:var(--text-muted);margin-top:4px}
+.price-amount .amount{font-family:'Sora',sans-serif;font-size:2.8rem;font-weight:800;color:var(--navy)}
+.price-amount .period{font-size:0.85rem;color:var(--text-muted)}
+.price-desc{font-size:0.85rem;color:var(--text-muted);margin-bottom:1.5rem;line-height:1.6}
+.price-features{list-style:none;margin-bottom:2rem}
+.price-features li{display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--text);padding:6px 0;border-bottom:1px solid var(--border-light)}
+.price-features li:last-child{border:none}
+.price-features li .check{color:var(--teal);font-size:1rem;flex-shrink:0;margin-top:1px}
+.price-features li .cross{color:var(--text-light)}
+.price-note{text-align:center;margin-top:2rem;font-size:0.82rem;color:var(--text-muted)}
+.price-toggle{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:2rem}
+.toggle-label{font-size:0.9rem;font-weight:600;color:var(--text-muted)}
+.toggle-label.active{color:var(--navy)}
+.toggle-switch{width:48px;height:26px;background:var(--navy);border-radius:100px;position:relative;cursor:pointer;transition:background .3s}
+.toggle-switch::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:var(--white);border-radius:50%;transition:transform .3s}
+.toggle-switch.annual::after{transform:translateX(22px)}
+.save-badge{background:rgba(0,196,140,0.15);color:var(--teal);font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:100px}
+
+/* ───── ONBOARDING WIZARD ───── */
+#onboarding{background:var(--navy-dark)}
+.wizard-wrap{max-width:720px;margin:3rem auto 0;background:var(--white);border-radius:24px;overflow:hidden;box-shadow:var(--shadow-lg)}
+.wizard-header{background:var(--navy);padding:2rem;text-align:center}
+.wizard-header h2{color:var(--white);font-size:1.4rem;margin-bottom:0.25rem}
+.wizard-header p{color:rgba(255,255,255,0.6);font-size:0.85rem}
+.wizard-steps{display:flex;padding:0 2rem;background:var(--bg);border-bottom:1px solid var(--border)}
+.wz-step{flex:1;padding:1rem 0.5rem;text-align:center;font-size:0.72rem;font-weight:600;color:var(--text-light);position:relative;cursor:pointer}
+.wz-step::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:transparent;transition:background .3s}
+.wz-step.active{color:var(--navy)}
+.wz-step.active::after{background:var(--navy)}
+.wz-step.done{color:var(--teal)}
+.wizard-body{padding:2.5rem 2rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.form-group{margin-bottom:1rem}
+.form-group.full{grid-column:1/-1}
+label{display:block;font-size:0.8rem;font-weight:600;color:var(--navy);margin-bottom:5px}
+input,select,textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:0.875rem;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);transition:border-color .2s;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--navy)}
+textarea{resize:vertical;min-height:80px}
+.wizard-footer{display:flex;justify-content:space-between;align-items:center;padding:1.5rem 2rem;border-top:1px solid var(--border);background:var(--bg)}
+.wz-progress{display:flex;gap:6px}
+.wz-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .3s}
+.wz-dot.active{background:var(--navy)}
+.wz-dot.done{background:var(--teal)}
+.success-screen{text-align:center;padding:3rem 2rem}
+.success-icon{width:80px;height:80px;background:rgba(0,196,140,0.12);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.5rem;margin:0 auto 1.5rem}
+.success-screen h3{font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem}
+.success-screen p{color:var(--text-muted);font-size:0.9rem;line-height:1.7;max-width:420px;margin:0 auto 1.5rem}
+
+/* ───── TEST ACCOUNT ───── */
+#test-account{background:var(--white)}
+.test-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2.5rem}
+.test-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.75rem;position:relative;overflow:hidden}
+.test-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+.test-card.admin::before{background:var(--navy)}
+.test-card.parent::before{background:var(--teal)}
+.test-card.driver::before{background:var(--yellow)}
+.test-card h3{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:1rem}
+.cred-row{display:flex;justify-content:space-between;margin-bottom:0.5rem}
+.cred-label{font-size:0.75rem;color:var(--text-muted);font-weight:600}
+.cred-val{font-size:0.8rem;font-family:'Inter',sans-serif;background:var(--white);border:1px solid var(--border);border-radius:6px;padding:3px 8px;color:var(--text);font-weight:500}
+.test-access-btn{margin-top:1rem;width:100%}
+
+/* ───── TESTIMONIALS ───── */
+#testimonials{background:var(--bg)}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2.5rem}
+.testi-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.75rem}
+.stars{color:var(--yellow);font-size:0.9rem;margin-bottom:1rem;letter-spacing:2px}
+.testi-card blockquote{font-size:0.88rem;color:var(--text);line-height:1.7;margin-bottom:1.25rem;font-style:italic}
+.testi-author{display:flex;align-items:center;gap:10px}
+.avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:0.85rem;font-weight:700;color:var(--white)}
+.av-navy{background:var(--navy)}.av-teal{background:var(--teal)}.av-yellow{background:var(--yellow);color:var(--navy)}
+.testi-name{font-size:0.85rem;font-weight:700;color:var(--navy)}
+.testi-role{font-size:0.75rem;color:var(--text-muted)}
+
+/* ───── FAQ ───── */
+#faq{background:var(--white)}
+.faq-list{max-width:760px;margin:2.5rem auto 0}
+.faq-item{border-bottom:1px solid var(--border);overflow:hidden}
+.faq-q{display:flex;justify-content:space-between;align-items:center;padding:1.25rem 0;cursor:pointer;font-weight:600;font-size:0.95rem;color:var(--navy);gap:1rem}
+.faq-q .icon{width:24px;height:24px;flex-shrink:0;border:1.5px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85rem;color:var(--text-muted);transition:all .3s}
+.faq-item.open .faq-q .icon{background:var(--navy);border-color:var(--navy);color:var(--white);transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .25s;font-size:0.875rem;color:var(--text-muted);line-height:1.7}
+.faq-item.open .faq-a{max-height:200px;padding-bottom:1.25rem}
+
+/* ───── CONTACT ───── */
+#contact{background:var(--bg)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;margin-top:2.5rem}
+.contact-info h3{font-size:1.1rem;font-weight:700;color:var(--navy);margin-bottom:1.5rem}
+.contact-item{display:flex;gap:14px;margin-bottom:1.5rem}
+.contact-item .icon{width:44px;height:44px;background:var(--white);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.contact-item h4{font-size:0.85rem;font-weight:700;color:var(--navy)}
+.contact-item p{font-size:0.82rem;color:var(--text-muted);line-height:1.6}
+.contact-form-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem}
+.form-sent{display:none;text-align:center;padding:2rem;color:var(--teal);font-weight:600}
+
+/* ───── CTA BANNER ───── */
+#cta-banner{background:var(--yellow);padding:60px 2rem}
+.cta-inner{max-width:700px;margin:0 auto;text-align:center}
+.cta-inner h2{font-size:clamp(1.8rem,3vw,2.5rem);font-weight:800;color:var(--navy);margin-bottom:0.75rem}
+.cta-inner p{color:rgba(27,43,107,0.7);font-size:1rem;margin-bottom:2rem}
+
+/* ───── FOOTER ───── */
+footer{background:var(--navy-dark);color:rgba(255,255,255,0.6);padding:60px 2rem 32px}
+.footer-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+.footer-brand p{font-size:0.85rem;line-height:1.7;margin:1rem 0;max-width:280px}
+.footer-col h4{font-family:'Sora',sans-serif;font-size:0.85rem;font-weight:700;color:var(--white);margin-bottom:1rem;letter-spacing:0.04em}
+.footer-col ul{list-style:none}
+.footer-col ul li{margin-bottom:0.6rem}
+.footer-col ul a{color:rgba(255,255,255,0.55);text-decoration:none;font-size:0.83rem;transition:color .2s}
+.footer-col ul a:hover{color:var(--yellow)}
+.footer-bottom{max-width:1200px;margin:0 auto;padding-top:2rem;border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:center;flex-wrap:gap;font-size:0.78rem;gap:1rem;flex-wrap:wrap}
+.footer-legal{display:flex;gap:1.5rem}
+.footer-legal a{color:rgba(255,255,255,0.45);text-decoration:none;transition:color .2s}
+.footer-legal a:hover{color:var(--yellow)}
+.social-links{display:flex;gap:10px}
+.social-link{width:34px;height:34px;background:rgba(255,255,255,0.08);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;color:rgba(255,255,255,0.6);text-decoration:none;transition:all .2s}
+.social-link:hover{background:var(--yellow);color:var(--navy)}
+
+/* ───── MODALS ───── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:999;padding:2rem;overflow-y:auto}
+.modal-overlay.open{display:flex;align-items:flex-start;justify-content:center}
+.modal-box{background:var(--white);border-radius:var(--radius-lg);max-width:720px;width:100%;margin:auto;position:relative}
+.modal-head{padding:1.75rem 2rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-head h2{font-size:1.25rem;color:var(--navy)}
+.modal-close{width:32px;height:32px;border:none;background:var(--bg);border-radius:8px;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;color:var(--text-muted)}
+.modal-body{padding:2rem;font-size:0.88rem;color:var(--text-muted);line-height:1.8;max-height:70vh;overflow-y:auto}
+.modal-body h3{font-size:1rem;color:var(--navy);font-weight:700;margin:1.5rem 0 0.5rem}
+.modal-body h3:first-child{margin-top:0}
+.modal-body p{margin-bottom:0.75rem}
+.modal-body ul{margin:0.5rem 0 0.75rem 1.25rem}
+.modal-body ul li{margin-bottom:0.4rem}
+
+/* ───── NOTIFICATIONS ───── */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--navy);color:var(--white);padding:12px 20px;border-radius:12px;font-size:0.875rem;font-weight:600;z-index:9999;transform:translateY(100px);opacity:0;transition:all .4s;display:flex;align-items:center;gap:8px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast .t-icon{background:var(--teal);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:0.7rem}
+
+/* ───── RESPONSIVE ───── */
+@media(max-width:1024px){
+  .features-grid{grid-template-columns:repeat(2,1fr)}
+  .how-grid{grid-template-columns:repeat(2,1fr);gap:2rem}
+  .how-grid::before{display:none}
+  .pricing-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:768px){
+  /* ── Navigation ── */
+  .hero-grid{grid-template-columns:1fr}
+  .hero-visual{height:260px;margin-top:1.5rem}
+  .nav-links{display:none}
+  .hamburger{display:flex}
+  nav{padding:0 1rem}
+  .nav-ctas{gap:0.5rem}
+  .nav-ctas .btn{padding:8px 14px;font-size:0.8rem}
+
+  /* ── Hero ── */
+  section#hero{padding:100px 1rem 60px}
+  .hero-badge{font-size:0.75rem;padding:6px 14px}
+  h1{font-size:clamp(2rem,8vw,2.8rem) !important;line-height:1.15}
+  .hero-sub{font-size:0.95rem}
+  .hero-ctas{flex-direction:column;gap:0.75rem}
+  .hero-ctas .btn{width:100%;justify-content:center;padding:14px 24px}
+  .hero-stats{gap:1rem;margin-top:2rem}
+  .hero-stats .stat{min-width:80px}
+  .stat-num{font-size:1.8rem !important}
+
+  /* ── Sections ── */
+  section{padding:60px 1rem}
+  .section-title{font-size:clamp(1.4rem,5vw,1.8rem) !important}
+  .section-sub{font-size:0.9rem}
+
+  /* ── Features ── */
+  .features-grid{grid-template-columns:1fr}
+  .feature-card{padding:1.25rem}
+
+  /* ── How it works ── */
+  .how-grid{grid-template-columns:1fr;gap:1.5rem}
+  .how-grid::before{display:none}
+  .how-step{padding:1.25rem}
+
+  /* ── Pricing ── */
+  .pricing-grid{grid-template-columns:1fr}
+  .price-card{padding:1.5rem}
+  .price-card.popular{order:-1}
+  #pricing > .section-inner > div[style*="grid-template-columns:repeat(3"]{grid-template-columns:1fr !important}
+  #calc-result{flex-direction:column;gap:1rem;text-align:center}
+
+  /* ── Demo Section ── */
+  .test-cards{grid-template-columns:1fr}
+  .test-card{padding:1.5rem}
+  div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important}
+
+  /* ── Testimonials ── */
+  .testi-grid{grid-template-columns:1fr}
+
+  /* ── Contact ── */
+  .contact-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+
+  /* ── Wizard ── */
+  .wizard-wrap{padding:0}
+  .wizard-header{padding:1.25rem 1.25rem 0}
+  .wizard-body{padding:1.25rem}
+  .wizard-footer{padding:1rem 1.25rem}
+  .wizard-steps{gap:0.5rem;padding:1rem 1.25rem}
+  .wz-step{font-size:0.75rem;padding:6px 10px}
+
+  /* ── Footer ── */
+  .footer-grid{grid-template-columns:1fr;gap:2rem}
+  .footer-bottom{flex-direction:column;text-align:center;gap:1rem}
+  footer{padding:40px 1rem 24px}
+
+  /* ── Logos strip ── */
+  .logos-inner{gap:1rem;justify-content:center}
+  .school-logo{font-size:0.8rem;padding:0 0.75rem}
+
+  /* ── FAQ ── */
+  .faq-q{font-size:0.9rem;padding:1rem}
+  .faq-a{font-size:0.85rem}
+
+  /* ── CTA Banner ── */
+  div[style*="background:var(--yellow)"]{padding:2.5rem 1.25rem !important}
+  div[style*="background:var(--yellow)"] h2{font-size:1.5rem !important}
+  div[style*="background:var(--yellow)"] .hero-ctas{flex-direction:column}
+
+  /* ── Pricing Calculator ── */
+  div[style*="grid-template-columns:repeat(3,1fr)"]{grid-template-columns:1fr !important}
+  
+  /* ── Contact info box ── */
+  div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important;gap:1.5rem !important}
+}
+
+/* ── Extra small screens ── */
+@media(max-width:400px){
+  h1{font-size:1.8rem !important}
+  .btn-lg{padding:12px 20px;font-size:0.9rem}
+  .price-amount .amount{font-size:2.2rem}
+  .hero-stats{flex-direction:column;align-items:flex-start;gap:0.75rem}
+}
+
+/* ─── Animated Route Van ─── */
+.route-path{stroke:rgba(255,184,0,0.5);stroke-width:3;fill:none;stroke-dasharray:6 4}
+.school-pin,.home-pin{filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))}
+.animated-van{animation:driveAlong 6s ease-in-out infinite}
+@keyframes driveAlong{
+  0%{transform:translate(60px,200px)}
+  20%{transform:translate(120px,160px)}
+  40%{transform:translate(180px,130px)}
+  60%{transform:translate(240px,110px)}
+  80%{transform:translate(300px,140px)}
+  100%{transform:translate(60px,200px)}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ NAV ═══════════ -->
+<nav id="navbar">
+  <a class="nav-logo" href="#">
+    <img src="SmartVan_web_logo.png" alt="SmartVan Logo" style="height:52px;width:169px;object-fit:contain;display:block">
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how-it-works">How It Works</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a class="btn btn-outline" href="#test-account">Try Free</a>
+    <a class="btn btn-primary" href="#onboarding">Get Started</a>
+  </div>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section id="hero">
+  <div class="hero-grid">
+    <div class="hero-content">
+      <div class="hero-badge"><span></span> Live GPS Tracking — Pakistan & Gulf</div>
+      <h1>Know Where Every<br><em>Child Is,</em><br>Every Moment.</h1>
+      <p>SmartVan brings real-time school transport intelligence to schools, parents, and fleet managers. Live tracking, smart ETAs, SOS alerts, and automated attendance — in one platform.</p>
+      <div class="hero-actions">
+        <a class="btn btn-yellow btn-lg" href="#onboarding">Start Free Trial →</a>
+        <a class="btn btn-outline btn-lg" href="#test-account" style="border-color:rgba(255,255,255,0.4);color:white">View Demo</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="num">200+</div>
+          <div class="lbl">Schools Onboarded</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num">12K+</div>
+          <div class="lbl">Students Tracked</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num">99.8%</div>
+          <div class="lbl">Uptime SLA</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="map-card">
+        <svg class="route-svg" viewBox="0 0 400 340" xmlns="http://www.w3.org/2000/svg">
+          <!-- Grid lines -->
+          <g stroke="rgba(255,255,255,0.05)" stroke-width="1">
+            <line x1="0" y1="85" x2="400" y2="85"/><line x1="0" y1="170" x2="400" y2="170"/>
+            <line x1="0" y1="255" x2="400" y2="255"/><line x1="100" y1="0" x2="100" y2="340"/>
+            <line x1="200" y1="0" x2="200" y2="340"/><line x1="300" y1="0" x2="300" y2="340"/>
+          </g>
+          <!-- Route path -->
+          <path class="route-path" d="M60,230 Q110,180 160,155 Q210,130 270,115 Q320,108 350,130"/>
+          <!-- Stop circles -->
+          <circle cx="60" cy="230" r="8" fill="rgba(255,184,0,0.3)" stroke="#FFB800" stroke-width="2"/>
+          <circle cx="160" cy="155" r="6" fill="rgba(255,184,0,0.3)" stroke="#FFB800" stroke-width="1.5"/>
+          <circle cx="270" cy="115" r="6" fill="rgba(255,184,0,0.3)" stroke="#FFB800" stroke-width="1.5"/>
+          <!-- School pin -->
+          <g transform="translate(330,115)">
+            <circle r="14" fill="#1B2B6B" stroke="white" stroke-width="2"/>
+            <text x="0" y="5" text-anchor="middle" fill="white" font-size="12">🏫</text>
+          </g>
+          <!-- Home pins -->
+          <g transform="translate(60,220)">
+            <circle r="10" fill="#00C48C" stroke="white" stroke-width="2"/>
+            <text x="0" y="4" text-anchor="middle" fill="white" font-size="10">🏠</text>
+          </g>
+          <g transform="translate(160,150)">
+            <circle r="9" fill="#4A90E2" stroke="white" stroke-width="2"/>
+            <text x="0" y="4" text-anchor="middle" fill="white" font-size="9">🏠</text>
+          </g>
+          <!-- Animated Van -->
+          <g class="animated-van">
+            <rect x="-14" y="-8" width="28" height="16" rx="4" fill="#FFB800"/>
+            <rect x="-10" y="-6" width="10" height="8" rx="2" fill="rgba(27,43,107,0.6)"/>
+            <circle cx="-8" cy="8" r="4" fill="#1B2B6B"/>
+            <circle cx="6" cy="8" r="4" fill="#1B2B6B"/>
+          </g>
+          <!-- Labels -->
+          <text x="65" y="215" fill="rgba(255,255,255,0.6)" font-size="9" font-family="Inter">Stop A</text>
+          <text x="165" y="142" fill="rgba(255,255,255,0.6)" font-size="9" font-family="Inter">Stop B</text>
+          <text x="275" y="102" fill="rgba(255,255,255,0.6)" font-size="9" font-family="Inter">Stop C</text>
+          <text x="318" y="148" fill="rgba(255,255,255,0.6)" font-size="9" font-family="Inter">School</text>
+        </svg>
+        <!-- Popup info card -->
+        <div class="van-popup">
+          <div class="live-badge"><span></span> LIVE</div>
+          <div class="vp-head">Van SV-001 • Route A</div>
+          <div class="vp-row"><span>Speed</span><span class="vp-val">42 km/h</span></div>
+          <div class="vp-row"><span>ETA School</span><span class="vp-val">8 min</span></div>
+          <div class="vp-row"><span>Students</span><span class="vp-val">14 / 18</span></div>
+        </div>
+      </div>
+      <!-- Floating alert cards -->
+      <div class="float-card fc1"><div class="dot" style="background:#00C48C"></div> Aisha picked up ✓</div>
+      <div class="float-card fc2"><div class="dot" style="background:#FFB800"></div> SOS resolved — Driver OK</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ LOGO BAR ═══════════ -->
+<div id="logos">
+  <div class="logos-inner">
+    <span class="logos-label">Trusted By</span>
+    <span class="school-logo">Beaconhouse</span>
+    <span class="school-logo">The City School</span>
+    <span class="school-logo">Roots Academy</span>
+    <span class="school-logo">DHA Schools</span>
+    <span class="school-logo">Al Noor Academy</span>
+    <span class="school-logo">Pakistan International School</span>
+  </div>
+</div>
+
+<!-- ═══════════ FEATURES ═══════════ -->
+<section id="features">
+  <div class="section-inner">
+    <div class="text-center">
+      <span class="section-tag">Platform Features</span>
+      <h2 class="section-title">Everything Transport Management Needs</h2>
+      <p class="section-sub">Built specifically for school transport in Pakistan and the Gulf — PDPA compliant, Arabic-ready, and priced for local markets.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon navy">📍</div>
+        <h3>Live GPS Tracking</h3>
+        <p>Real-time location updates every 5 seconds. Parents see the van on a Google Map in their app — no more anxious calling.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon yellow">⏱️</div>
+        <h3>Smart ETA Engine</h3>
+        <p>ML-powered arrival predictions that account for traffic, stops, and historical data. Accurate within 2 minutes on most routes.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon teal">🛡️</div>
+        <h3>SOS Emergency Alerts</h3>
+        <p>One-tap SOS from driver or parent. School admin and guardian notified instantly with last known location and driver contact.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon red">🔔</div>
+        <h3>Push Notifications</h3>
+        <p>Pickup confirmations, route deviations, late arrivals, and custom school announcements sent to every parent in real time.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon orange">📋</div>
+        <h3>Digital Attendance</h3>
+        <p>Driver marks pickup and drop-off. Automated attendance synced to school admin panel. No paper registers ever again.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon green">🗂️</div>
+        <h3>Fleet & Route Management</h3>
+        <p>Manage unlimited vans, drivers, and optimised routes from one admin dashboard. Assign students to vans in seconds.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon navy">🌍</div>
+        <h3>Multi-Language & Currency</h3>
+        <p>Full Arabic RTL interface for Gulf markets (KSA, UAE, Qatar). Multi-currency billing: PKR, SAR, AED, QAR, USD — all in one platform.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon yellow">📊</div>
+        <h3>Analytics & Reports</h3>
+        <p>Weekly route efficiency, driver performance scores, on-time rates, and student attendance summaries for school management.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon teal">⛔</div>
+        <h3>Geofencing & Zone Alerts</h3>
+        <p>Define school zones and home areas. Get notified when a van enters or exits a zone — ideal for gate management.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ HOW IT WORKS ═══════════ -->
+<section id="how-it-works" style="background:var(--white)">
+  <div class="section-inner">
+    <div class="text-center">
+      <span class="section-tag">Getting Started</span>
+      <h2 class="section-title">Up and Running in 48 Hours</h2>
+      <p class="section-sub">No hardware to install. No IT team needed. SmartVan is a pure software platform that runs on any Android device.</p>
+    </div>
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="step-num">1</div>
+        <h3>Register Your School</h3>
+        <p>Fill the onboarding form below. We verify your school and activate your account within one business day.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">2</div>
+        <h3>Add Vans & Drivers</h3>
+        <p>Enter your fleet details on the admin panel. Drivers download the SmartVan Driver app — no hardware needed.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">3</div>
+        <h3>Enrol Students & Parents</h3>
+        <p>Upload student lists or add manually. Parents receive an invite code to download the parent app and track their child.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">4</div>
+        <h3>Go Live</h3>
+        <p>Activate routes and everything runs automatically. Parents track, drivers log attendance, admin monitors fleet in real time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ PRICING ═══════════ -->
+<section id="pricing">
+  <div class="section-inner">
+    <div class="text-center">
+      <span class="section-tag">Transparent Pricing</span>
+      <h2 class="section-title">Simple Plans for Every School</h2>
+      <p class="section-sub">No setup fees. No per-device charges. Cancel any time. Prices in PKR — Gulf pricing available in SAR, AED, QAR.</p>
+    </div>
+    <!-- Van Type Pricing Toggle -->
+    <div style="display:flex;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap">
+      <button onclick="showPricing('pkr')" id="btn-pkr" class="btn btn-primary" style="min-width:140px">🇵🇰 Pakistan (PKR)</button>
+      <button onclick="showPricing('usd')" id="btn-usd" class="btn btn-outline" style="min-width:140px">🌍 Gulf (USD)</button>
+    </div>
+
+    <!-- How Pricing Works Banner -->
+    <div style="background:rgba(27,43,107,0.05);border:1.5px solid rgba(27,43,107,0.12);border-radius:16px;padding:1.25rem 1.75rem;margin-bottom:2rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+      <div style="font-size:1.5rem">💡</div>
+      <div>
+        <p style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-bottom:2px">Simple Per-Van Pricing — Pay Only for What You Use</p>
+        <p style="font-size:0.82rem;color:var(--text-muted)">Add or remove vans anytime. Your bill adjusts automatically each month. No fixed plans, no hidden fees.</p>
+      </div>
+    </div>
+
+    <div class="pricing-grid" id="pricing-pkr">
+      <!-- Car/Rickshaw -->
+      <div class="price-card">
+        <div class="price-plan">Car / Auto Rickshaw</div>
+        <div><strong style="font-family:'Sora';font-size:0.8rem;color:var(--text-muted)">Ideal for 4–5 students per vehicle</strong></div>
+        <div class="price-amount">
+          <span class="currency">PKR</span>
+          <span class="amount">790</span>
+          <span class="period">/van/mo</span>
+        </div>
+        <p class="price-desc">Perfect for small transport operators and schools using cars or rickshaws for student pickup.</p>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Live GPS tracking</li>
+          <li><span class="check">✓</span> Parent app (real-time map)</li>
+          <li><span class="check">✓</span> Driver app</li>
+          <li><span class="check">✓</span> Push notifications</li>
+          <li><span class="check">✓</span> Digital attendance</li>
+          <li><span class="check">✓</span> Fee management</li>
+          <li><span class="check">✓</span> WhatsApp alerts</li>
+          <li><span class="check">✓</span> Route planning</li>
+        </ul>
+        <a class="btn btn-outline" href="#onboarding" style="width:100%;justify-content:center">Get Started</a>
+      </div>
+
+      <!-- Hiroof/Hiace - Popular -->
+      <div class="price-card popular">
+        <div class="popular-badge">⭐ Most Popular</div>
+        <div class="price-plan">Hiroof / Hiace</div>
+        <div><strong style="font-family:'Sora';font-size:0.8rem;color:var(--text-muted)">Ideal for 8–20 students per vehicle</strong></div>
+        <div class="price-amount">
+          <span class="currency">PKR</span>
+          <span class="amount">990</span>
+          <span class="period">/van/mo</span>
+        </div>
+        <p class="price-desc">The most common school transport in Pakistan. Everything you need to run a professional transport operation.</p>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Live GPS tracking</li>
+          <li><span class="check">✓</span> Parent app (real-time map)</li>
+          <li><span class="check">✓</span> Driver app</li>
+          <li><span class="check">✓</span> SOS emergency alerts</li>
+          <li><span class="check">✓</span> Geofencing & zone alerts</li>
+          <li><span class="check">✓</span> Smart ETA engine</li>
+          <li><span class="check">✓</span> WhatsApp notifications</li>
+          <li><span class="check">✓</span> Full analytics & reports</li>
+        </ul>
+        <a class="btn btn-primary btn-yellow" href="#onboarding" style="width:100%;justify-content:center">Start Free Trial</a>
+      </div>
+
+      <!-- Bus/Coach -->
+      <div class="price-card">
+        <div class="price-plan">Bus / Coach</div>
+        <div><strong style="font-family:'Sora';font-size:0.8rem;color:var(--text-muted)">Ideal for 20–40 students per vehicle</strong></div>
+        <div class="price-amount">
+          <span class="currency">PKR</span>
+          <span class="amount">1,990</span>
+          <span class="period">/van/mo</span>
+        </div>
+        <p class="price-desc">For schools running full-size buses and coaches. Advanced fleet management with route optimization.</p>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Live GPS tracking</li>
+          <li><span class="check">✓</span> Parent app (real-time map)</li>
+          <li><span class="check">✓</span> Driver app</li>
+          <li><span class="check">✓</span> SOS emergency alerts</li>
+          <li><span class="check">✓</span> Advanced route optimization</li>
+          <li><span class="check">✓</span> Multi-stop management</li>
+          <li><span class="check">✓</span> WhatsApp notifications</li>
+          <li><span class="check">✓</span> Priority support</li>
+        </ul>
+        <a class="btn btn-outline" href="#onboarding" style="width:100%;justify-content:center">Get Started</a>
+      </div>
+    </div>
+
+    <!-- Gulf Pricing -->
+    <div class="pricing-grid" id="pricing-usd" style="display:none">
+      <!-- Car -->
+      <div class="price-card">
+        <div class="price-plan">Car / Rickshaw</div>
+        <div><strong style="font-family:'Sora';font-size:0.8rem;color:var(--text-muted)">Ideal for 4–5 students per vehicle</strong></div>
+        <div class="price-amount">
+          <span class="currency">$</span>
+          <span class="amount">9</span>
+          <span class="period">/van/mo</span>
+        </div>
+        <p class="price-desc">Perfect for small transport operators in KSA, UAE, Qatar and other Gulf markets.</p>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Live GPS tracking</li>
+          <li><span class="check">✓</span> Parent app (real-time map)</li>
+          <li><span class="check">✓</span> Driver app</li>
+          <li><span class="check">✓</span> Push notifications</li>
+          <li><span class="check">✓</span> Digital attendance</li>
+          <li><span class="check">✓</span> Fee management</li>
+          <li><span class="check">✓</span> Arabic RTL support</li>
+          <li><span class="check">✓</span> SAR/AED/QAR billing</li>
+        </ul>
+        <a class="btn btn-outline" href="#onboarding" style="width:100%;justify-content:center">Get Started</a>
+      </div>
+
+      <!-- Hiroof/Hiace Gulf - Popular -->
+      <div class="price-card popular">
+        <div class="popular-badge">⭐ Most Popular</div>
+        <div class="price-plan">Hiroof / Hiace</div>
+        <div><strong style="font-family:'Sora';font-size:0.8rem;color:var(--text-muted)">Ideal for 8–20 students per vehicle</strong></div>
+        <div class="price-amount">
+          <span class="currency">$</span>
+          <span class="amount">19</span>
+          <span class="period">/van/mo</span>
+        </div>
+        <p class="price-desc">The most popular choice for Gulf schools. Full Arabic RTL interface and local currency billing.</p>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Live GPS tracking</li>
+          <li><span class="check">✓</span> Arabic RTL full support</li>
+          <li><span class="check">✓</span> Parent app (real-time map)</li>
+          <li><span class="check">✓</span> SOS emergency alerts</li>
+          <li><span class="check">✓</span> Geofencing & zone alerts</li>
+          <li><span class="check">✓</span> WhatsApp notifications</li>
+          <li><span class="check">✓</span> SAR/AED/QAR billing</li>
+          <li><span class="check">✓</span> Full analytics & reports</li>
+        </ul>
+        <a class="btn btn-primary btn-yellow" href="#onboarding" style="width:100%;justify-content:center">Start Free Trial</a>
+      </div>
+
+      <!-- Bus Gulf -->
+      <div class="price-card">
+        <div class="price-plan">Bus / Coach</div>
+        <div><strong style="font-family:'Sora';font-size:0.8rem;color:var(--text-muted)">Ideal for 20–40 students per vehicle</strong></div>
+        <div class="price-amount">
+          <span class="currency">$</span>
+          <span class="amount">39</span>
+          <span class="period">/van/mo</span>
+        </div>
+        <p class="price-desc">For Gulf schools running full-size buses. Advanced fleet management with route optimization.</p>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Live GPS tracking</li>
+          <li><span class="check">✓</span> Arabic RTL full support</li>
+          <li><span class="check">✓</span> Advanced route optimization</li>
+          <li><span class="check">✓</span> SOS emergency alerts</li>
+          <li><span class="check">✓</span> Multi-stop management</li>
+          <li><span class="check">✓</span> WhatsApp notifications</li>
+          <li><span class="check">✓</span> SAR/AED/QAR billing</li>
+          <li><span class="check">✓</span> Priority support</li>
+        </ul>
+        <a class="btn btn-outline" href="#onboarding" style="width:100%;justify-content:center">Get Started</a>
+      </div>
+    </div>
+
+    <!-- Pricing Calculator -->
+    <div style="background:var(--white);border:1.5px solid var(--border);border-radius:20px;padding:2rem;margin-top:2rem">
+      <h3 style="font-size:1.1rem;font-weight:700;color:var(--navy);margin-bottom:1.5rem;text-align:center">📊 Calculate Your Monthly Cost</h3>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem">
+        <div>
+          <label style="font-size:0.8rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:0.5rem">🚗 Cars / Rickshaws</label>
+          <input type="number" id="calc-car" min="0" value="0" oninput="calcPrice()"
+            style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-size:1rem;font-weight:600;color:var(--navy);outline:none">
+        </div>
+        <div>
+          <label style="font-size:0.8rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:0.5rem">🚐 Hiroof / Hiace</label>
+          <input type="number" id="calc-hiroof" min="0" value="0" oninput="calcPrice()"
+            style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-size:1rem;font-weight:600;color:var(--navy);outline:none">
+        </div>
+        <div>
+          <label style="font-size:0.8rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:0.5rem">🚌 Bus / Coach</label>
+          <input type="number" id="calc-bus" min="0" value="0" oninput="calcPrice()"
+            style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-size:1rem;font-weight:600;color:var(--navy);outline:none">
+        </div>
+      </div>
+      <div id="calc-result" style="background:linear-gradient(135deg,var(--navy),#2D4099);border-radius:14px;padding:1.25rem 1.75rem;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <p style="color:rgba(255,255,255,0.7);font-size:0.8rem;margin-bottom:4px">Your Estimated Monthly Cost</p>
+          <p style="color:white;font-size:0.85rem" id="calc-breakdown">Add your vans above to calculate</p>
+        </div>
+        <div style="text-align:right">
+          <p style="color:var(--yellow);font-size:2rem;font-weight:800;font-family:'Sora'" id="calc-total">PKR 0</p>
+          <a href="#onboarding" style="color:rgba(255,255,255,0.8);font-size:0.75rem;text-decoration:none">Get started →</a>
+        </div>
+      </div>
+    </div>
+    <p class="price-note" style="margin-top:1.5rem">✅ All features included in every plan &nbsp;•&nbsp; No setup fees &nbsp;•&nbsp; Cancel anytime &nbsp;•&nbsp; 14-day free trial</p>
+  </div>
+</section>
+
+<!-- ═══════════ SCHOOL ONBOARDING WIZARD ═══════════ -->
+<section id="onboarding">
+  <div class="section-inner">
+    <div class="text-center">
+      <span class="section-tag" style="background:rgba(255,184,0,0.2);color:#c8900a">Get Started</span>
+      <h2 class="section-title" style="color:var(--white)">Register Your School</h2>
+      <p class="section-sub" style="color:rgba(255,255,255,0.65);margin:0 auto">Takes 3 minutes. We'll have your account ready within 24 hours.</p>
+    </div>
+    <div class="wizard-wrap">
+      <div class="wizard-header">
+        <h2>School Onboarding</h2>
+        <p>Step <span id="step-current">1</span> of 3</p>
+      </div>
+      <!-- Steps -->
+      <div class="wizard-steps">
+        <div class="wz-step active" id="ws-1">🏫 School Info</div>
+        <div class="wz-step" id="ws-2">👤 Admin Details</div>
+        <div class="wz-step" id="ws-3">📋 Plan & Needs</div>
+      </div>
+      <!-- Body -->
+      <div class="wizard-body" id="wizard-body">
+        <!-- Step 1 -->
+        <div id="step1">
+          <div class="form-row">
+            <div class="form-group">
+              <label>School Name *</label>
+              <input type="text" id="school-name" placeholder="e.g. Beaconhouse North Campus" required>
+            </div>
+            <div class="form-group">
+              <label>School Type *</label>
+              <select id="school-type">
+                <option value="">Select type…</option>
+                <option>Private School</option>
+                <option>Government School</option>
+                <option>International School</option>
+                <option>University / College</option>
+                <option>Transport Company</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Country *</label>
+              <select id="country">
+                <option value="">Select country…</option>
+                <option>Pakistan</option>
+                <option>Saudi Arabia</option>
+                <option>UAE</option>
+                <option>Qatar</option>
+                <option>Kuwait</option>
+                <option>Bahrain</option>
+                <option>Oman</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>City *</label>
+              <input type="text" id="city" placeholder="e.g. Lahore">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>School Address</label>
+            <input type="text" id="address" placeholder="Full postal address">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Number of Vans</label>
+              <select id="van-count">
+                <option>1–3 vans</option>
+                <option>4–10 vans</option>
+                <option>11–30 vans</option>
+                <option>30+ vans</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Number of Students</label>
+              <select id="student-count">
+                <option>Up to 60</option>
+                <option>61–200</option>
+                <option>201–500</option>
+                <option>500+</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <!-- Step 2 (hidden) -->
+        <div id="step2" style="display:none">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Admin Full Name *</label>
+              <input type="text" id="admin-name" placeholder="First & Last name">
+            </div>
+            <div class="form-group">
+              <label>Designation *</label>
+              <input type="text" id="designation" placeholder="e.g. Transport Manager">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Work Email *</label>
+              <input type="email" id="admin-email" placeholder="admin@yourschool.edu">
+            </div>
+            <div class="form-group">
+              <label>WhatsApp / Phone *</label>
+              <input type="tel" id="phone" placeholder="+92 300 0000000">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Password *</label>
+            <input type="password" id="pwd" placeholder="Min 8 chars, include a number">
+          </div>
+          <div class="form-group">
+            <label>Confirm Password *</label>
+            <input type="password" id="pwd2" placeholder="Repeat password">
+          </div>
+        </div>
+        <!-- Step 3 (hidden) -->
+        <div id="step3" style="display:none">
+          <div class="form-group">
+            <label>Van Type *</label>
+            <select id="plan-select">
+              <option value="car_pkr">🚗 Car / Auto Rickshaw — PKR 790/van/month</option>
+              <option value="hiroof_pkr" selected>🚐 Hiroof / Hiace — PKR 990/van/month (Most Popular)</option>
+              <option value="bus_pkr">🚌 Bus / Coach — PKR 1,990/van/month</option>
+              <option value="hiroof_usd">🚐 Hiroof / Hiace — $19/van/month (Gulf)</option>
+              <option value="bus_usd">🚌 Bus / Coach — $39/van/month (Gulf)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Billing Currency</label>
+            <select id="currency">
+              <option>PKR – Pakistani Rupee</option>
+              <option>SAR – Saudi Riyal</option>
+              <option>AED – UAE Dirham</option>
+              <option>QAR – Qatari Riyal</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Key Challenges (optional)</label>
+            <textarea id="challenges" placeholder="Tell us what problems you want SmartVan to solve for your school…"></textarea>
+          </div>
+          <div class="form-group">
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-weight:400;color:var(--text)">
+              <input type="checkbox" id="tos" style="width:16px;height:16px;margin-top:2px;flex-shrink:0">
+              I agree to SmartVan's <a href="#" onclick="openModal('terms-modal');return false" style="color:var(--navy)">Terms of Service</a> and <a href="#" onclick="openModal('privacy-modal');return false" style="color:var(--navy)">Privacy Policy</a>
+            </label>
+          </div>
+        </div>
+        <!-- Success -->
+        <div id="step-success" style="display:none" class="success-screen">
+          <div class="success-icon">✅</div>
+          <h3>Application Submitted!</h3>
+          <p>We've received your school registration. Our team will review and activate your SmartVan account within <strong>1 business day</strong>. Check your email for next steps.</p>
+          <a class="btn btn-primary" href="https://smartvanride.com/auth/login" target="_blank">Go to Admin Panel →</a>
+        </div>
+      </div>
+      <!-- Footer with progress dots -->
+      <div class="wizard-footer" id="wizard-footer">
+        <div class="wz-progress">
+          <div class="wz-dot active" id="dot1"></div>
+          <div class="wz-dot" id="dot2"></div>
+          <div class="wz-dot" id="dot3"></div>
+        </div>
+        <div style="display:flex;gap:0.75rem">
+          <button class="btn btn-outline" id="btn-back" style="display:none" onclick="wizardBack()">← Back</button>
+          <button class="btn btn-primary" id="btn-next" onclick="wizardNext()">Next Step →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ DEMO REQUEST ═══════════ -->
+<section id="test-account" style="background:var(--white)">
+  <div class="section-inner">
+    <div class="text-center">
+      <span class="section-tag">Live Demo</span>
+      <h2 class="section-title">See SmartVan in Action</h2>
+      <p class="section-sub">Request a personalized demo and we'll walk you through the entire platform — live, with your school's requirements in mind.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2.5rem">
+      <div class="test-card admin" style="text-align:center">
+        <div style="font-size:2.5rem;margin-bottom:1rem">🖥️</div>
+        <h3 style="margin-bottom:0.75rem">Admin Dashboard</h3>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.6">Full fleet management, student tracking, fee collection and real-time analytics — all in one place.</p>
+        <a class="btn btn-primary test-access-btn" href="#onboarding">Request Demo →</a>
+      </div>
+      <div class="test-card parent" style="text-align:center">
+        <div style="font-size:2.5rem;margin-bottom:1rem">📱</div>
+        <h3 style="margin-bottom:0.75rem">Parent App</h3>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.6">Real-time van tracking, pickup/drop alerts, attendance history and fee payment — all in parents' hands.</p>
+        <a class="btn btn-primary test-access-btn" href="https://play.google.com/store/apps/details?id=com.smartvan" target="_blank" style="background:var(--teal)">Download App →</a>
+      </div>
+      <div class="test-card driver" style="text-align:center">
+        <div style="font-size:2.5rem;margin-bottom:1rem">🚐</div>
+        <h3 style="margin-bottom:0.75rem">Driver App</h3>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.6">Route navigation, student attendance, SOS alerts and trip management — built for drivers on the road.</p>
+        <a class="btn btn-primary test-access-btn" href="https://play.google.com/store/apps/details?id=com.smartvan.driver" target="_blank" style="background:var(--navy)">Download App →</a>
+      </div>
+    </div>
+    <!-- Contact Info -->
+    <div style="margin-top:3rem;background:linear-gradient(135deg,var(--navy),#2D4099);border-radius:20px;padding:2.5rem;display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center">
+      <div>
+        <h3 style="color:white;font-size:1.3rem;font-weight:700;margin-bottom:0.75rem">Talk to Our Team</h3>
+        <p style="color:rgba(255,255,255,0.7);font-size:0.9rem;line-height:1.7;margin-bottom:1.5rem">Have questions? Our team is ready to help you get started. Contact us via WhatsApp, email or phone.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem">
+          <a href="mailto:info@smartvan.pk" style="color:var(--yellow);text-decoration:none;font-size:0.9rem;display:flex;align-items:center;gap:8px">
+            <span>📧</span> info@smartvan.pk
+          </a>
+          <a href="https://wa.me/923211181555" target="_blank" style="color:var(--yellow);text-decoration:none;font-size:0.9rem;display:flex;align-items:center;gap:8px">
+            <span>💬</span> +92 321 118 1555 (WhatsApp)
+          </a>
+          <a href="https://smartvanride.com" style="color:var(--yellow);text-decoration:none;font-size:0.9rem;display:flex;align-items:center;gap:8px">
+            <span>🌐</span> smartvanride.com
+          </a>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1rem">
+        <a href="#onboarding" class="btn btn-primary btn-yellow" style="justify-content:center;font-size:1rem;padding:14px 24px">
+          🚀 Register Your School
+        </a>
+        <a href="mailto:info@smartvan.pk" class="btn btn-outline" style="justify-content:center;border-color:rgba(255,255,255,0.3);color:white;font-size:0.9rem">
+          📧 Email Us for a Demo
+        </a>
+        <a href="https://wa.me/923211181555?text=Hi%20SmartVan%2C%20I%27d%20like%20to%20request%20a%20demo%20for%20my%20school." target="_blank" class="btn" style="justify-content:center;background:#25D366;color:white;font-size:0.9rem;padding:12px 24px;border-radius:12px;display:flex;align-items:center;gap:8px;font-weight:600;text-decoration:none">
+          💬 WhatsApp Us
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ TESTIMONIALS ═══════════ -->
+<section id="testimonials">
+  <div class="section-inner">
+    <div class="text-center">
+      <span class="section-tag">Testimonials</span>
+      <h2 class="section-title">Schools That Trust SmartVan</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>"Before SmartVan, parents called the school 30 times a morning. Now they open the app and see exactly where the van is. Our admin team finally breathes."</blockquote>
+        <div class="testi-author">
+          <div class="avatar av-navy">SA</div>
+          <div>
+            <div class="testi-name">Samina Akhtar</div>
+            <div class="testi-role">Principal, Roots Academy Lahore</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>"The SOS feature alone is worth every riyal. When our driver had a minor accident, the alert fired before he even called the office. Parents were informed in seconds."</blockquote>
+        <div class="testi-author">
+          <div class="avatar av-teal">FK</div>
+          <div>
+            <div class="testi-name">Faisal Al-Khaldi</div>
+            <div class="testi-role">Transport Manager, DHA School Riyadh</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>"Setting up 22 vans and 600 students took us two days. The onboarding support was exceptional and the route planner saved hours of manual work every week."</blockquote>
+        <div class="testi-author">
+          <div class="avatar av-yellow">MR</div>
+          <div>
+            <div class="testi-name">Muhammad Raza</div>
+            <div class="testi-role">CEO, National Transport Solutions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FAQ ═══════════ -->
+<section id="faq">
+  <div class="section-inner">
+    <div class="text-center">
+      <span class="section-tag">FAQ</span>
+      <h2 class="section-title">Frequently Asked Questions</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Do drivers need special hardware or a GPS device? <div class="icon">+</div></div>
+        <div class="faq-a">No. SmartVan uses the driver's existing Android smartphone. There is no hardware to purchase or install. The driver simply downloads the SmartVan Driver app, logs in, and starts their route.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How accurate is the live tracking? <div class="icon">+</div></div>
+        <div class="faq-a">Location updates happen every 5 seconds using the device's native GPS (accurate to 3–5 metres in open areas). In dense urban areas, accuracy is typically within 10–15 metres. The ETA engine accounts for traffic data via Google Maps API.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Is my child's data safe and private? <div class="icon">+</div></div>
+        <div class="faq-a">Absolutely. All data is encrypted in transit (TLS 1.3) and at rest. Only verified parents can see their own children's location. SmartVan does not sell or share personal data with any third parties. We comply with Pakistan's PDPA and Gulf PDPL regulations.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Can we use SmartVan in Arabic? <div class="icon">+</div></div>
+        <div class="faq-a">Yes. The parent app, driver app, and admin panel all support full Arabic RTL (right-to-left) layout. Gulf customers in Saudi Arabia, UAE, and Qatar can switch the entire interface to Arabic with one setting.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What payment methods are accepted? <div class="icon">+</div></div>
+        <div class="faq-a">We accept all major credit and debit cards (Visa, Mastercard) via Stripe. Bank transfer (IBFT) is available for Pakistani customers. Enterprise clients in the Gulf can pay via wire transfer in SAR, AED, or QAR.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How long does setup take? <div class="icon">+</div></div>
+        <div class="faq-a">Most schools are fully live within 48 hours of registration. After account activation (within 1 business day), a typical school with 10 vans and 200 students takes about 2–3 hours of admin panel setup. Our onboarding team assists every step of the way.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Can we cancel or change our plan? <div class="icon">+</div></div>
+        <div class="faq-a">Yes. Plans can be upgraded, downgraded, or cancelled at any time from your admin panel. Annual subscribers receive a pro-rated refund on unused months if they cancel early (within 30 days of purchase).</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CONTACT ═══════════ -->
+<section id="contact">
+  <div class="section-inner">
+    <div class="text-center">
+      <span class="section-tag">Contact Us</span>
+      <h2 class="section-title">We'd Love to Hear From You</h2>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h3>Get in touch</h3>
+        <div class="contact-item">
+          <div class="icon">📧</div>
+          <div>
+            <h4>Email</h4>
+            <p>info@smartvan.pk<br>support@smartvan.pk</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="icon">📱</div>
+          <div>
+            <h4>WhatsApp (Pakistan)</h4>
+            <p>+92 321 118 1555<br>Mon – Sat, 9am – 7pm PKT</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="icon">📞</div>
+          <div>
+            <h4>Gulf Support</h4>
+            <p>info@smartvan.pk<br>Available via WhatsApp</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="icon">📍</div>
+          <div>
+            <h4>Headquarters</h4>
+            <p>i9Experts Technology<br>Lahore, Pakistan</p>
+          </div>
+        </div>
+      </div>
+      <div class="contact-form-wrap">
+        <div id="form-success" class="form-sent">✅ Message sent! We'll reply within 24 hours.</div>
+        <div id="contact-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Your Name</label>
+              <input type="text" id="cf-name" placeholder="Full name">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="cf-email" placeholder="you@school.edu">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Subject</label>
+            <select id="cf-subject">
+              <option>General Inquiry</option>
+              <option>Request a Demo</option>
+              <option>Enterprise Pricing</option>
+              <option>Technical Support</option>
+              <option>Partnership</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea id="cf-message" placeholder="Tell us about your school and what you need…" style="min-height:120px"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="submitContact()" style="width:100%;justify-content:center;padding:13px">Send Message →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CTA BANNER ═══════════ -->
+<section id="cta-banner">
+  <div class="cta-inner">
+    <h2>Ready to Transform Your School Transport?</h2>
+    <p>Join 200+ schools already running smarter, safer transport with SmartVan. Start your 14-day free trial today — no credit card required.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a class="btn btn-primary btn-lg" href="#onboarding" style="background:var(--navy)">Register Your School →</a>
+      <a class="btn btn-outline btn-lg" href="#contact" style="border-color:var(--navy);color:var(--navy)">Talk to Sales</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#" style="display:inline-block;margin-bottom:0.25rem">
+        <img src="SmartVan_web_logo.png" alt="SmartVan" style="height:52px;width:169px;object-fit:contain;display:block;background:white;border-radius:10px;padding:6px 10px;margin-bottom:0.5rem">
+      </a>
+      <p>School transport intelligence for Pakistan and the Gulf. Keeping children safe, one route at a time.</p>
+      <div class="social-links">
+        <a class="social-link" href="#" title="Facebook">f</a>
+        <a class="social-link" href="#" title="Twitter">𝕏</a>
+        <a class="social-link" href="#" title="LinkedIn">in</a>
+        <a class="social-link" href="#" title="Instagram">ig</a>
+        <a class="social-link" href="#" title="YouTube">▶</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#test-account">Live Demo</a></li>
+        <li><a href="https://smartvanride.com/auth/login" target="_blank">Admin Panel</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#" onclick="openModal('about-modal');return false">About Us</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#testimonials">Testimonials</a></li>
+        <li><a href="#" onclick="openModal('careers-modal');return false">Careers</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#" onclick="openModal('privacy-modal');return false">Privacy Policy</a></li>
+        <li><a href="#" onclick="openModal('terms-modal');return false">Terms of Service</a></li>
+        <li><a href="https://smartvanride.com/delete-account" target="_blank">Delete Account</a></li>
+        <li><a href="https://smartvanride.com/privacy-policy" target="_blank">App Privacy</a></li>
+        <li><a href="#" onclick="openModal('cookie-modal');return false">Cookie Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 SmartVan by i9Experts Technology. All rights reserved.</span>
+    <div class="footer-legal">
+      <a href="#" onclick="openModal('privacy-modal');return false">Privacy</a>
+      <a href="#" onclick="openModal('terms-modal');return false">Terms</a>
+      <a href="#" onclick="openModal('cookie-modal');return false">Cookies</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════ MODALS ═══════════ -->
+<!-- Privacy Policy -->
+<div class="modal-overlay" id="privacy-modal" onclick="closeModalOut(event,'privacy-modal')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>Privacy Policy</h2>
+      <button class="modal-close" onclick="closeModal('privacy-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p><strong>Last updated:</strong> January 1, 2025</p>
+      <h3>1. Who We Are</h3>
+      <p>SmartVan is a product of i9Experts Technology, headquartered in Lahore, Pakistan. We provide school transport management software serving schools, transport companies, parents, and drivers in Pakistan and the Gulf region.</p>
+      <h3>2. Data We Collect</h3>
+      <p>We collect information you provide during registration: school name, admin name, email, phone number, and billing details. From the mobile apps we collect:</p>
+      <ul>
+        <li>Driver GPS location (only during active trips)</li>
+        <li>Student pickup/drop-off timestamps</li>
+        <li>Push notification tokens</li>
+        <li>Device identifiers (for authentication)</li>
+      </ul>
+      <h3>3. How We Use Your Data</h3>
+      <p>Your data is used solely to provide the SmartVan service: showing live van locations to parents, logging attendance, sending alerts, and generating reports. We do not sell, rent, or share personal data with third parties for marketing purposes.</p>
+      <h3>4. Data Security</h3>
+      <p>All data is encrypted in transit using TLS 1.3. Data at rest is encrypted using AES-256 on our MongoDB Atlas infrastructure. Access is restricted to authorised personnel only.</p>
+      <h3>5. Children's Privacy</h3>
+      <p>SmartVan does not directly collect data from children. Student records are managed by the school administrator and linked to parent accounts. Parents may request deletion of their child's data at any time.</p>
+      <h3>6. Data Retention</h3>
+      <p>Account data is retained for the duration of your subscription plus 30 days. Trip location data is retained for 90 days. You may request full data deletion by visiting smartvanride.com/delete-account.</p>
+      <h3>7. Your Rights</h3>
+      <p>You have the right to access, correct, or delete your personal data. Requests can be submitted to: privacy@smartvanride.com. We respond within 30 days.</p>
+      <h3>8. Regulatory Compliance</h3>
+      <p>SmartVan complies with Pakistan's Personal Data Protection Act (PDPA) and the Gulf's Personal Data Protection Law (PDPL) applicable in UAE, KSA, and Qatar.</p>
+      <h3>9. Contact</h3>
+      <p>For privacy-related inquiries: privacy@smartvanride.com</p>
+    </div>
+  </div>
+</div>
+
+<!-- Terms of Service -->
+<div class="modal-overlay" id="terms-modal" onclick="closeModalOut(event,'terms-modal')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>Terms of Service</h2>
+      <button class="modal-close" onclick="closeModal('terms-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p><strong>Last updated:</strong> January 1, 2025</p>
+      <h3>1. Acceptance</h3>
+      <p>By registering for or using SmartVan, you agree to these Terms. If you do not agree, do not use the service. These Terms are a legally binding agreement between your institution and i9Experts Technology.</p>
+      <h3>2. Service Description</h3>
+      <p>SmartVan provides a cloud-based school transport management platform including GPS tracking, attendance, alerts, route planning, and analytics. The service is provided on a subscription basis.</p>
+      <h3>3. Acceptable Use</h3>
+      <p>You may use SmartVan only for lawful school transport management. You may not: attempt to reverse engineer the platform, share credentials with unauthorised parties, use the service to track individuals without their consent, or violate any applicable law.</p>
+      <h3>4. Subscription & Billing</h3>
+      <p>Subscriptions are billed monthly or annually. Fees are non-refundable except as described in Section 5. Pricing is subject to change with 30 days written notice.</p>
+      <h3>5. Refund Policy</h3>
+      <p>Monthly subscribers may cancel at any time; no refund is issued for the current billing period. Annual subscribers who cancel within 30 days of purchase receive a pro-rated refund for unused months.</p>
+      <h3>6. Uptime & SLA</h3>
+      <p>SmartVan targets 99.8% monthly uptime for Starter and Professional plans, and 99.9% for Enterprise. Planned maintenance is announced 24 hours in advance and does not count toward downtime.</p>
+      <h3>7. Limitation of Liability</h3>
+      <p>SmartVan is a tracking and communication tool. We are not liable for delays in vehicle arrivals, accidents, or events that occur while using the platform. The maximum liability to any customer is limited to the fees paid in the preceding 3 months.</p>
+      <h3>8. Termination</h3>
+      <p>Either party may terminate the subscription at any time. Upon termination, your data is retained for 30 days then deleted, unless you request earlier deletion.</p>
+      <h3>9. Governing Law</h3>
+      <p>These Terms are governed by the laws of Pakistan. Disputes shall be resolved in the courts of Lahore, Pakistan.</p>
+      <h3>10. Contact</h3>
+      <p>legal@smartvanride.com</p>
+    </div>
+  </div>
+</div>
+
+<!-- Cookie Policy -->
+<div class="modal-overlay" id="cookie-modal" onclick="closeModalOut(event,'cookie-modal')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>Cookie Policy</h2>
+      <button class="modal-close" onclick="closeModal('cookie-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p><strong>Last updated:</strong> January 1, 2025</p>
+      <h3>What Are Cookies</h3>
+      <p>Cookies are small text files stored on your device. SmartVan's website (smartvanride.com) uses a minimal set of cookies to function correctly and improve your experience.</p>
+      <h3>Cookies We Use</h3>
+      <ul>
+        <li><strong>Essential cookies:</strong> Authentication session tokens, CSRF protection. These cannot be disabled as the platform requires them to function.</li>
+        <li><strong>Analytics cookies:</strong> Anonymous page view data via a self-hosted analytics tool. No data is shared with Google or Meta.</li>
+        <li><strong>Preference cookies:</strong> Your language preference and billing currency selection.</li>
+      </ul>
+      <h3>Mobile Apps</h3>
+      <p>The SmartVan parent and driver apps do not use browser cookies. They use secure device-level storage for authentication tokens.</p>
+      <h3>Managing Cookies</h3>
+      <p>You can clear cookies at any time through your browser settings. Clearing essential cookies will require you to log in again. Disabling analytics cookies does not affect the platform's functionality.</p>
+      <h3>Contact</h3>
+      <p>privacy@smartvanride.com</p>
+    </div>
+  </div>
+</div>
+
+<!-- About Modal -->
+<div class="modal-overlay" id="about-modal" onclick="closeModalOut(event,'about-modal')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>About SmartVan</h2>
+      <button class="modal-close" onclick="closeModal('about-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <h3>Our Mission</h3>
+      <p>SmartVan exists to make school transport safe, transparent, and stress-free — for every school, parent, and child in Pakistan and the Gulf.</p>
+      <h3>The Problem We Solve</h3>
+      <p>Every school day, millions of parents in Pakistan and the Gulf have no idea where their child's school van is. Drivers have no way to log attendance. School admins have no visibility into their fleet. SmartVan changes all of that with a single platform.</p>
+      <h3>The Company</h3>
+      <p>SmartVan is built by i9Experts Technology, a software product company headquartered in Lahore, Pakistan. Our team of 15 engineers and designers has built SmartVan from the ground up for the realities of South Asian and Gulf transport networks — from narrow galis in Lahore to highway routes in Riyadh.</p>
+      <h3>Vision</h3>
+      <p>Our vision is to be the default school transport OS for every school in Pakistan and the Gulf by 2027 — the way schools think of transport management, reimagined around real-time data and parent peace of mind.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Careers Modal -->
+<div class="modal-overlay" id="careers-modal" onclick="closeModalOut(event,'careers-modal')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>Careers at SmartVan</h2>
+      <button class="modal-close" onclick="closeModal('careers-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>We're a small, fast-moving team building software that keeps children safe every day. If that mission excites you, we'd love to hear from you.</p>
+      <h3>Open Roles</h3>
+      <ul>
+        <li><strong>Flutter Developer</strong> — Lahore, Pakistan (Hybrid)</li>
+        <li><strong>NestJS Backend Engineer</strong> — Remote (PKT zone)</li>
+        <li><strong>Sales Executive – Gulf Markets</strong> — Dubai or Riyadh</li>
+        <li><strong>Customer Success Manager</strong> — Lahore, Pakistan</li>
+      </ul>
+      <h3>How to Apply</h3>
+      <p>Send your CV and a short note on why you want to work on SmartVan to: <strong>careers@smartvanride.com</strong></p>
+      <p>We review every application and respond within 5 business days.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><span class="t-icon">✓</span> <span id="toast-msg">Done!</span></div>
+
+<!-- ═══════════ JAVASCRIPT ═══════════ -->
+<script>
+// Wizard state
+var wizardStep = 1;
+var billingAnnual = false;
+
+function wizardNext() {
+  if (wizardStep === 1) {
+    var sn = document.getElementById('school-name').value.trim();
+    var st = document.getElementById('school-type').value;
+    var ct = document.getElementById('country').value;
+    var ci = document.getElementById('city').value.trim();
+    if (!sn || !st || !ct || !ci) { showToast('Please fill in all required fields.'); return; }
+  }
+  if (wizardStep === 2) {
+    var an = document.getElementById('admin-name').value.trim();
+    var ae = document.getElementById('admin-email').value.trim();
+    var ph = document.getElementById('phone').value.trim();
+    var pw = document.getElementById('pwd').value;
+    var pw2 = document.getElementById('pwd2').value;
+    if (!an || !ae || !ph || !pw) { showToast('Please fill in all required fields.'); return; }
+    if (pw !== pw2) { showToast('Passwords do not match.'); return; }
+    if (pw.length < 8) { showToast('Password must be at least 8 characters.'); return; }
+  }
+  if (wizardStep === 3) {
+    var tos = document.getElementById('tos').checked;
+    if (!tos) { showToast('Please accept the Terms of Service to continue.'); return; }
+
+    var btn = document.getElementById('btn-next');
+    btn.textContent = 'Submitting…';
+    btn.disabled = true;
+
+    var payload = {
+      schoolName:   document.getElementById('school-name').value.trim(),
+      schoolType:   document.getElementById('school-type').value,
+      country:      document.getElementById('country').value,
+      city:         document.getElementById('city').value.trim(),
+      address:      document.getElementById('address').value.trim(),
+      vanCount:     document.getElementById('van-count').value,
+      studentCount: document.getElementById('student-count').value,
+      adminName:    document.getElementById('admin-name').value.trim(),
+      designation:  document.getElementById('designation').value.trim(),
+      email:        document.getElementById('admin-email').value.trim(),
+      phone:        document.getElementById('phone').value.trim(),
+      plan:         document.getElementById('plan-select').value,
+      currency:     document.getElementById('currency').value,
+      challenges:   document.getElementById('challenges').value.trim(),
+    };
+
+    fetch('https://smartvanride.com/backend/school/register-interest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      document.getElementById('step3').style.display = 'none';
+      document.getElementById('step-success').style.display = 'block';
+      document.getElementById('wizard-footer').style.display = 'none';
+      document.querySelector('.wizard-header p').textContent = 'Registration complete!';
+      ['ws-1','ws-2','ws-3'].forEach(function(id) {
+        document.getElementById(id).className = 'wz-step done';
+      });
+      showToast('School registration submitted successfully!');
+    })
+    .catch(function(err) {
+      btn.textContent = 'Submit Registration ✓';
+      btn.disabled = false;
+      showToast('Submission failed. Please try again.');
+    });
+    return;
+  }
+  wizardStep++;
+  updateWizard();
+}
+
+function wizardBack() {
+  wizardStep--;
+  updateWizard();
+}
+
+function updateWizard() {
+  document.querySelectorAll('[id^="step"]').forEach(function(el) { el.style.display = 'none'; });
+  document.getElementById('step' + wizardStep).style.display = 'block';
+  document.getElementById('step-current').textContent = wizardStep;
+  ['ws-1','ws-2','ws-3'].forEach(function(id, i) {
+    var el = document.getElementById(id);
+    el.className = 'wz-step' + (i + 1 < wizardStep ? ' done' : '') + (i + 1 === wizardStep ? ' active' : '');
+  });
+  ['dot1','dot2','dot3'].forEach(function(id, i) {
+    var el = document.getElementById(id);
+    el.className = 'wz-dot' + (i + 1 < wizardStep ? ' done' : '') + (i + 1 === wizardStep ? ' active' : '');
+  });
+  document.getElementById('btn-back').style.display = wizardStep > 1 ? 'inline-flex' : 'none';
+  document.getElementById('btn-next').textContent = wizardStep === 3 ? 'Submit Registration ✓' : 'Next Step →';
+}
+
+// Billing toggle
+var prices = { starter: [7500, 6000], pro: [18000, 14400] };
+function toggleBilling() {
+  billingAnnual = !billingAnnual;
+  var toggle = document.getElementById('billing-toggle');
+  toggle.className = 'toggle-switch' + (billingAnnual ? ' annual' : '');
+  document.getElementById('lbl-monthly').className = 'toggle-label' + (!billingAnnual ? ' active' : '');
+  document.getElementById('lbl-annual').className = 'toggle-label' + (billingAnnual ? ' active' : '');
+  var i = billingAnnual ? 1 : 0;
+  document.getElementById('price-starter').textContent = prices.starter[i].toLocaleString();
+  document.getElementById('price-pro').textContent = prices.pro[i].toLocaleString();
+  document.getElementById('price-ent').textContent = 'Custom';
+}
+
+// FAQ accordion
+function toggleFaq(el) {
+  var item = el.parentElement;
+  var isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(function(i) { i.classList.remove('open'); });
+  if (!isOpen) item.classList.add('open');
+}
+
+// Modals
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeModalOut(e, id) {
+  if (e.target.id === id) closeModal(id);
+}
+
+// Contact form
+function submitContact() {
+  var name = document.getElementById('cf-name').value.trim();
+  var email = document.getElementById('cf-email').value.trim();
+  var subject = document.getElementById('cf-subject').value;
+  var msg = document.getElementById('cf-message').value.trim();
+  if (!name || !email || !msg) { showToast('Please fill in all fields.'); return; }
+  
+  var btn = document.querySelector('#contact-form .btn-primary');
+  btn.textContent = 'Sending…';
+  btn.disabled = true;
+
+  fetch('https://smartvanride.com/backend/contact/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: name, email: email, subject: subject, message: msg })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.success) {
+      document.getElementById('contact-form').style.display = 'none';
+      document.getElementById('form-success').style.display = 'block';
+      showToast('Message sent successfully!');
+    } else {
+      btn.textContent = 'Send Message →';
+      btn.disabled = false;
+      showToast(data.message || 'Failed to send. Please try again.');
+    }
+  })
+  .catch(function() {
+    btn.textContent = 'Send Message →';
+    btn.disabled = false;
+    showToast('Network error. Please try WhatsApp or email us directly.');
+  });
+}
+
+// Toast
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+
+// Hamburger
+function toggleMenu() {
+  var links = document.querySelector('.nav-links');
+  if (!links._open) {
+    links.style.display = 'flex';
+    links.style.flexDirection = 'column';
+    links.style.position = 'fixed';
+    links.style.top = '68px';
+    links.style.left = '0';
+    links.style.right = '0';
+    links.style.background = 'white';
+    links.style.padding = '1rem 2rem 2rem';
+    links.style.borderBottom = '1px solid #e5e7eb';
+    links.style.zIndex = '99';
+    links._open = true;
+  } else {
+    links.style.display = 'none';
+    links._open = false;
+  }
+}
+
+// Nav scroll effect
+window.addEventListener('scroll', function() {
+  var nav = document.getElementById('navbar');
+  if (window.scrollY > 40) {
+    nav.style.boxShadow = '0 4px 24px rgba(27,43,107,0.1)';
+  } else {
+    nav.style.boxShadow = 'none';
+  }
+});
+
+// Escape key closes modals
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(function(m) {
+      m.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  }
+});
+
+function showPricing(type) {
+  document.getElementById('pricing-pkr').style.display = type === 'pkr' ? 'grid' : 'none';
+  document.getElementById('pricing-usd').style.display = type === 'usd' ? 'grid' : 'none';
+  document.getElementById('btn-pkr').className = type === 'pkr' ? 'btn btn-primary' : 'btn btn-outline';
+  document.getElementById('btn-usd').className = type === 'usd' ? 'btn btn-primary' : 'btn btn-outline';
+  window._pricingCurrency = type;
+  calcPrice();
+}
+
+function calcPrice() {
+  const currency = window._pricingCurrency || 'pkr';
+  const car = parseInt(document.getElementById('calc-car').value) || 0;
+  const hiroof = parseInt(document.getElementById('calc-hiroof').value) || 0;
+  const bus = parseInt(document.getElementById('calc-bus').value) || 0;
+  
+  let total = 0;
+  let breakdown = [];
+  
+  if (currency === 'pkr') {
+    total = car * 790 + hiroof * 990 + bus * 1990;
+    if (car > 0) breakdown.push(car + ' car × PKR 790');
+    if (hiroof > 0) breakdown.push(hiroof + ' hiroof × PKR 990');
+    if (bus > 0) breakdown.push(bus + ' bus × PKR 1,990');
+    document.getElementById('calc-total').textContent = 'PKR ' + total.toLocaleString();
+  } else {
+    total = car * 9 + hiroof * 19 + bus * 39;
+    if (car > 0) breakdown.push(car + ' car × $9');
+    if (hiroof > 0) breakdown.push(hiroof + ' hiroof × $19');
+    if (bus > 0) breakdown.push(bus + ' bus × $39');
+    document.getElementById('calc-total').textContent = '$' + total.toLocaleString();
+  }
+  
+  document.getElementById('calc-breakdown').textContent = breakdown.length ? breakdown.join(' + ') : 'Add your vans above to calculate';
+}
+window._pricingCurrency = 'pkr';
+</script>
+</body>
+</html>
