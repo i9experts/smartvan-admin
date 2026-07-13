@@ -30,8 +30,8 @@ interface RouteData {
   tripType?: 'pick' | 'drop';
   startTime?: string;
   tripDays?: Record<string, boolean>;
-  startPoint?: { lat: number; long: number };
-  endPoint?: { lat: number; long: number };
+  startPoint?: { lat: number; long: number; address?: string };
+  endPoint?: { lat: number; long: number; address?: string };
   kidLocations?: KidStop[];
   createdAt: string;
   van?: { carNumber?: string; vehicleType?: string };
@@ -212,7 +212,11 @@ function RouteDetailDrawer({ route, onClose, onEdit }: { route: RouteData; onClo
                   </div>
                   <div>
                     <p className="text-xs font-medium text-emerald-700">Start Point</p>
-                    <p className="text-xs font-mono text-emerald-600">{route.startPoint.lat.toFixed(6)}, {route.startPoint.long.toFixed(6)}</p>
+                    {route.startPoint.address ? (
+                      <p className="text-xs text-emerald-600">{route.startPoint.address}</p>
+                    ) : (
+                      <p className="text-xs font-mono text-emerald-600">{route.startPoint.lat.toFixed(6)}, {route.startPoint.long.toFixed(6)}</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -223,7 +227,11 @@ function RouteDetailDrawer({ route, onClose, onEdit }: { route: RouteData; onClo
                   </div>
                   <div>
                     <p className="text-xs font-medium text-red-700">End Point</p>
-                    <p className="text-xs font-mono text-red-600">{route.endPoint.lat.toFixed(6)}, {route.endPoint.long.toFixed(6)}</p>
+                    {route.endPoint.address ? (
+                      <p className="text-xs text-red-600">{route.endPoint.address}</p>
+                    ) : (
+                      <p className="text-xs font-mono text-red-600">{route.endPoint.lat.toFixed(6)}, {route.endPoint.long.toFixed(6)}</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -255,6 +263,15 @@ function RouteDetailDrawer({ route, onClose, onEdit }: { route: RouteData; onClo
 
 type MapTarget = 'startPoint' | 'endPoint' | { kidId: string };
 
+// datetime-local inputs expect local wall-clock time with no timezone info.
+// Using toISOString() here would convert to UTC first, shifting the
+// displayed time by the server/browser's UTC offset — this builds the
+// string from local getters instead, matching what the input actually shows.
+function toLocalDatetimeInputValue(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
   mode: 'add' | 'edit';
   route?: RouteData | null;
@@ -269,10 +286,10 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
         title: route.title ?? '',
         vanId: route.vanId ?? '',
         tripType: route.tripType ?? 'pick',
-        startTime: route.startTime ? new Date(route.startTime).toISOString().slice(0, 16) : '',
+        startTime: route.startTime ? toLocalDatetimeInputValue(new Date(route.startTime)) : '',
         tripDays: route.tripDays ?? Object.fromEntries(DAYS.map(d => [d, false])),
-        startPoint: route.startPoint ? { ...route.startPoint, lng: route.startPoint.long, address: '' } as any : null,
-        endPoint: route.endPoint ? { ...route.endPoint, lng: route.endPoint.long, address: '' } as any : null,
+        startPoint: route.startPoint ? { ...route.startPoint, lng: route.startPoint.long, address: route.startPoint.address ?? '' } as any : null,
+        endPoint: route.endPoint ? { ...route.endPoint, lng: route.endPoint.long, address: route.endPoint.address ?? '' } as any : null,
         kidLocations: route.kidLocations ?? [],
       };
     }
@@ -288,10 +305,10 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
       title: form.title,
       vanId: form.vanId || undefined,
       tripType: form.tripType,
-      startTime: form.startTime || undefined,
+      startTime: form.startTime ? new Date(form.startTime).toISOString() : undefined,
       tripDays: form.tripDays,
-      startPoint: form.startPoint ? { lat: form.startPoint.lat, long: form.startPoint.long } : undefined,
-      endPoint: form.endPoint ? { lat: form.endPoint.lat, long: form.endPoint.long } : undefined,
+      startPoint: form.startPoint ? { lat: form.startPoint.lat, long: form.startPoint.long, address: form.startPoint.address } : undefined,
+      endPoint: form.endPoint ? { lat: form.endPoint.lat, long: form.endPoint.long, address: form.endPoint.address } : undefined,
       kidLocations: form.kidLocations.map(k => ({ kidId: k.kidId, lat: k.lat, long: k.long })),
     }),
     onSuccess: () => { onSuccess(); onClose(); },
@@ -314,10 +331,10 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
       title: form.title,
       vanId: form.vanId || undefined,
       tripType: form.tripType,
-      startTime: form.startTime || undefined,
+      startTime: form.startTime ? new Date(form.startTime).toISOString() : undefined,
       tripDays: form.tripDays,
-      startPoint: form.startPoint ? { lat: form.startPoint.lat, long: form.startPoint.long } : undefined,
-      endPoint: form.endPoint ? { lat: form.endPoint.lat, long: form.endPoint.long } : undefined,
+      startPoint: form.startPoint ? { lat: form.startPoint.lat, long: form.startPoint.long, address: form.startPoint.address } : undefined,
+      endPoint: form.endPoint ? { lat: form.endPoint.lat, long: form.endPoint.long, address: form.endPoint.address } : undefined,
       kidLocations: form.kidLocations.map(k => ({ kidId: k.kidId, lat: k.lat, long: k.long })),
     }),
     onSuccess: () => { onSuccess(); onClose(); },
@@ -361,7 +378,15 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
     const sId = student._id || student.id; if (form.kidLocations.find(k => k.kidId === sId)) return;
     setForm(f => ({
       ...f,
-      kidLocations: [...f.kidLocations, { kidId: student._id || student.id, lat: 0, long: 0, kidName: student.fullname }],
+      kidLocations: [...f.kidLocations, {
+        kidId: sId,
+        // Auto-fill from the student's saved pickup point (set via the
+        // map picker in the parent/admin Add Kid flow) — falls back to
+        // 0,0 (requiring a manual map pick) only if none was ever saved.
+        lat: student.homeLat ?? 0,
+        long: student.homeLng ?? 0,
+        kidName: student.fullname,
+      }],
     }));
   }
 
@@ -383,7 +408,9 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
     mode === 'add' ? createMutation.mutate() : editMutation.mutate();
   }
 
-  const availableStudents = students.filter(s => !form.kidLocations.find(k => k.kidId === (s._id || s.id)));
+  const availableStudents = students
+    .filter(s => !form.kidLocations.find(k => k.kidId === (s._id || s.id)))
+    .filter(s => !form.vanId || s.VanId === form.vanId);
   const TABS = [
     { key: 'basic' as const, label: 'Basic Info', icon: <Route size={13} /> },
     { key: 'schedule' as const, label: 'Schedule', icon: <Calendar size={13} /> },
@@ -534,8 +561,10 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-2">Add Student Stop</label>
                   <div className="max-h-40 overflow-y-auto space-y-1 border border-gray-200 rounded-xl p-2">
-                    {availableStudents.length === 0 ? (
-                      <p className="text-xs text-gray-400 text-center py-2">All students added</p>
+                    {!form.vanId ? (
+                      <p className="text-xs text-gray-400 text-center py-2">Select a van in Basic Info first — only students assigned to that van will appear here.</p>
+                    ) : availableStudents.length === 0 ? (
+                      <p className="text-xs text-gray-400 text-center py-2">No unassigned students found for this van. Assign students to it from Student Management first.</p>
                     ) : (
                       availableStudents.map(s => (
                         <button key={s._id} onClick={() => addStop(s)}
@@ -698,7 +727,15 @@ export default function RoutesPage() {
   const { data: students = [] } = useQuery({
     queryKey: ['students-for-routes'],
     queryFn: () => studentApi.getAll({ page: 1, limit: 500 }),
-    select: r => r.data?.data ?? [],
+    select: (r: any) => (r.data?.data ?? []).map((item: any) => ({
+      _id: item.student?.id,
+      fullname: item.student?.fullname,
+      grade: item.student?.grade,
+      VanId: item.van?.id,
+      homeAddress: item.student?.homeAddress,
+      homeLat: item.student?.homeLat,
+      homeLng: item.student?.homeLng,
+    })),
     staleTime: 120_000,
   });
 

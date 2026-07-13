@@ -6,8 +6,9 @@ import {
   Search, X, AlertCircle, Filter,
   ChevronLeft, ChevronRight, CheckCircle2, XCircle,
   Phone, Mail, MapPin, FileText, Eye, UserMinus, Bus,
+  Smartphone, RefreshCw,
 } from 'lucide-react';
-import { vanApi } from '@/lib/api';
+import { vanApi, api } from '@/lib/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -28,7 +29,39 @@ interface Driver {
   vehicleCardImageBack?: string;
   expiryDateLicense?: string;
   createdAt: string;
+  lastLoginAt?: string | null;
   van?: { carNumber?: string; vehicleType?: string; _id: string };
+}
+
+function timeAgo(dateStr?: string | null): string {
+  if (!dateStr) return '';
+  const diffMs = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days}d ago`;
+  return new Date(dateStr!).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function AppConnectionBadge({ lastLoginAt }: { lastLoginAt?: string | null }) {
+  if (lastLoginAt) {
+    return (
+      <span className="flex items-center gap-1.5 text-xs">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+        <span className="text-emerald-700 font-medium">Connected</span>
+        <span className="text-gray-400">· {timeAgo(lastLoginAt)}</span>
+      </span>
+    );
+  }
+  return (
+    <span className="flex items-center gap-1.5 text-xs">
+      <span className="w-1.5 h-1.5 rounded-full bg-gray-300" />
+      <span className="text-gray-400 font-medium">Not connected yet</span>
+    </span>
+  );
 }
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
@@ -58,6 +91,26 @@ function DriverStatusBadge({ status, verified }: { status: string; verified: boo
 // ─── Driver Detail Drawer ─────────────────────────────────────────────────────
 
 function DriverDetailDrawer({ driver, onClose }: { driver: Driver; onClose: () => void }) {
+  const [resetResult, setResetResult] = useState<string | null>(null);
+  const [resetError, setResetError] = useState('');
+
+  const resetMutation = useMutation({
+    mutationFn: () => api.post('/van/resetDriverPassword', { driverId: driver._id }),
+    onSuccess: (res: any) => {
+      const tempPassword = res?.data?.data?.temporaryPassword;
+      setResetResult(
+        tempPassword
+          ? `New password sent via WhatsApp to ${driver.phoneNo}. If delivery fails, share this manually: ${tempPassword}`
+          : `New password sent via WhatsApp to ${driver.phoneNo}.`
+      );
+      setResetError('');
+    },
+    onError: (e: any) => {
+      setResetError(e?.response?.data?.message ?? 'Failed to reset password');
+      setResetResult(null);
+    },
+  });
+
   const docs = [
     { label: 'Licence Front', url: driver.licenceImageFront },
     { label: 'Licence Back', url: driver.licenceImageBack },
@@ -113,6 +166,39 @@ function DriverDetailDrawer({ driver, onClose }: { driver: Driver; onClose: () =
               </div>
             </div>
           )}
+        </div>
+
+        {/* App Account */}
+        <div className="p-5 border-b border-gray-100">
+          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">App Account</h4>
+          <div className="p-3.5 bg-gray-50 rounded-xl space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <Smartphone size={16} className="text-[#1B2B6B]" />
+                <div>
+                  <p className="text-xs text-gray-400">Login Username</p>
+                  <p className="text-sm font-medium text-gray-800">{driver.phoneNo || driver.NIC || driver.email}</p>
+                </div>
+              </div>
+              <AppConnectionBadge lastLoginAt={driver.lastLoginAt} />
+            </div>
+
+            <button
+              onClick={() => { setResetResult(null); setResetError(''); resetMutation.mutate(); }}
+              disabled={resetMutation.isPending}
+              className="w-full flex items-center justify-center gap-2 py-2 border border-[#1B2B6B]/20 text-[#1B2B6B] rounded-lg text-sm font-medium hover:bg-[#1B2B6B]/5 transition disabled:opacity-50"
+            >
+              <RefreshCw size={13} className={resetMutation.isPending ? 'animate-spin' : ''} />
+              {resetMutation.isPending ? 'Resetting…' : 'Reset Password & Resend via WhatsApp'}
+            </button>
+
+            {resetResult && (
+              <p className="text-xs text-emerald-700 bg-emerald-50 rounded-lg p-2.5">{resetResult}</p>
+            )}
+            {resetError && (
+              <p className="text-xs text-red-600 bg-red-50 rounded-lg p-2.5">{resetError}</p>
+            )}
+          </div>
         </div>
 
         {/* Van */}
@@ -332,6 +418,7 @@ export default function DriversPage() {
                   </th>
                   <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Driver</th>
                   <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Contact</th>
+                  <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">App Status</th>
                   <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Van</th>
                   <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Documents</th>
                   <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
@@ -343,14 +430,14 @@ export default function DriversPage() {
                 {isLoading ? (
                   Array.from({ length: 6 }).map((_, i) => (
                     <tr key={i} className="border-b border-gray-50 animate-pulse">
-                      {Array.from({ length: 8 }).map((_, j) => (
+                      {Array.from({ length: 9 }).map((_, j) => (
                         <td key={j} className="p-4"><div className="h-4 bg-gray-100 rounded" /></td>
                       ))}
                     </tr>
                   ))
                 ) : drivers.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="p-12 text-center">
+                    <td colSpan={9} className="p-12 text-center">
                       <p className="text-sm text-gray-400">{search ? 'No drivers match your search.' : 'No drivers registered yet.'}</p>
                     </td>
                   </tr>
@@ -377,6 +464,9 @@ export default function DriversPage() {
                         <td className="p-4">
                           <p className="text-sm text-gray-700">{driver.phoneNo ?? '—'}</p>
                           <p className="text-xs text-gray-400">{driver.email}</p>
+                        </td>
+                        <td className="p-4">
+                          <AppConnectionBadge lastLoginAt={driver.lastLoginAt} />
                         </td>
                         <td className="p-4">
                           {(driver as any).van ? (

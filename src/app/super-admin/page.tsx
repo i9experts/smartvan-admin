@@ -10,6 +10,7 @@ import {
   Wifi,
   WifiOff,
   Activity,
+  Smartphone,
 } from 'lucide-react';
 import { api, schoolApi } from '@/lib/api';
 
@@ -32,6 +33,16 @@ interface SuperAdminOverview {
   drivers: {
     total: number;
     active: number;
+  };
+  appConnections: {
+    parents: { total: number; connected: number; rate: number };
+    drivers: { total: number; connected: number; rate: number };
+    bySchool: {
+      schoolId: string;
+      schoolName: string;
+      parents: { total: number; connected: number };
+      drivers: { total: number; connected: number };
+    }[];
   };
   trips: {
     today: number;
@@ -267,6 +278,83 @@ export default function SuperAdminPage() {
                     <td className="py-2 text-gray-900">{s.schoolName}</td>
                     <td className="py-2 text-gray-600">{s.totalVans}</td>
                     <td className="py-2 text-gray-900 font-medium">{s.currency} {s.monthlyRevenue.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* App Connection Status */}
+      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <div className="flex items-center gap-2 mb-4">
+          <Smartphone size={18} className="text-[#1B2B6B]" />
+          <h2 className="text-lg font-semibold text-gray-900">App Connection Status</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+          <div className="p-4 bg-gray-50 rounded-xl">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-gray-700">Parents</span>
+              <span className="text-xs text-gray-400">
+                {data?.appConnections.parents.connected ?? 0} / {data?.appConnections.parents.total ?? 0} connected
+              </span>
+            </div>
+            <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#1B2B6B] rounded-full transition-all"
+                style={{ width: `${data?.appConnections.parents.rate ?? 0}%` }}
+              />
+            </div>
+            <p className="text-xs text-gray-400 mt-1.5">{data?.appConnections.parents.rate ?? 0}% have logged into the app</p>
+          </div>
+          <div className="p-4 bg-gray-50 rounded-xl">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-gray-700">Drivers</span>
+              <span className="text-xs text-gray-400">
+                {data?.appConnections.drivers.connected ?? 0} / {data?.appConnections.drivers.total ?? 0} connected
+              </span>
+            </div>
+            <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#FFB800] rounded-full transition-all"
+                style={{ width: `${data?.appConnections.drivers.rate ?? 0}%` }}
+              />
+            </div>
+            <p className="text-xs text-gray-400 mt-1.5">{data?.appConnections.drivers.rate ?? 0}% have logged into the app</p>
+          </div>
+        </div>
+
+        {data?.appConnections.bySchool && data.appConnections.bySchool.length > 0 && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-gray-400 border-b border-gray-100">
+                  <th className="pb-2 font-medium">School</th>
+                  <th className="pb-2 font-medium">Parents Connected</th>
+                  <th className="pb-2 font-medium">Drivers Connected</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.appConnections.bySchool.map((s) => (
+                  <tr key={s.schoolId} className="border-b border-gray-50">
+                    <td className="py-2 text-gray-900">{s.schoolName}</td>
+                    <td className="py-2 text-gray-600">
+                      {s.parents.connected} / {s.parents.total}
+                      {s.parents.total > 0 && (
+                        <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${s.parents.connected === s.parents.total ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                          {Math.round((s.parents.connected / s.parents.total) * 100)}%
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-2 text-gray-600">
+                      {s.drivers.connected} / {s.drivers.total}
+                      {s.drivers.total > 0 && (
+                        <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${s.drivers.connected === s.drivers.total ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                          {Math.round((s.drivers.connected / s.drivers.total) * 100)}%
+                        </span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

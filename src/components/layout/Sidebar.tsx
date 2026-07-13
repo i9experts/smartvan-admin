@@ -16,6 +16,7 @@ const navItems: { labelKey: string; href: string; icon: any; badge?: number; rol
   { labelKey: "nav.liveTracking", href: "/tracking", icon: MapPin, roles: ["admin"] },
   { labelKey: "nav.studentManagement", href: "/students", icon: School, roles: ["admin"] },
   { labelKey: "nav.vanDriverMgmt", href: "/vans", icon: Bus, roles: ["admin"] },
+  { labelKey: "nav.driverAccounts", href: "/drivers", icon: Users, roles: ["admin"] },
   { labelKey: "nav.parentManagement", href: "/parents", icon: Users, roles: ["admin"] },
   { labelKey: "nav.routePlanner", href: "/routes", icon: Route, roles: ["admin"] },
   { labelKey: "nav.alertsOverview", href: "/alerts", icon: Bell, badge: 3, roles: ["admin"] },
