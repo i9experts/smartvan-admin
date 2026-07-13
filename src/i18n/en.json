@@ -13,6 +13,9 @@
     "attendance": "Attendance",
     "feeManagement": "Fee Management",
     "schoolLeads": "School Leads",
+    "employees": "Employees",
+    "tickets": "Tickets",
+    "auditLog": "Audit Log",
     "settings": "Settings"
   },
   "common": {

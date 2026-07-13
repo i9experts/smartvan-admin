@@ -6,7 +6,7 @@ import {
   Bus, Filter, ChevronLeft, ChevronRight,
   CheckCircle2, XCircle, UserCheck, MapPin, Cpu, User, Phone,
 } from 'lucide-react';
-import { vanApi, api } from '@/lib/api';
+import { vanApi, api, uploadApi } from '@/lib/api';
 
 interface VanItem {
   _id: string;
@@ -20,6 +20,14 @@ interface VanItem {
   assignRoute?: string;
   driver?: { id: string | null; fullname: string; phoneNo: string; image: string };
   routes?: { id: string; title: string; tripType: string }[];
+  insuranceExpiry?: string;
+  registrationExpiry?: string;
+  fitnessExpiry?: string;
+  routePermitExpiry?: string;
+  insuranceDocUrl?: string;
+  registrationDocUrl?: string;
+  fitnessDocUrl?: string;
+  routePermitDocUrl?: string;
 }
 interface Driver {
   _id: string; fullname: string; email: string; phoneNo: string; image: string; status: string;
@@ -27,8 +35,14 @@ interface Driver {
 interface VanForm {
   carNumber: string; vehicleType: string; venCapacity: string;
   condition: string; deviceId: string; assignRoute: string; ownVan: boolean;
+  insuranceExpiry: string; registrationExpiry: string; fitnessExpiry: string; routePermitExpiry: string;
+  insuranceDocUrl: string; registrationDocUrl: string; fitnessDocUrl: string; routePermitDocUrl: string;
 }
-const EMPTY_FORM: VanForm = { carNumber: '', vehicleType: '', venCapacity: '', condition: '', deviceId: '', assignRoute: '', ownVan: false };
+const EMPTY_FORM: VanForm = {
+  carNumber: '', vehicleType: '', venCapacity: '', condition: '', deviceId: '', assignRoute: '', ownVan: false,
+  insuranceExpiry: '', registrationExpiry: '', fitnessExpiry: '', routePermitExpiry: '',
+  insuranceDocUrl: '', registrationDocUrl: '', fitnessDocUrl: '', routePermitDocUrl: '',
+};
 const VEHICLE_TYPES = ['Suzuki Bolan','Toyota Hiace','Suzuki Carry','Honda Civic','Toyota Corolla','Hyundai H100','Datsun','Other'];
 const CONDITIONS = ['Excellent','Good','Fair','Poor'];
 
@@ -46,6 +60,14 @@ function mapVans(raw: any): { data: VanItem[]; total: number } {
       assignRoute: item.van?.assignRoute ?? '',
       driver: item.driver ?? null,
       routes: item.routes ?? [],
+      insuranceExpiry: item.van?.insuranceExpiry ?? '',
+      registrationExpiry: item.van?.registrationExpiry ?? '',
+      fitnessExpiry: item.van?.fitnessExpiry ?? '',
+      routePermitExpiry: item.van?.routePermitExpiry ?? '',
+      insuranceDocUrl: item.van?.insuranceDocUrl ?? '',
+      registrationDocUrl: item.van?.registrationDocUrl ?? '',
+      fitnessDocUrl: item.van?.fitnessDocUrl ?? '',
+      routePermitDocUrl: item.van?.routePermitDocUrl ?? '',
     })),
     total: raw.pagination?.total ?? 0,
   };
@@ -66,19 +88,53 @@ function ConditionBadge({ condition }: { condition: string }) {
 
 function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?: VanItem|null; onClose: ()=>void; onSuccess: ()=>void }) {
   const [form, setForm] = useState<VanForm>(
-    van ? { carNumber: van.carNumber, vehicleType: van.vehicleType, venCapacity: String(van.venCapacity ?? ''), condition: van.condition, deviceId: van.deviceId ?? '', assignRoute: van.assignRoute ?? '', ownVan: van.ownVan } : EMPTY_FORM
+    van ? {
+      carNumber: van.carNumber, vehicleType: van.vehicleType, venCapacity: String(van.venCapacity ?? ''), condition: van.condition,
+      deviceId: van.deviceId ?? '', assignRoute: van.assignRoute ?? '', ownVan: van.ownVan,
+      insuranceExpiry: van.insuranceExpiry ?? '', registrationExpiry: van.registrationExpiry ?? '',
+      fitnessExpiry: van.fitnessExpiry ?? '', routePermitExpiry: van.routePermitExpiry ?? '',
+      insuranceDocUrl: van.insuranceDocUrl ?? '', registrationDocUrl: van.registrationDocUrl ?? '',
+      fitnessDocUrl: van.fitnessDocUrl ?? '', routePermitDocUrl: van.routePermitDocUrl ?? '',
+    } : EMPTY_FORM
   );
   const [error, setError] = useState('');
   const addMutation = useMutation({
-    mutationFn: (f: VanForm) => vanApi.addByAdmin({ carNumber: f.carNumber, vehicleType: f.vehicleType, venCapacity: f.venCapacity ? Number(f.venCapacity) : undefined, condition: f.condition, deviceId: f.deviceId || undefined, assignRoute: f.assignRoute || undefined, ownVan: f.ownVan }),
+    mutationFn: (f: VanForm) => vanApi.addByAdmin({
+      carNumber: f.carNumber, vehicleType: f.vehicleType, venCapacity: f.venCapacity ? Number(f.venCapacity) : undefined, condition: f.condition,
+      deviceId: f.deviceId || undefined, assignRoute: f.assignRoute || undefined, ownVan: f.ownVan,
+      insuranceExpiry: f.insuranceExpiry || undefined, registrationExpiry: f.registrationExpiry || undefined,
+      fitnessExpiry: f.fitnessExpiry || undefined, routePermitExpiry: f.routePermitExpiry || undefined,
+      insuranceDocUrl: f.insuranceDocUrl || undefined, registrationDocUrl: f.registrationDocUrl || undefined,
+      fitnessDocUrl: f.fitnessDocUrl || undefined, routePermitDocUrl: f.routePermitDocUrl || undefined,
+    }),
     onSuccess: () => { onSuccess(); onClose(); },
     onError: (e: any) => setError(e?.response?.data?.message ?? 'Failed to add van'),
   });
   const editMutation = useMutation({
-    mutationFn: (f: VanForm) => vanApi.editByAdmin({ vanId: van!._id, carNumber: f.carNumber, vehicleType: f.vehicleType, venCapacity: f.venCapacity ? Number(f.venCapacity) : undefined, condition: f.condition, deviceId: f.deviceId || undefined, assignRoute: f.assignRoute || undefined, ownVan: f.ownVan }),
+    mutationFn: (f: VanForm) => vanApi.editByAdmin({
+      vanId: van!._id, carNumber: f.carNumber, vehicleType: f.vehicleType, venCapacity: f.venCapacity ? Number(f.venCapacity) : undefined, condition: f.condition,
+      deviceId: f.deviceId || undefined, assignRoute: f.assignRoute || undefined, ownVan: f.ownVan,
+      insuranceExpiry: f.insuranceExpiry || undefined, registrationExpiry: f.registrationExpiry || undefined,
+      fitnessExpiry: f.fitnessExpiry || undefined, routePermitExpiry: f.routePermitExpiry || undefined,
+      insuranceDocUrl: f.insuranceDocUrl || undefined, registrationDocUrl: f.registrationDocUrl || undefined,
+      fitnessDocUrl: f.fitnessDocUrl || undefined, routePermitDocUrl: f.routePermitDocUrl || undefined,
+    }),
     onSuccess: () => { onSuccess(); onClose(); },
     onError: (e: any) => setError(e?.response?.data?.message ?? 'Failed to update van'),
   });
+  const [uploadingField, setUploadingField] = useState<string | null>(null);
+  async function handleFileUpload(field: 'insuranceDocUrl' | 'registrationDocUrl' | 'fitnessDocUrl' | 'routePermitDocUrl', file: File) {
+    setUploadingField(field);
+    try {
+      const res = await uploadApi.image(file);
+      const url = res.data?.url ?? res.data?.data?.url ?? '';
+      setForm(f => ({ ...f, [field]: url }));
+    } catch (e) {
+      setError('File upload failed. Please try again.');
+    } finally {
+      setUploadingField(null);
+    }
+  }
   const isLoading = addMutation.isPending || editMutation.isPending;
   function handleSubmit() {
     if (!form.carNumber || !form.vehicleType || !form.condition) { setError('Plate number, vehicle type and condition are required.'); return; }
@@ -138,6 +194,43 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Assigned Route</label>
                 <input value={form.assignRoute} onChange={e => setForm(f => ({ ...f, assignRoute: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white" placeholder="e.g. Route A - Gulshan to School" />
+              </div>
+            </div>
+          </div>
+          <div className="p-3 bg-gray-50 rounded-xl">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Compliance & Documents</p>
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Insurance Expiry</label>
+                <input type="date" value={form.insuranceExpiry} onChange={e => setForm(f => ({ ...f, insuranceExpiry: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white" />
+                <label className="mt-1.5 flex items-center justify-center gap-1.5 text-xs text-gray-500 border border-dashed border-gray-300 rounded-lg py-1.5 cursor-pointer hover:bg-gray-100">
+                  {uploadingField === 'insuranceDocUrl' ? 'Uploading…' : form.insuranceDocUrl ? '✓ Document uploaded' : 'Upload document'}
+                  <input type="file" className="hidden" accept="image/*,.pdf" onChange={e => e.target.files?.[0] && handleFileUpload('insuranceDocUrl', e.target.files[0])} />
+                </label>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Registration Expiry</label>
+                <input type="date" value={form.registrationExpiry} onChange={e => setForm(f => ({ ...f, registrationExpiry: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white" />
+                <label className="mt-1.5 flex items-center justify-center gap-1.5 text-xs text-gray-500 border border-dashed border-gray-300 rounded-lg py-1.5 cursor-pointer hover:bg-gray-100">
+                  {uploadingField === 'registrationDocUrl' ? 'Uploading…' : form.registrationDocUrl ? '✓ Document uploaded' : 'Upload document'}
+                  <input type="file" className="hidden" accept="image/*,.pdf" onChange={e => e.target.files?.[0] && handleFileUpload('registrationDocUrl', e.target.files[0])} />
+                </label>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Fitness Cert. Expiry</label>
+                <input type="date" value={form.fitnessExpiry} onChange={e => setForm(f => ({ ...f, fitnessExpiry: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white" />
+                <label className="mt-1.5 flex items-center justify-center gap-1.5 text-xs text-gray-500 border border-dashed border-gray-300 rounded-lg py-1.5 cursor-pointer hover:bg-gray-100">
+                  {uploadingField === 'fitnessDocUrl' ? 'Uploading…' : form.fitnessDocUrl ? '✓ Document uploaded' : 'Upload document'}
+                  <input type="file" className="hidden" accept="image/*,.pdf" onChange={e => e.target.files?.[0] && handleFileUpload('fitnessDocUrl', e.target.files[0])} />
+                </label>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Route Permit Expiry</label>
+                <input type="date" value={form.routePermitExpiry} onChange={e => setForm(f => ({ ...f, routePermitExpiry: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white" />
+                <label className="mt-1.5 flex items-center justify-center gap-1.5 text-xs text-gray-500 border border-dashed border-gray-300 rounded-lg py-1.5 cursor-pointer hover:bg-gray-100">
+                  {uploadingField === 'routePermitDocUrl' ? 'Uploading…' : form.routePermitDocUrl ? '✓ Document uploaded' : 'Upload document'}
+                  <input type="file" className="hidden" accept="image/*,.pdf" onChange={e => e.target.files?.[0] && handleFileUpload('routePermitDocUrl', e.target.files[0])} />
+                </label>
               </div>
             </div>
           </div>
@@ -242,18 +335,26 @@ function AddDriverModal({ onClose }: { onClose: () => void }) {
 
   const mutation = useMutation({
     mutationFn: () => api.post('/van/addDriverByAdmin', form),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['drivers-list'] }); onClose(); },
+    onSuccess: (res: any) => {
+      qc.invalidateQueries({ queryKey: ['drivers-list'] });
+      const tempPassword = res?.data?.data?.temporaryPassword;
+      if (tempPassword) {
+        alert(`Driver added! A WhatsApp with login details was sent to ${form.phoneNo || 'the driver'}.\n\nIf WhatsApp delivery fails, share this password manually:\n${tempPassword}`);
+      }
+      onClose();
+    },
     onError: (e: any) => setError(e?.response?.data?.message ?? 'Failed to add driver'),
   });
 
   function handleNext() {
-    if (!form.fullname || !form.email || !form.password) { setError('Name, email and password are required.'); return; }
-    if (form.password.length < 6) { setError('Password must be at least 6 characters.'); return; }
+    if (!form.fullname) { setError('Full name is required.'); return; }
+    if (!form.phoneNo && !form.NIC && !form.email) { setError('Please provide at least a phone number, CNIC, or email.'); return; }
+    if (form.password && form.password.length < 6) { setError('Password must be at least 6 characters.'); return; }
     setError(''); setStep(2);
   }
 
   function handleSubmit() {
-    if (!form.NIC) { setError('CNIC number is required.'); return; }
+    if (!form.phoneNo && !form.NIC && !form.email) { setError('Please provide at least a phone number, CNIC, or email.'); return; }
     setError(''); mutation.mutate();
   }
 
@@ -315,15 +416,16 @@ function AddDriverModal({ onClose }: { onClose: () => void }) {
               {/* Account Info */}
               <div className="p-3 bg-gray-50 rounded-xl">
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">App Account</p>
+                <p className="text-xs text-gray-400 -mt-1 mb-3">Most drivers log in with just their phone number — email is optional.</p>
                 <div className="space-y-3">
                   <div>
-                    <label className={labelClass}>Email Address *</label>
-                    <input type="email" value={form.email} onChange={e => f('email', e.target.value)} className={inputClass} placeholder="driver@example.com" />
+                    <label className={labelClass}>Email Address (optional)</label>
+                    <input type="email" value={form.email} onChange={e => f('email', e.target.value)} className={inputClass} placeholder="driver@example.com" autoComplete="off" />
                   </div>
                   <div>
-                    <label className={labelClass}>Password *</label>
-                    <input type="password" value={form.password} onChange={e => f('password', e.target.value)} className={inputClass} placeholder="Min 6 characters" />
-                    <p className="text-xs text-gray-400 mt-1">Driver uses this to log into the SmartVan Driver App</p>
+                    <label className={labelClass}>Password (optional — auto-generated if left blank)</label>
+                    <input type="password" value={form.password} onChange={e => f('password', e.target.value)} className={inputClass} placeholder="Leave blank to auto-generate" autoComplete="new-password" />
+                    <p className="text-xs text-gray-400 mt-1">Sent directly to the driver via WhatsApp — no email or OTP needed.</p>
                   </div>
                 </div>
               </div>
@@ -337,7 +439,7 @@ function AddDriverModal({ onClose }: { onClose: () => void }) {
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">CNIC / National ID</p>
                 <div className="space-y-3">
                   <div>
-                    <label className={labelClass}>CNIC Number * <span className="text-gray-400 font-normal">(e.g. 42101-1234567-1)</span></label>
+                    <label className={labelClass}>CNIC Number (optional) <span className="text-gray-400 font-normal">(e.g. 42101-1234567-1)</span></label>
                     <input value={form.NIC} onChange={e => f('NIC', e.target.value)} className={inputClass} placeholder="XXXXX-XXXXXXX-X" />
                   </div>
                   <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl">

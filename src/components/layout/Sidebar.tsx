@@ -5,25 +5,29 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import {
   LayoutDashboard, MapPin, School, Bus, Users, Route,
-  Bell, BarChart3, Receipt, Wrench, Settings, LogOut,
+  Bell, BarChart3, Receipt, Wrench, Settings, LogOut, MessageSquare, History,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/i18n/LanguageContext";
 
-const navItems: { labelKey: string; href: string; icon: any; badge?: number; superadminOnly?: boolean }[] = [
-  { labelKey: "nav.overview", href: "/dashboard", icon: LayoutDashboard },
-  { labelKey: "nav.liveTracking", href: "/tracking", icon: MapPin },
-  { labelKey: "nav.studentManagement", href: "/students", icon: School },
-  { labelKey: "nav.vanDriverMgmt", href: "/vans", icon: Bus },
-  { labelKey: "nav.parentManagement", href: "/parents", icon: Users },
-  { labelKey: "nav.routePlanner", href: "/routes", icon: Route },
-  { labelKey: "nav.alertsOverview", href: "/alerts", icon: Bell, badge: 3 },
-  { labelKey: "nav.analytics", href: "/analytics", icon: BarChart3 },
-  { labelKey: "nav.billing", href: "/billing", icon: Receipt, superadminOnly: false },
-  { labelKey: "nav.fleetManagement", href: "/fleet", icon: Wrench },
-  { labelKey: "nav.attendance", href: "/attendance", icon: Users },
-  { labelKey: "nav.feeManagement", href: "/fees", icon: Users },
-  { labelKey: "nav.schoolLeads", href: "/leads", icon: Users, superadminOnly: true },
+const navItems: { labelKey: string; href: string; icon: any; badge?: number; roles: ("admin" | "superadmin")[] }[] = [
+  { labelKey: "nav.overview", href: "/super-admin", icon: LayoutDashboard, roles: ["superadmin"] },
+  { labelKey: "nav.overview", href: "/dashboard", icon: LayoutDashboard, roles: ["admin"] },
+  { labelKey: "nav.liveTracking", href: "/tracking", icon: MapPin, roles: ["admin"] },
+  { labelKey: "nav.studentManagement", href: "/students", icon: School, roles: ["admin"] },
+  { labelKey: "nav.vanDriverMgmt", href: "/vans", icon: Bus, roles: ["admin"] },
+  { labelKey: "nav.parentManagement", href: "/parents", icon: Users, roles: ["admin"] },
+  { labelKey: "nav.routePlanner", href: "/routes", icon: Route, roles: ["admin"] },
+  { labelKey: "nav.alertsOverview", href: "/alerts", icon: Bell, badge: 3, roles: ["admin"] },
+  { labelKey: "nav.analytics", href: "/analytics", icon: BarChart3, roles: ["admin"] },
+  { labelKey: "nav.billing", href: "/billing", icon: Receipt, roles: ["admin"] },
+  { labelKey: "nav.fleetManagement", href: "/fleet", icon: Wrench, roles: ["admin"] },
+  { labelKey: "nav.attendance", href: "/attendance", icon: Users, roles: ["admin"] },
+  { labelKey: "nav.feeManagement", href: "/fees", icon: Users, roles: ["admin"] },
+  { labelKey: "nav.schoolLeads", href: "/leads", icon: Users, roles: ["superadmin"] },
+  { labelKey: "nav.employees", href: "/employees", icon: Users, roles: ["superadmin"] },
+  { labelKey: "nav.tickets", href: "/tickets", icon: MessageSquare, roles: ["superadmin"] },
+  { labelKey: "nav.auditLog", href: "/audit-log", icon: History, roles: ["superadmin"] },
 ];
 
 export function Sidebar() {
@@ -32,15 +36,15 @@ export function Sidebar() {
   const { t, isRTL } = useLanguage();
 
   return (
-    <aside className="w-[190px] bg-white border-r border-sv-border flex flex-col flex-shrink-0 h-screen sticky top-0">
+    <aside className="w-[190px] bg-white dark:bg-[var(--sv-card-bg)] border-r border-sv-border dark:border-[var(--sv-border)] flex flex-col flex-shrink-0 h-screen sticky top-0">
       {/* Logo */}
-      <div className="px-4 py-[14px] border-b border-sv-border flex items-center justify-center">
+      <div className="px-4 py-[14px] border-b border-sv-border dark:border-[var(--sv-border)] flex items-center justify-center">
         <Image src="/smartvan-logo.png" alt="SmartVan" width={140} height={56} className="object-contain" />
       </div>
 
       {/* Nav */}
       <nav className="flex-1 py-2.5 overflow-y-auto scrollbar-hide">
-        {navItems.filter(item => !item.superadminOnly || admin?.role === "superadmin").map((item) => {
+        {navItems.filter(item => item.roles.includes((admin?.role as "admin" | "superadmin") ?? "admin")).map((item) => {
           const active = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link
@@ -50,7 +54,7 @@ export function Sidebar() {
                 "flex items-center gap-2.5 px-4 py-[9px] text-[12.5px] transition-all",
                 active
                   ? "bg-sv-navy text-white rounded-lg mx-2 px-3"
-                  : "text-sv-muted hover:text-sv-text hover:bg-sv-bg"
+                  : "text-sv-muted hover:text-sv-text hover:bg-sv-bg dark:hover:bg-white/5"
               )}
             >
               <item.icon size={16} className="flex-shrink-0" />
@@ -66,10 +70,10 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom: user + settings + logout */}
-      <div className="border-t border-sv-border p-3 space-y-1">
+      <div className="border-t border-sv-border dark:border-[var(--sv-border)] p-3 space-y-1">
         <Link
           href="/settings"
-          className="flex items-center gap-2.5 px-3 py-2 text-[12px] text-sv-muted hover:text-sv-text hover:bg-sv-bg rounded-lg transition-all"
+          className="flex items-center gap-2.5 px-3 py-2 text-[12px] text-sv-muted hover:text-sv-text hover:bg-sv-bg dark:hover:bg-white/5 rounded-lg transition-all"
         >
           <Settings size={15} />
           Settings

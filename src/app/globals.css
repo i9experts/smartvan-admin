@@ -10,29 +10,46 @@
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 225 57% 26%;
+    --sv-bg: #F5F6FA;
+    --sv-body-text: #1A1A2E;
+    --sv-border: #EAECF0;
+    --sv-card-bg: #FFFFFF;
+  }
+  .dark {
+    --background: 230 20% 10%;
+    --foreground: 220 15% 92%;
+    --border: 230 12% 22%;
+    --input: 230 12% 22%;
+    --ring: 225 57% 55%;
+    --sv-bg: #14151F;
+    --sv-body-text: #E5E7EB;
+    --sv-border: #262838;
+    --sv-card-bg: #1B1D2A;
   }
   * {
     box-sizing: border-box;
-    border-color: #EAECF0;
+    border-color: var(--sv-border);
   }
   body {
-    background-color: #F5F6FA;
-    color: #1A1A2E;
+    background-color: var(--sv-bg);
+    color: var(--sv-body-text);
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 13px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
-  h1 { font-size: 1.5rem; font-weight: 500; color: #1A1A2E; }
-  h2 { font-size: 1.25rem; font-weight: 500; color: #1A1A2E; }
-  h3 { font-size: 1rem; font-weight: 500; color: #1A1A2E; }
+  h1, h2, h3 { color: var(--sv-body-text); }
+  h1 { font-size: 1.5rem; font-weight: 500; }
+  h2 { font-size: 1.25rem; font-weight: 500; }
+  h3 { font-size: 1rem; font-weight: 500; }
 }
 
 @layer utilities {
   .card {
-    background-color: #FFFFFF;
+    background-color: var(--sv-card-bg);
     border-radius: 10px;
-    border: 0.5px solid #EAECF0;
+    border: 0.5px solid var(--sv-border);
   }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

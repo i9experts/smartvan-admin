@@ -13,6 +13,9 @@
     "attendance": "الحضور والغياب",
     "feeManagement": "إدارة الرسوم",
     "schoolLeads": "المدارس المحتملة",
+    "employees": "الموظفين",
+    "tickets": "التذاكر",
+    "auditLog": "سجل النشاط",
     "settings": "الإعدادات"
   },
   "common": {

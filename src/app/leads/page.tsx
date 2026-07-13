@@ -218,7 +218,14 @@ export default function LeadsPage() {
                       <div className="text-xs text-gray-400">{lead.studentCount || ''} students</div>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="text-gray-700 font-medium text-xs">{lead.plan?.split('–')[0] || '—'}</div>
+                      <div className="text-gray-700 font-medium text-xs">{
+                        lead.plan === 'car_pkr' ? '🚗 Car/Rickshaw – PKR 790' :
+                        lead.plan === 'hiroof_pkr' ? '🚐 Hiroof/Hiace – PKR 990' :
+                        lead.plan === 'bus_pkr' ? '🚌 Bus/Coach – PKR 1,990' :
+                        lead.plan === 'hiroof_usd' ? '🚐 Hiroof/Hiace – $19' :
+                        lead.plan === 'bus_usd' ? '🚌 Bus/Coach – $39' :
+                        lead.plan?.split('–')[0] || '—'
+                      }</div>
                       <div className="text-xs text-gray-400">{lead.currency}</div>
                     </td>
                     <td className="px-4 py-3">
@@ -324,7 +331,14 @@ export default function LeadsPage() {
                     <Row label="Role" value={selectedLead.designation} />
                     <Row label="Email" value={selectedLead.email} isEmail />
                     <Row label="Phone" value={selectedLead.phone} isPhone />
-                    <Row label="Plan" value={selectedLead.plan || '—'} />
+                    <Row label="Van Type / Plan" value={
+                      selectedLead.plan === 'car_pkr' ? '🚗 Car/Rickshaw — PKR 790/van/month' :
+                      selectedLead.plan === 'hiroof_pkr' ? '🚐 Hiroof/Hiace — PKR 990/van/month' :
+                      selectedLead.plan === 'bus_pkr' ? '🚌 Bus/Coach — PKR 1,990/van/month' :
+                      selectedLead.plan === 'hiroof_usd' ? '🚐 Hiroof/Hiace — $19/van/month (Gulf)' :
+                      selectedLead.plan === 'bus_usd' ? '🚌 Bus/Coach — $39/van/month (Gulf)' :
+                      selectedLead.plan || '—'
+                    } />
                     <Row label="Currency" value={selectedLead.currency || '—'} />
                     <Row label="Submitted" value={new Date(selectedLead.createdAt).toLocaleString()} />
                   </div>

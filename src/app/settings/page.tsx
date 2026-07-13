@@ -1,4 +1,5 @@
 'use client';
+import { useTheme } from '@/theme/ThemeContext';
 
 import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -161,13 +162,14 @@ const SECTIONS = [
 
 export default function SettingsPage() {
   const qc = useQueryClient();
+  const { theme, setTheme } = useTheme();
   const [activeSection, setActiveSection] = useState('school');
   const [isDirty, setIsDirty] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [showCurrentPw, setShowCurrentPw] = useState(false);
   const [showNewPw, setShowNewPw] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('light');
+
   const [waForm, setWaForm] = useState({ wabaId: '', waPhoneNumberId: '', waAccessToken: '', waPhoneNumber: '' });
   const [waConnecting, setWaConnecting] = useState(false);
   const [waMsg, setWaMsg] = useState('');
@@ -212,12 +214,15 @@ export default function SettingsPage() {
     setNotifPrefs(getNotifPrefs());
   }, []);
 
-  // Fetch school profile
+  const isSuperAdmin = typeof window !== 'undefined' && JSON.parse(localStorage.getItem('smartvan_user') ?? '{}').role === 'superadmin';
+  // Fetch school profile — skipped entirely for superadmin, since they have no linked school
+  // and this endpoint 401s for them, which would otherwise trigger a global logout
   const { data: profileData, isLoading } = useQuery({
     queryKey: ['settings-profile'],
     queryFn: () => api.get('/Admin/getProfile'),
     select: r => r.data?.data as SchoolProfile,
     staleTime: 60_000,
+    enabled: !isSuperAdmin,
   });
 
   const school = profileData;
@@ -268,8 +273,10 @@ export default function SettingsPage() {
 
   const saveMutation = useMutation({
     mutationFn: () => {
-      const user = JSON.parse(localStorage.getItem('smartvan_user') ?? '{}');
-      const isSuperAdmin = user.role === 'superadmin';
+      if (isSuperAdmin) {
+        // Superadmin has no linked school — only update their own admin profile
+        return api.patch('/Admin/update-own-profile', adminForm);
+      }
       const payload = {
         schoolInfo: {
           ...schoolForm,
@@ -280,9 +287,6 @@ export default function SettingsPage() {
         },
         adminInfo: adminForm,
       };
-      if (isSuperAdmin) {
-        return api.post('/Admin/edit-admin-school', { schoolId: school?._id, ...payload });
-      }
       return api.post('/Admin/editSchoolProfile', payload);
     },
     onSuccess: () => {
@@ -917,7 +921,7 @@ export default function SettingsPage() {
                       </button>
                     ))}
                   </div>
-                  <p className="text-xs text-gray-400 mt-3">Dark mode coming soon — currently only light mode is supported.</p>
+                  <p className="text-xs text-gray-400 mt-3">Applies instantly across the sidebar, top bar, and page background. Full page-level dark styling is still being rolled out.</p>
                 </div>
 
                 <div>

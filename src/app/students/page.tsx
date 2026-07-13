@@ -43,6 +43,7 @@ interface AddStudentForm {
   age: string;
   dob: string;
   parentEmail: string;
+  parentPhone: string;
 }
 
 const EMPTY_FORM: AddStudentForm = {
@@ -52,6 +53,7 @@ const EMPTY_FORM: AddStudentForm = {
   age: '',
   dob: '',
   parentEmail: '',
+  parentPhone: '',
 };
 
 // ─── API calls ────────────────────────────────────────────────────────────────
@@ -95,6 +97,7 @@ async function addStudent(form: AddStudentForm) {
     age: Number(form.age),
     dob: form.dob,
     parentEmail: form.parentEmail,
+    parentPhone: form.parentPhone || undefined,
   });
 }
 
@@ -160,6 +163,7 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
           age: String(student.age ?? ''),
           dob: student.dob ? student.dob.split('T')[0] : '',
           parentEmail: '',
+          parentPhone: '',
         }
       : EMPTY_FORM
   );
@@ -302,6 +306,21 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
               <p className="text-xs text-gray-400 mt-1">
                 Parent account will be linked to this student.
               </p>
+              <div className="mt-3">
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  Parent Phone (WhatsApp)
+                </label>
+                <input
+                  type="tel"
+                  value={form.parentPhone}
+                  onChange={(e) => setForm((f) => ({ ...f, parentPhone: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                  placeholder="e.g. 03001234567"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Optional — enables a WhatsApp welcome message to the parent.
+                </p>
+              </div>
             </div>
           )}
 
@@ -338,10 +357,12 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
 // ─── Assign Route Modal ───────────────────────────────────────────────────────
 function AssignVanModal({ student, onClose, onSuccess }: { student: any; onClose: () => void; onSuccess: () => void }) {
   const [selectedRouteId, setSelectedRouteId] = useState('');
+  const [selectedVanId, setSelectedVanId] = useState('');
   const [loading, setLoading] = useState(false);
+  const [vanLoading, setVanLoading] = useState(false);
   const [error, setError] = useState('');
   const [studentRoutes, setStudentRoutes] = useState<any[]>([]);
-  const [tab, setTab] = useState<'assign' | 'current'>('current');
+  const [tab, setTab] = useState<'current' | 'assign' | 'van'>('current');
 
   const { data: routes = [], isLoading: routesLoading } = useQuery({
     queryKey: ['routes-for-assign'],
@@ -366,11 +387,34 @@ function AssignVanModal({ student, onClose, onSuccess }: { student: any; onClose
     },
   });
 
+  const { data: vans = [], isLoading: vansLoading } = useQuery({
+    queryKey: ['vans-for-assign'],
+    queryFn: () => api.get('/van/GetVansByAdmin', { params: { limit: 100 } }),
+    select: (r: any) => r.data?.data ?? [],
+  });
+
   useEffect(() => {
     api.get(`/route/student-routes/${student._id}`)
       .then(r => setStudentRoutes(r.data?.data ?? []))
       .catch(() => setStudentRoutes([]));
   }, [student._id]);
+
+  async function handleAssignVan() {
+    if (!selectedVanId) { setError('Please select a van'); return; }
+    setVanLoading(true);
+    setError('');
+    try {
+      await api.post('/kid/assignVanToStudents', {
+        kidIds: [student._id],
+        vanId: selectedVanId,
+      });
+      onSuccess();
+    } catch (e: any) {
+      setError(e?.response?.data?.message ?? 'Failed to assign van');
+    } finally {
+      setVanLoading(false);
+    }
+  }
 
   async function handleAssign() {
     if (!selectedRouteId) { setError('Please select a route'); return; }
@@ -415,7 +459,7 @@ function AssignVanModal({ student, onClose, onSuccess }: { student: any; onClose
               <Bus size={18} className="text-[#1B2B6B]" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Route Assignment</h2>
+              <h2 className="text-lg font-bold text-gray-900">Van & Route Assignment</h2>
               <p className="text-xs text-gray-400">{student.fullname}</p>
             </div>
           </div>
@@ -426,19 +470,74 @@ function AssignVanModal({ student, onClose, onSuccess }: { student: any; onClose
 
         {/* Tabs */}
         <div className="flex border-b border-gray-100 px-6">
-          {(['current', 'assign'] as const).map(t => (
+          {(['current', 'van', 'assign'] as const).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
               className={`px-4 py-2.5 text-sm font-medium border-b-2 transition ${tab === t ? 'border-[#1B2B6B] text-[#1B2B6B]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
             >
-              {t === 'current' ? `Current Routes (${studentRoutes.length})` : 'Assign New Route'}
+              {t === 'current' ? `Current Routes (${studentRoutes.length})` : t === 'van' ? 'Assign Van' : 'Assign New Route'}
             </button>
           ))}
         </div>
 
         <div className="p-6 space-y-4 max-h-96 overflow-y-auto">
-          {tab === 'current' ? (
+          {tab === 'van' ? (
+            <div className="space-y-4">
+              {student.VanId && (
+                <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-xs text-emerald-700">
+                  Currently assigned to a van. Selecting a different van below will reassign this student.
+                </div>
+              )}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">Select Van</label>
+                {vansLoading ? (
+                  <div className="text-xs text-gray-400 py-2">Loading vans...</div>
+                ) : vans.length === 0 ? (
+                  <div className="text-xs text-gray-400 py-2">No vans found. Add a van first in Fleet Management.</div>
+                ) : (
+                  <div className="space-y-2">
+                    {vans.map((item: any) => (
+                      <div
+                        key={item.van?.id}
+                        onClick={() => setSelectedVanId(item.van?.id)}
+                        className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition ${
+                          selectedVanId === item.van?.id
+                            ? 'border-[#1B2B6B] bg-[#1B2B6B]/5'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{item.van?.carNumber || 'Unnamed Van'}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            Driver: {item.driver?.fullname || 'Unassigned'} · {item.van?.status}
+                          </p>
+                        </div>
+                        {selectedVanId === item.van?.id && (
+                          <div className="w-5 h-5 rounded-full bg-[#1B2B6B] flex items-center justify-center shrink-0">
+                            <CheckCircle2 size={12} className="text-white" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {error && <p className="text-xs text-red-500">{error}</p>}
+              <div className="flex gap-3">
+                <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition">
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAssignVan}
+                  disabled={vanLoading || !selectedVanId}
+                  className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
+                >
+                  {vanLoading ? 'Assigning...' : 'Assign Van'}
+                </button>
+              </div>
+            </div>
+          ) : tab === 'current' ? (
             studentRoutes.length === 0 ? (
               <div className="text-center py-8 text-gray-400">
                 <Bus size={32} className="mx-auto mb-2 opacity-30" />

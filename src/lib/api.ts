@@ -103,4 +103,34 @@ export const schoolApi = {
   getAll: (params?: { page?: number; limit?: number; search?: string }) =>
     api.get('/Admin/getAllSchoolsBySuperAdmin', { params }),
   getById: (id: string) => api.get(`/Admin/getSchoolById/${id}`),
+  changeStatus: (schoolId: string, status: string) =>
+    api.post('/school/changeSchoolStatus', { schoolId, status }),
+};
+export const employeeApi = {
+  getPermissions: () => api.get('/employee/permissions'),
+  getAll: () => api.get('/employee/all'),
+  create: (data: { name: string; email: string; password: string; permissions: string[] }) =>
+    api.post('/employee/create', data),
+  update: (id: string, data: { name?: string; permissions?: string[]; status?: string }) =>
+    api.patch(`/employee/${id}`, data),
+  remove: (id: string) => api.delete(`/employee/${id}`),
+  login: (email: string, password: string) => api.post('/employee/login', { email, password }),
+  getMyTickets: () => api.get('/employee/my-tickets'),
+  updateTicketStatus: (ticketId: string, status: string, adminRemarks?: string) =>
+    api.patch(`/employee/my-tickets/${ticketId}/status`, { status, adminRemarks }),
+  assignTicket: (reportId: string, employeeId: string) =>
+    api.post('/employee/assign-ticket', { reportId, employeeId }),
+};
+export const uploadApi = {
+  image: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/upload/image', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+  },
+};
+export const auditLogApi = {
+  getRecent: () => api.get('/audit-log/recent'),
+};
+export const searchApi = {
+  universal: (q: string) => api.get('/search/universal', { params: { q } }),
 };

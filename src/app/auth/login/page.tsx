@@ -28,7 +28,7 @@ export default function LoginPage() {
       localStorage.setItem('smartvan_token', token);
       localStorage.setItem('smartvan_user', JSON.stringify(user ?? {}));
       document.cookie = `smartvan_token=${token}; path=/; max-age=${30*24*60*60}; SameSite=Lax`;
-      window.location.href = '/dashboard';
+      window.location.href = user?.role === 'superadmin' ? '/super-admin' : '/dashboard';
     } catch (e) {
       setError('Network error. Please try again.');
       setLoading(false);
