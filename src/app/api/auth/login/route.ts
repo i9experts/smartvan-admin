@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Server-side env var — falls back to NEXT_PUBLIC_API_URL if a non-public
+// API_URL isn't separately set, then to the old VPS IP only as a last resort
+// so nothing breaks if an env var is missing during the Railway cutover.
+const BACKEND_URL =
+  process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://72.61.119.165:3002';
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const res = await fetch('http://72.61.119.165:3002/Admin/login', {
+    const res = await fetch(`${BACKEND_URL}/Admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
