@@ -309,6 +309,15 @@ export default function AlertsPage() {
   const total: number = data?.total ?? alerts.length ?? 0;
   const totalPages = Math.ceil(total / 12);
 
+  const [driverAlertsPage, setDriverAlertsPage] = useState(1);
+  const { data: driverAlertsData, isLoading: driverAlertsLoading } = useQuery({
+    queryKey: ['driver-alerts', driverAlertsPage],
+    queryFn: () => alertApi.getFromDrivers({ page: driverAlertsPage, limit: 10 }),
+    select: (r: any) => r.data,
+    staleTime: 30_000,
+  });
+  const driverAlertsList: any[] = driverAlertsData?.data ?? [];
+
   const [waMsg, setWaMsg] = useState('');
 
   async function sendAlertViaWhatsApp(alert: any) {
@@ -424,6 +433,49 @@ _Safe Ride, Every Side_`;
             ))}
           </div>
         )}
+
+        {/* Alerts from drivers — driver-originated messages/voice notes,
+            distinct from the broadcast alerts admin sends out above */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+          <div className="p-4 border-b border-gray-100">
+            <h2 className="text-base font-semibold text-gray-900">Alerts from Drivers</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Messages and voice notes sent directly from drivers</p>
+          </div>
+          <div className="p-4 space-y-3">
+            {driverAlertsLoading ? (
+              <div className="animate-pulse space-y-2">
+                <div className="h-12 bg-gray-100 rounded-xl" />
+                <div className="h-12 bg-gray-100 rounded-xl" />
+              </div>
+            ) : driverAlertsList.length === 0 ? (
+              <p className="text-sm text-gray-400 text-center py-4">No alerts from drivers yet</p>
+            ) : (
+              driverAlertsList.map((a: any) => (
+                <div key={a._id} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                  <div className="w-9 h-9 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center shrink-0">
+                    <User size={16} className="text-[#1B2B6B]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-medium text-gray-900">{a.driverName || 'Driver'}</p>
+                      <p className="text-xs text-gray-400 shrink-0">
+                        {new Date(a.date || a.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                    {a.message && (
+                      <p className="text-sm text-gray-600 mt-1">{a.message}</p>
+                    )}
+                    {a.audioUrl && (
+                      <audio controls className="mt-2 h-8 w-full max-w-xs">
+                        <source src={a.audioUrl} />
+                      </audio>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
 
         {/* Alerts list */}
         {isLoading ? (

@@ -89,6 +89,8 @@ export const alertApi = {
   add: (data: any) => api.post('/alert/addAlert', data),
   edit: (alertId: string, data: any) => api.post('/alert/editAlert', { alertId, ...data }),
   delete: (alertId: string) => api.post('/alert/deleteAlert', { alertId }),
+  getFromDrivers: (params?: { page?: number; limit?: number }) =>
+    api.get('/alert/getDriverAlertsForAdmin', { params }),
 };
 
 export const invoiceApi = {
