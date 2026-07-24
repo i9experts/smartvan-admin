@@ -231,6 +231,8 @@ export default function SettingsPage() {
   const [schoolForm, setSchoolForm] = useState<Partial<SchoolProfile>>({});
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   async function handleLogoSelected(file: File) {
     if (file.size > 2 * 1024 * 1024) {
@@ -252,6 +254,26 @@ export default function SettingsPage() {
     }
   }
 
+  async function handleAvatarSelected(file: File) {
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Photo must be under 2MB.');
+      setTimeout(() => setError(''), 4000);
+      return;
+    }
+    setIsUploadingAvatar(true);
+    try {
+      const res = await uploadApi.image(file);
+      const url = res.data?.url ?? res.data?.data?.url ?? '';
+      setAdminForm(f => ({ ...f, image: url }));
+      markDirty();
+    } catch (e) {
+      setError('Photo upload failed. Please try again.');
+      setTimeout(() => setError(''), 4000);
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  }
+
   const CURRENCIES = [
     { code: 'PKR', label: 'Pakistani Rupee (PKR)', symbol: '₨', flag: '🇵🇰' },
     { code: 'SAR', label: 'Saudi Riyal (SAR)', symbol: '﷼', flag: '🇸🇦' },
@@ -265,7 +287,7 @@ export default function SettingsPage() {
     { code: 'AE', label: 'United Arab Emirates', flag: '🇦🇪' },
     { code: 'QA', label: 'Qatar', flag: '🇶🇦' },
   ];
-  const [adminForm, setAdminForm] = useState<{ name: string; email: string }>({ name: '', email: '' });
+  const [adminForm, setAdminForm] = useState<{ name: string; email: string; image?: string }>({ name: '', email: '' });
   const [tripForm, setTripForm] = useState({
     startTime: '', endTime: '', maxTripDuration: '', bufferTime: '',
   });
@@ -291,7 +313,7 @@ export default function SettingsPage() {
       });
     }
     const user = JSON.parse(localStorage.getItem('smartvan_user') ?? '{}');
-    setAdminForm({ name: user.name ?? '', email: user.email ?? '' });
+    setAdminForm({ name: user.name ?? '', email: user.email ?? '', image: user.image ?? undefined });
   }, [school]);
 
   const saveMutation = useMutation({
@@ -556,11 +578,34 @@ export default function SettingsPage() {
               <div className="space-y-5">
                 <div className="flex items-center gap-5">
                   <div className="relative">
-                    <div className="w-20 h-20 rounded-full bg-[#1B2B6B] flex items-center justify-center text-white text-3xl font-bold">
-                      {adminForm.name?.charAt(0)?.toUpperCase() ?? 'A'}
+                    <div className="w-20 h-20 rounded-full bg-[#1B2B6B] flex items-center justify-center text-white text-3xl font-bold overflow-hidden">
+                      {adminForm.image ? (
+                        <img src={adminForm.image} alt="Profile" className="w-full h-full object-cover" />
+                      ) : (
+                        adminForm.name?.charAt(0)?.toUpperCase() ?? 'A'
+                      )}
                     </div>
-                    <button className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#FFB800] rounded-full flex items-center justify-center shadow-md">
-                      <Camera size={13} className="text-white" />
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg"
+                      className="hidden"
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (file) handleAvatarSelected(file);
+                        e.target.value = '';
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => avatarInputRef.current?.click()}
+                      disabled={isUploadingAvatar}
+                      className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#FFB800] rounded-full flex items-center justify-center shadow-md disabled:opacity-60">
+                      {isUploadingAvatar ? (
+                        <Loader2 size={13} className="text-white animate-spin" />
+                      ) : (
+                        <Camera size={13} className="text-white" />
+                      )}
                     </button>
                   </div>
                   <div>
