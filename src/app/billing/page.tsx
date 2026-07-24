@@ -224,7 +224,7 @@ function SchoolBillingView() {
 
 // ─── Superadmin Billing Dashboard ─────────────────────────────────────────────
 function SuperAdminBillingView() {
-  const { data: schools = [], isLoading } = useQuery({
+  const { data: schools = [], isLoading, refetch, isRefetching } = useQuery({
     queryKey: ['all-schools-billing'],
     queryFn: () => api.get('/billing/all-schools').then(r => r.data),
     staleTime: 60_000,
@@ -309,8 +309,12 @@ function SuperAdminBillingView() {
                     {school.currentPeriodEnd ? formatDate(school.currentPeriodEnd) : '—'}
                   </td>
                   <td className="p-4">
-                    <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 transition">
-                      <RefreshCw size={13} />
+                    <button
+                      onClick={() => refetch()}
+                      disabled={isRefetching}
+                      title="Refresh billing data"
+                      className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 transition disabled:opacity-50">
+                      <RefreshCw size={13} className={isRefetching ? 'animate-spin' : ''} />
                     </button>
                   </td>
                 </tr>
