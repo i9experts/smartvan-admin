@@ -98,7 +98,8 @@ export const invoiceApi = {
 };
 
 export const routeApi = {
-  getAll: () => api.get('/route'),
+  getAll: (params?: { tripType?: string; page?: number; limit?: number }) =>
+    api.get('/Route/getRoutes', { params }),
 };
 
 export const schoolApi = {
