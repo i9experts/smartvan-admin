@@ -10,7 +10,7 @@ import {
   Sun, Moon, Monitor, Zap, Bus, Users, Route,
   Info, Lock, LogOut, Loader2, MessageSquare,
 } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api, uploadApi } from '@/lib/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -229,6 +229,29 @@ export default function SettingsPage() {
 
   // Local editable copies
   const [schoolForm, setSchoolForm] = useState<Partial<SchoolProfile>>({});
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleLogoSelected(file: File) {
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Logo must be under 2MB.');
+      setTimeout(() => setError(''), 4000);
+      return;
+    }
+    setIsUploadingLogo(true);
+    try {
+      const res = await uploadApi.image(file);
+      const url = res.data?.url ?? res.data?.data?.url ?? '';
+      setSchoolForm(f => ({ ...f, schoolImage: url }));
+      markDirty();
+    } catch (e) {
+      setError('Logo upload failed. Please try again.');
+      setTimeout(() => setError(''), 4000);
+    } finally {
+      setIsUploadingLogo(false);
+    }
+  }
+
   const CURRENCIES = [
     { code: 'PKR', label: 'Pakistani Rupee (PKR)', symbol: '₨', flag: '🇵🇰' },
     { code: 'SAR', label: 'Saudi Riyal (SAR)', symbol: '﷼', flag: '🇸🇦' },
@@ -408,14 +431,33 @@ export default function SettingsPage() {
                   <div className="flex items-center gap-5">
                     <div className="relative">
                       <div className="w-20 h-20 rounded-2xl bg-[#1B2B6B]/10 flex items-center justify-center overflow-hidden">
-                        {school.schoolImage ? (
-                          <img src={school.schoolImage} alt="School" className="w-full h-full object-cover" />
+                        {schoolForm.schoolImage || school.schoolImage ? (
+                          <img src={schoolForm.schoolImage ?? school.schoolImage} alt="School" className="w-full h-full object-cover" />
                         ) : (
                           <Building2 size={32} className="text-[#1B2B6B]/40" />
                         )}
                       </div>
-                      <button className="absolute -bottom-1.5 -right-1.5 w-7 h-7 bg-[#1B2B6B] rounded-full flex items-center justify-center shadow-md hover:bg-[#162356] transition">
-                        <Camera size={13} className="text-white" />
+                      <input
+                        ref={logoInputRef}
+                        type="file"
+                        accept="image/png,image/jpeg"
+                        className="hidden"
+                        onChange={e => {
+                          const file = e.target.files?.[0];
+                          if (file) handleLogoSelected(file);
+                          e.target.value = '';
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => logoInputRef.current?.click()}
+                        disabled={isUploadingLogo}
+                        className="absolute -bottom-1.5 -right-1.5 w-7 h-7 bg-[#1B2B6B] rounded-full flex items-center justify-center shadow-md hover:bg-[#162356] transition disabled:opacity-60">
+                        {isUploadingLogo ? (
+                          <Loader2 size={13} className="text-white animate-spin" />
+                        ) : (
+                          <Camera size={13} className="text-white" />
+                        )}
                       </button>
                     </div>
                     <div>
