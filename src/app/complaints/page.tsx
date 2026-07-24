@@ -386,7 +386,9 @@ export default function ComplaintsPage() {
                         {new Date(complaint.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </td>
                       <td className="p-4">
-                        <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 transition">
+                        <button
+                          onClick={() => setSelected(complaint)}
+                          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 transition">
                           <Eye size={14} />
                         </button>
                       </td>
