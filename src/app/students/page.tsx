@@ -16,7 +16,7 @@ import {
   Filter,
   Bus,
 } from "lucide-react";
-import { api, vanApi } from '@/lib/api';
+import { api, vanApi, uploadApi } from '@/lib/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -44,6 +44,7 @@ interface AddStudentForm {
   dob: string;
   parentEmail: string;
   parentPhone: string;
+  image?: string;
 }
 
 const EMPTY_FORM: AddStudentForm = {
@@ -54,6 +55,7 @@ const EMPTY_FORM: AddStudentForm = {
   dob: '',
   parentEmail: '',
   parentPhone: '',
+  image: undefined,
 };
 
 // ─── API calls ────────────────────────────────────────────────────────────────
@@ -98,6 +100,7 @@ async function addStudent(form: AddStudentForm) {
     dob: form.dob,
     parentEmail: form.parentEmail,
     parentPhone: form.parentPhone || undefined,
+    image: form.image || undefined,
   });
 }
 
@@ -109,6 +112,7 @@ async function editStudent(kidId: string, form: Partial<AddStudentForm>) {
     gender: form.gender,
     age: Number(form.age),
     dob: form.dob,
+    image: form.image || undefined,
   });
 }
 
@@ -164,9 +168,28 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
           dob: student.dob ? student.dob.split('T')[0] : '',
           parentEmail: '',
           parentPhone: '',
+          image: student.image ?? undefined,
         }
       : EMPTY_FORM
   );
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+
+  async function handlePhotoSelected(file: File) {
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Photo must be under 2MB.');
+      return;
+    }
+    setIsUploadingPhoto(true);
+    try {
+      const res = await uploadApi.image(file);
+      const url = res.data?.url ?? res.data?.data?.url ?? '';
+      setForm(f => ({ ...f, image: url }));
+    } catch (e) {
+      setError('Photo upload failed. Please try again.');
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  }
   const [error, setError] = useState('');
 
   const addMutation = useMutation({
@@ -229,6 +252,39 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
         </div>
 
         <div className="space-y-3">
+          <div className="flex justify-center mb-1">
+            <div className="relative">
+              <div className="w-20 h-20 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center overflow-hidden">
+                {form.image ? (
+                  <img src={form.image} alt="Student" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-2xl font-semibold text-[#1B2B6B]">
+                    {form.fullname?.charAt(0)?.toUpperCase() ?? '?'}
+                  </span>
+                )}
+              </div>
+              <input
+                id="student-photo-input"
+                type="file"
+                accept="image/png,image/jpeg"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handlePhotoSelected(file);
+                  e.target.value = '';
+                }}
+              />
+              <label
+                htmlFor="student-photo-input"
+                className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#1B2B6B] rounded-full flex items-center justify-center shadow-md cursor-pointer">
+                {isUploadingPhoto ? (
+                  <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Pencil size={12} className="text-white" />
+                )}
+              </label>
+            </div>
+          </div>
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Full Name *</label>
             <input
@@ -907,8 +963,12 @@ export default function StudentsPage() {
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] font-semibold text-sm shrink-0">
-                            {student.fullname?.charAt(0)?.toUpperCase() ?? '?'}
+                          <div className="w-9 h-9 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] font-semibold text-sm shrink-0 overflow-hidden">
+                            {student.image ? (
+                              <img src={student.image} alt={student.fullname} className="w-full h-full object-cover" />
+                            ) : (
+                              student.fullname?.charAt(0)?.toUpperCase() ?? '?'
+                            )}
                           </div>
                           <div>
                             <p className="text-sm font-medium text-gray-900">
