@@ -1,75 +1,41 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Search, X, Phone, Mail, Users,
   ChevronLeft, ChevronRight, Eye,
   GraduationCap, Bus, CheckCircle2, XCircle,
 } from 'lucide-react';
-import { studentApi } from '@/lib/api';
+import { api } from '@/lib/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface Student {
+interface LinkedKid {
   _id: string;
   fullname: string;
-  grade: number;
-  gender: string;
-  age: number;
-  status: string;
-  verifiedBySchool: boolean;
+  grade?: number;
   VanId?: string;
-  parentId: string;
-  createdAt: string;
-  parent?: ParentInfo;
+  status: string;
 }
 
-interface ParentInfo {
+interface ParentRow {
   _id: string;
   fullname?: string;
   email: string;
   phoneNo?: string;
   address?: string;
   image?: string;
+  kids: LinkedKid[];
 }
 
-interface ParentRow {
-  parentId: string;
-  fullname?: string;
-  email: string;
-  phoneNo?: string;
-  address?: string;
-  kids: Student[];
-  activeKids: number;
-}
+const parentApi = {
+  getAll: (params: { page: number; limit: number; search?: string }) =>
+    api.get('/Admin/getAllParents', { params }),
+};
 
 // ─── Build parent rows from students ─────────────────────────────────────────
 
-function buildParentRows(students: Student[]): ParentRow[] {
-  const map = new Map<string, ParentRow>();
-
-  for (const s of students) {
-    if (!s.parentId) continue;
-    const key = s.parentId;
-    if (!map.has(key)) {
-      map.set(key, {
-        parentId: key,
-        fullname: s.parent?.fullname,
-        email: s.parent?.email ?? '—',
-        phoneNo: s.parent?.phoneNo,
-        address: s.parent?.address,
-        kids: [],
-        activeKids: 0,
-      });
-    }
-    const row = map.get(key)!;
-    row.kids.push(s);
-    if (s.status === 'active') row.activeKids++;
-  }
-
-  return Array.from(map.values());
-}
 
 // ─── Parent Detail Drawer ─────────────────────────────────────────────────────
 
@@ -88,8 +54,12 @@ function ParentDetailDrawer({ parent, onClose }: { parent: ParentRow; onClose: (
 
         {/* Avatar + name */}
         <div className="flex flex-col items-center pt-8 pb-6 px-5 border-b border-gray-100">
-          <div className="w-20 h-20 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] text-3xl font-bold mb-3">
-            {(parent.fullname ?? parent.email)?.charAt(0)?.toUpperCase() ?? 'P'}
+          <div className="w-20 h-20 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] text-3xl font-bold mb-3 overflow-hidden">
+            {parent.image ? (
+              <img src={parent.image} alt={parent.fullname} className="w-full h-full object-cover" />
+            ) : (
+              (parent.fullname ?? parent.email)?.charAt(0)?.toUpperCase() ?? 'P'
+            )}
           </div>
           <h3 className="text-xl font-bold text-gray-900">{parent.fullname ?? 'Unknown Parent'}</h3>
           <p className="text-sm text-gray-400 mt-1">{parent.email}</p>
@@ -98,7 +68,7 @@ function ParentDetailDrawer({ parent, onClose }: { parent: ParentRow; onClose: (
               {parent.kids.length} student{parent.kids.length !== 1 ? 's' : ''}
             </span>
             <span className="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-full">
-              {parent.activeKids} active
+              {parent.kids.filter(k => k.status === 'active').length} active
             </span>
           </div>
         </div>
@@ -179,56 +149,26 @@ const PAGE_SIZE = 12;
 
 export default function ParentsPage() {
   const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [page, setPage] = useState(1);
   const [detailParent, setDetailParent] = useState<ParentRow | null>(null);
 
-  // Fetch all students (with parent info populated by backend)
-  const { data: studentsRaw = [], isLoading } = useQuery({
-    queryKey: ['students-all-for-parents'],
-    queryFn: async () => {
-      const res = await studentApi.getAll({ page: 1, limit: 1000 });
-      const raw = res.data;
-      return (raw.data ?? []).map((item: any) => ({
-        _id: item.student?.id,
-        fullname: item.student?.fullname,
-        grade: item.student?.grade,
-        gender: item.student?.gender,
-        age: item.student?.age,
-        status: item.student?.status,
-        verifiedBySchool: item.student?.verifiedBySchool ?? false,
-        VanId: item.van?.id,
-        parentId: item.parent?.id,
-        createdAt: item.student?.createdAt ?? '',
-        parent: {
-          _id: item.parent?.id,
-          fullname: item.parent?.fullname,
-          email: item.parent?.email,
-          phoneNo: item.parent?.phoneNo,
-          address: item.parent?.address,
-          image: item.parent?.image,
-        },
-      }));
-
-    },
-    staleTime: 60_000,
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ['parents', page, search],
+    queryFn: () => parentApi.getAll({ page, limit: PAGE_SIZE, search: search || undefined }),
+    select: r => r.data,
+    staleTime: 30_000,
   });
 
-  const allParents = useMemo(() => buildParentRows(studentsRaw), [studentsRaw]);
+  const parents: ParentRow[] = data?.data ?? [];
+  const total: number = data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const filtered = useMemo(() => {
-    if (!search.trim()) return allParents;
-    const q = search.toLowerCase();
-    return allParents.filter(
-      p =>
-        p.fullname?.toLowerCase().includes(q) ||
-        p.email?.toLowerCase().includes(q) ||
-        p.phoneNo?.includes(q) ||
-        p.kids.some(k => k.fullname?.toLowerCase().includes(q))
-    );
-  }, [allParents, search]);
-
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  function handleSearchSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSearch(searchInput.trim());
+    setPage(1);
+  }
 
   return (
     <>
@@ -242,21 +182,21 @@ export default function ParentsPage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Parents</h1>
             <p className="text-sm text-gray-400 mt-0.5">
-              {allParents.length} parent{allParents.length !== 1 ? 's' : ''} registered
+              {total} parent{total !== 1 ? 's' : ''} registered
             </p>
           </div>
         </div>
 
         {/* Search */}
-        <div className="relative max-w-sm">
+        <form onSubmit={handleSearchSubmit} className="relative max-w-sm">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            placeholder="Search by name, email or student…"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Search by name, email or phone…"
             className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
           />
-        </div>
+        </form>
 
         {/* Cards grid */}
         {isLoading ? (
@@ -275,23 +215,27 @@ export default function ParentsPage() {
               </div>
             ))}
           </div>
-        ) : paginated.length === 0 ? (
+        ) : parents.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400">
             <Users size={40} className="mb-3 opacity-30" />
             <p className="text-sm">{search ? 'No parents match your search.' : 'No parents yet.'}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {paginated.map(parent => (
+            {parents.map(parent => (
               <div
-                key={parent.parentId}
+                key={parent._id}
                 className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-[#1B2B6B]/20 transition-all cursor-pointer group"
                 onClick={() => setDetailParent(parent)}
               >
                 {/* Avatar + name */}
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] text-lg font-bold shrink-0">
-                    {(parent.fullname ?? parent.email)?.charAt(0)?.toUpperCase() ?? 'P'}
+                  <div className="w-12 h-12 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] text-lg font-bold shrink-0 overflow-hidden">
+                    {parent.image ? (
+                      <img src={parent.image} alt={parent.fullname} className="w-full h-full object-cover" />
+                    ) : (
+                      (parent.fullname ?? parent.email)?.charAt(0)?.toUpperCase() ?? 'P'
+                    )}
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-gray-900 truncate">
@@ -350,7 +294,7 @@ export default function ParentsPage() {
         {totalPages > 1 && (
           <div className="flex items-center justify-between">
             <span className="text-xs text-gray-400">
-              Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
+              Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} of {total}
             </span>
             <div className="flex items-center gap-1">
               <button
