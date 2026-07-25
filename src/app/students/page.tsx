@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Search,
@@ -15,8 +15,14 @@ import {
   Clock,
   Filter,
   Bus,
+  MapPin,
+  Loader2,
 } from "lucide-react";
 import { api, vanApi, uploadApi } from '@/lib/api';
+import type { PickedLocation } from '@/components/MapPicker';
+
+// Lazy load MapPicker so Google Maps script loads only when needed
+const MapPicker = lazy(() => import('@/components/MapPicker'));
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -33,6 +39,9 @@ interface Student {
   schoolId?: string;
   parentId: string;
   image?: string;
+  homeAddress?: string;
+  homeLat?: number;
+  homeLng?: number;
   createdAt: string;
 }
 
@@ -45,6 +54,9 @@ interface AddStudentForm {
   parentEmail: string;
   parentPhone: string;
   image?: string;
+  homeAddress?: string;
+  homeLat?: number;
+  homeLng?: number;
 }
 
 const EMPTY_FORM: AddStudentForm = {
@@ -56,6 +68,9 @@ const EMPTY_FORM: AddStudentForm = {
   parentEmail: '',
   parentPhone: '',
   image: undefined,
+  homeAddress: undefined,
+  homeLat: undefined,
+  homeLng: undefined,
 };
 
 // ─── API calls ────────────────────────────────────────────────────────────────
@@ -83,6 +98,9 @@ async function fetchStudents(page: number, search: string, status: string) {
     parentName: item.parent?.fullname,
     parentEmail: item.parent?.email,
     image: item.student?.image,
+    homeAddress: item.student?.homeAddress,
+    homeLat: item.student?.homeLat,
+    homeLng: item.student?.homeLng,
     createdAt: item.student?.createdAt ?? item.student?.dob,
   }));
   return {
@@ -101,6 +119,9 @@ async function addStudent(form: AddStudentForm) {
     parentEmail: form.parentEmail,
     parentPhone: form.parentPhone || undefined,
     image: form.image || undefined,
+    homeAddress: form.homeAddress || undefined,
+    homeLat: form.homeLat,
+    homeLng: form.homeLng,
   });
 }
 
@@ -113,6 +134,9 @@ async function editStudent(kidId: string, form: Partial<AddStudentForm>) {
     age: Number(form.age),
     dob: form.dob,
     image: form.image || undefined,
+    homeAddress: form.homeAddress || undefined,
+    homeLat: form.homeLat,
+    homeLng: form.homeLng,
   });
 }
 
@@ -169,10 +193,19 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
           parentEmail: '',
           parentPhone: '',
           image: student.image ?? undefined,
+          homeAddress: student.homeAddress ?? undefined,
+          homeLat: student.homeLat ?? undefined,
+          homeLng: student.homeLng ?? undefined,
         }
       : EMPTY_FORM
   );
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [showMapPicker, setShowMapPicker] = useState(false);
+
+  function handleLocationConfirm(loc: PickedLocation) {
+    setForm(f => ({ ...f, homeAddress: loc.address, homeLat: loc.lat, homeLng: loc.lng }));
+    setShowMapPicker(false);
+  }
 
   async function handlePhotoSelected(file: File) {
     if (file.size > 2 * 1024 * 1024) {
@@ -347,6 +380,22 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
             </div>
           </div>
 
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Home Address / Pickup Point</label>
+            <button
+              type="button"
+              onClick={() => setShowMapPicker(true)}
+              className="w-full flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-left hover:border-[#1B2B6B]/40 transition">
+              <MapPin size={15} className={form.homeAddress ? 'text-[#1B2B6B]' : 'text-gray-400'} />
+              <span className={form.homeAddress ? 'text-gray-800 truncate' : 'text-gray-400'}>
+                {form.homeAddress || 'Tap to pick location on map'}
+              </span>
+            </button>
+            <p className="text-xs text-gray-400 mt-1">
+              Used for route planning — where this student gets picked up / dropped off.
+            </p>
+          </div>
+
           {mode === 'add' && (
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">
@@ -404,6 +453,24 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
           </button>
         </div>
       </div>
+
+      {showMapPicker && (
+        <Suspense fallback={
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50">
+            <div className="bg-white rounded-2xl p-8 flex items-center gap-3">
+              <Loader2 size={24} className="animate-spin text-[#1B2B6B]" />
+              <span className="text-sm font-medium text-gray-700">Loading map…</span>
+            </div>
+          </div>
+        }>
+          <MapPicker
+            title="Pick Student's Home Location"
+            initial={form.homeLat && form.homeLng ? { lat: form.homeLat, lng: form.homeLng } : undefined}
+            onConfirm={handleLocationConfirm}
+            onClose={() => setShowMapPicker(false)}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
