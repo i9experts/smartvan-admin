@@ -6,7 +6,7 @@ import {
   Search, X, AlertCircle, Filter,
   ChevronLeft, ChevronRight, CheckCircle2, XCircle,
   Phone, Mail, MapPin, FileText, Eye, UserMinus, Bus,
-  Smartphone, RefreshCw,
+  Smartphone, RefreshCw, Pencil,
 } from 'lucide-react';
 import { vanApi, api } from '@/lib/api';
 
@@ -17,6 +17,7 @@ interface Driver {
   fullname?: string;
   email: string;
   phoneNo?: string;
+  alternatePhoneNo?: string;
   NIC?: string;
   address?: string;
   status: string;
@@ -28,6 +29,7 @@ interface Driver {
   vehicleCardImageFront?: string;
   vehicleCardImageBack?: string;
   expiryDateLicense?: string;
+  expiryDateVehicleCard?: string;
   createdAt: string;
   lastLoginAt?: string | null;
   van?: { carNumber?: string; vehicleType?: string; _id: string };
@@ -90,7 +92,7 @@ function DriverStatusBadge({ status, verified }: { status: string; verified: boo
 
 // ─── Driver Detail Drawer ─────────────────────────────────────────────────────
 
-function DriverDetailDrawer({ driver, onClose }: { driver: Driver; onClose: () => void }) {
+function DriverDetailDrawer({ driver, onClose, onEdit }: { driver: Driver; onClose: () => void; onEdit: () => void }) {
   const [resetResult, setResetResult] = useState<string | null>(null);
   const [resetError, setResetError] = useState('');
 
@@ -125,9 +127,14 @@ function DriverDetailDrawer({ driver, onClose }: { driver: Driver; onClose: () =
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100 sticky top-0 bg-white z-10">
           <h2 className="text-lg font-bold text-gray-900">Driver Profile</h2>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
-            <X size={16} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={onEdit} className="flex items-center gap-1.5 px-3 py-1.5 border border-[#1B2B6B]/20 text-[#1B2B6B] rounded-lg text-xs font-medium hover:bg-[#1B2B6B]/5 transition">
+              <Pencil size={12} /> Edit
+            </button>
+            <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
+              <X size={16} />
+            </button>
+          </div>
         </div>
 
         {/* Avatar + name */}
@@ -247,6 +254,137 @@ function DriverDetailDrawer({ driver, onClose }: { driver: Driver; onClose: () =
   );
 }
 
+// ─── Edit Driver ──────────────────────────────────────────────────────────────
+
+function EditDriverModal({ driver, onClose, onSuccess }: { driver: Driver; onClose: () => void; onSuccess: () => void }) {
+  const qc = useQueryClient();
+  const [form, setForm] = useState({
+    fullname: driver.fullname ?? '',
+    phoneNo: driver.phoneNo ?? '',
+    alternatePhoneNo: driver.alternatePhoneNo ?? '',
+    NIC: driver.NIC ?? '',
+    address: driver.address ?? '',
+    expiryDateLicense: driver.expiryDateLicense ? driver.expiryDateLicense.split('T')[0] : '',
+    expiryDateVehicleCard: driver.expiryDateVehicleCard ? driver.expiryDateVehicleCard.split('T')[0] : '',
+  });
+  const [error, setError] = useState('');
+  const f = (k: string, v: string) => setForm(prev => ({ ...prev, [k]: v }));
+
+  const mutation = useMutation({
+    mutationFn: () => api.post('/van/editDriverByAdmin', { driverId: driver._id, ...form }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['drivers'] });
+      onSuccess();
+      onClose();
+    },
+    onError: (e: any) => setError(e?.response?.data?.message ?? 'Failed to update driver'),
+  });
+
+  function handleSubmit() {
+    if (!form.fullname.trim()) { setError('Full name is required.'); return; }
+    setError('');
+    mutation.mutate();
+  }
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-bold text-gray-900">Edit Driver</h2>
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Full Name *</label>
+            <input
+              value={form.fullname}
+              onChange={e => f('fullname', e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Phone Number</label>
+              <input
+                value={form.phoneNo}
+                onChange={e => f('phoneNo', e.target.value)}
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                placeholder="03xx-xxxxxxx"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Alternate Phone</label>
+              <input
+                value={form.alternatePhoneNo}
+                onChange={e => f('alternatePhoneNo', e.target.value)}
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">NIC</label>
+            <input
+              value={form.NIC}
+              onChange={e => f('NIC', e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Address</label>
+            <input
+              value={form.address}
+              onChange={e => f('address', e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Licence Expiry</label>
+              <input
+                type="date"
+                value={form.expiryDateLicense}
+                onChange={e => f('expiryDateLicense', e.target.value)}
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Vehicle Card Expiry</label>
+              <input
+                type="date"
+                value={form.expiryDateVehicleCard}
+                onChange={e => f('expiryDateVehicleCard', e.target.value)}
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              />
+            </div>
+          </div>
+
+          {error && (
+            <div className="flex items-center gap-2 text-red-600 text-xs bg-red-50 rounded-lg p-2.5">
+              <AlertCircle size={14} /> {error}
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-3 mt-6">
+          <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition">
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={mutation.isPending}
+            className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
+          >
+            {mutation.isPending ? 'Saving…' : 'Save Changes'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Remove Confirm ───────────────────────────────────────────────────────────
 
 function RemoveConfirm({ count, onConfirm, onCancel, loading }: { count: number; onConfirm: () => void; onCancel: () => void; loading: boolean }) {
@@ -280,6 +418,7 @@ export default function DriversPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [detailDriver, setDetailDriver] = useState<Driver | null>(null);
+  const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
   const [showRemove, setShowRemove] = useState(false);
 
   const { data, isLoading, isFetching } = useQuery({
@@ -332,7 +471,20 @@ export default function DriversPage() {
 
   return (
     <>
-      {detailDriver && <DriverDetailDrawer driver={detailDriver} onClose={() => setDetailDriver(null)} />}
+      {detailDriver && (
+        <DriverDetailDrawer
+          driver={detailDriver}
+          onClose={() => setDetailDriver(null)}
+          onEdit={() => { setEditingDriver(detailDriver); setDetailDriver(null); }}
+        />
+      )}
+      {editingDriver && (
+        <EditDriverModal
+          driver={editingDriver}
+          onClose={() => setEditingDriver(null)}
+          onSuccess={() => setEditingDriver(null)}
+        />
+      )}
       {showRemove && (
         <RemoveConfirm
           count={selectedArr.length}
