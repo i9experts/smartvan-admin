@@ -590,7 +590,7 @@ export default function VansPage() {
       <div className="p-6 space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Fleet</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Vans</h1>
             <p className="text-sm text-gray-400 mt-0.5">{total} van{total !== 1 ? 's' : ''} registered</p>
           </div>
           <button onClick={() => setShowAddDriver(true)} className="flex items-center gap-2 px-4 py-2.5 border border-[#1B2B6B] text-[#1B2B6B] text-sm font-medium rounded-xl hover:bg-[#1B2B6B]/5 transition"><Plus size={16} /> Add Driver</button>
