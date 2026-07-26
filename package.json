@@ -33,7 +33,8 @@
     "react-dom": "^18",
     "recharts": "^2.12.7",
     "socket.io-client": "^4.7.5",
-    "tailwind-merge": "^2.5.2"
+    "tailwind-merge": "^2.5.2",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",

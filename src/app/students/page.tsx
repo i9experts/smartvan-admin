@@ -17,6 +17,11 @@ import {
   Bus,
   MapPin,
   Loader2,
+  Upload,
+  Download,
+  FileSpreadsheet,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { api, vanApi, uploadApi } from '@/lib/api';
 import type { PickedLocation } from '@/components/MapPicker';
@@ -787,6 +792,337 @@ function DeleteConfirm({
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
+// ─── Bulk Upload ────────────────────────────────────────────────────────────
+
+interface BulkRow {
+  fullname: string;
+  grade: string;
+  gender: string;
+  age: string;
+  dob: string;
+  parentEmail: string;
+  parentPhone: string;
+  errors: string[];
+}
+
+interface BulkResult {
+  row: number;
+  fullname: string;
+  success: boolean;
+  message: string;
+}
+
+const TEMPLATE_HEADERS = ['Full Name', 'Grade', 'Gender', 'Age', 'Date of Birth (YYYY-MM-DD)', 'Parent Email', 'Parent Phone'];
+
+function validateBulkRow(raw: Record<string, any>): BulkRow {
+  const get = (...keys: string[]) => {
+    for (const k of keys) {
+      const found = Object.keys(raw).find(rk => rk.trim().toLowerCase() === k.toLowerCase());
+      if (found && raw[found] !== undefined && raw[found] !== null) return String(raw[found]).trim();
+    }
+    return '';
+  };
+
+  const fullname = get('Full Name', 'fullname');
+  const grade = get('Grade', 'grade');
+  const gender = get('Gender', 'gender');
+  const age = get('Age', 'age');
+  const dob = get('Date of Birth (YYYY-MM-DD)', 'Date of Birth', 'dob');
+  const parentEmail = get('Parent Email', 'parentEmail', 'parent email');
+  const parentPhone = get('Parent Phone', 'parentPhone', 'parent phone');
+
+  const errors: string[] = [];
+  if (!fullname) errors.push('Full name is required');
+  if (!grade) errors.push('Grade is required');
+  if (!gender) errors.push('Gender is required');
+  if (!parentEmail) {
+    errors.push('Parent email is required');
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(parentEmail)) {
+    errors.push('Parent email looks invalid');
+  }
+  if (age && isNaN(Number(age))) errors.push('Age must be a number');
+
+  return { fullname, grade, gender, age, dob, parentEmail, parentPhone, errors };
+}
+
+async function downloadTemplate() {
+  const XLSX = await import('xlsx');
+  const ws = XLSX.utils.aoa_to_sheet([
+    TEMPLATE_HEADERS,
+    ['Ahmed Khan', '5', 'Male', '10', '2015-03-12', 'parent@example.com', '03001234567'],
+  ]);
+  ws['!cols'] = TEMPLATE_HEADERS.map(() => ({ wch: 22 }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Students');
+  XLSX.writeFile(wb, 'smartvan-student-upload-template.xlsx');
+}
+
+function BulkUploadModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
+  const [step, setStep] = useState<'upload' | 'preview' | 'results'>('upload');
+  const [rows, setRows] = useState<BulkRow[]>([]);
+  const [fileName, setFileName] = useState('');
+  const [parseError, setParseError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [results, setResults] = useState<BulkResult[]>([]);
+  const [submitError, setSubmitError] = useState('');
+
+  function handleFile(file: File) {
+    setParseError('');
+    setFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const XLSX = await import('xlsx');
+        const data = e.target?.result;
+        const workbook = XLSX.read(data, { type: 'binary' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const json: Record<string, any>[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+        if (json.length === 0) {
+          setParseError('This file has no rows. Please use the template and fill in at least one student.');
+          return;
+        }
+        if (json.length > 500) {
+          setParseError(`This file has ${json.length} rows — a single upload is limited to 500 students. Please split it into smaller batches.`);
+          return;
+        }
+
+        setRows(json.map(validateBulkRow));
+        setStep('preview');
+      } catch (err) {
+        setParseError('Could not read this file. Please make sure it\'s a valid .xlsx or .csv file.');
+      }
+    };
+    reader.readAsBinaryString(file);
+  }
+
+  const validRows = rows.filter(r => r.errors.length === 0);
+  const invalidCount = rows.length - validRows.length;
+
+  async function handleSubmit() {
+    if (validRows.length === 0) return;
+    setIsSubmitting(true);
+    setSubmitError('');
+    try {
+      const res = await api.post('/Admin/bulkAddStudents', {
+        students: validRows.map(r => ({
+          fullname: r.fullname,
+          grade: r.grade,
+          gender: r.gender,
+          age: r.age || undefined,
+          dob: r.dob || undefined,
+          parentEmail: r.parentEmail,
+          parentPhone: r.parentPhone || undefined,
+        })),
+      });
+      setResults(res.data?.results ?? []);
+      setStep('results');
+      onSuccess();
+    } catch (err: any) {
+      setSubmitError(err?.response?.data?.message ?? 'Bulk upload failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl mx-4 max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100">
+          <div>
+            <h2 className="text-lg font-bold text-gray-900">Bulk Upload Students</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Add many students at once from a spreadsheet</p>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="p-6 overflow-y-auto flex-1">
+          {step === 'upload' && (
+            <div className="space-y-4">
+              <button
+                onClick={downloadTemplate}
+                className="w-full flex items-center justify-between p-4 border border-dashed border-[#1B2B6B]/30 rounded-xl hover:bg-[#1B2B6B]/5 transition text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-[#1B2B6B]/10 flex items-center justify-center">
+                    <FileSpreadsheet size={18} className="text-[#1B2B6B]" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">Download template</p>
+                    <p className="text-xs text-gray-400">Start with the correct column headers</p>
+                  </div>
+                </div>
+                <Download size={16} className="text-[#1B2B6B]" />
+              </button>
+
+              <label className="flex flex-col items-center justify-center gap-2 p-10 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-[#1B2B6B]/40 hover:bg-gray-50 transition">
+                <Upload size={28} className="text-gray-400" />
+                <p className="text-sm font-medium text-gray-700">Click to upload a .xlsx or .csv file</p>
+                <p className="text-xs text-gray-400">Up to 500 students per upload</p>
+                <input
+                  type="file"
+                  accept=".xlsx,.xls,.csv"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleFile(file);
+                    e.target.value = '';
+                  }}
+                />
+              </label>
+
+              {parseError && (
+                <div className="flex items-center gap-2 text-red-600 text-xs bg-red-50 rounded-lg p-3">
+                  <AlertCircle size={14} className="shrink-0" /> {parseError}
+                </div>
+              )}
+            </div>
+          )}
+
+          {step === 'preview' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">{fileName}</span> — {rows.length} row{rows.length !== 1 ? 's' : ''} found
+                </p>
+                <div className="flex items-center gap-3 text-xs">
+                  <span className="flex items-center gap-1 text-emerald-600 font-medium">
+                    <CheckCircle size={13} /> {validRows.length} ready
+                  </span>
+                  {invalidCount > 0 && (
+                    <span className="flex items-center gap-1 text-red-500 font-medium">
+                      <XCircle size={13} /> {invalidCount} need fixing
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="border border-gray-200 rounded-xl overflow-hidden">
+                <div className="max-h-80 overflow-y-auto">
+                  <table className="w-full text-xs">
+                    <thead className="bg-gray-50 sticky top-0">
+                      <tr>
+                        <th className="p-2.5 text-left font-medium text-gray-500">#</th>
+                        <th className="p-2.5 text-left font-medium text-gray-500">Name</th>
+                        <th className="p-2.5 text-left font-medium text-gray-500">Grade</th>
+                        <th className="p-2.5 text-left font-medium text-gray-500">Gender</th>
+                        <th className="p-2.5 text-left font-medium text-gray-500">Parent Email</th>
+                        <th className="p-2.5 text-left font-medium text-gray-500">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map((r, i) => (
+                        <tr key={i} className={`border-t border-gray-100 ${r.errors.length > 0 ? 'bg-red-50/50' : ''}`}>
+                          <td className="p-2.5 text-gray-400">{i + 1}</td>
+                          <td className="p-2.5 text-gray-800">{r.fullname || '—'}</td>
+                          <td className="p-2.5 text-gray-600">{r.grade || '—'}</td>
+                          <td className="p-2.5 text-gray-600">{r.gender || '—'}</td>
+                          <td className="p-2.5 text-gray-600">{r.parentEmail || '—'}</td>
+                          <td className="p-2.5">
+                            {r.errors.length === 0 ? (
+                              <span className="text-emerald-600 flex items-center gap-1"><CheckCircle size={12} /> Ready</span>
+                            ) : (
+                              <span className="text-red-500" title={r.errors.join(', ')}>
+                                {r.errors[0]}
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {invalidCount > 0 && (
+                <div className="flex items-center gap-2 text-amber-700 text-xs bg-amber-50 rounded-lg p-3">
+                  <AlertCircle size={14} className="shrink-0" />
+                  {invalidCount} row{invalidCount !== 1 ? 's' : ''} will be skipped due to the issues above. Fix your file and re-upload if you'd like to include {invalidCount !== 1 ? 'them' : 'it'}.
+                </div>
+              )}
+              {submitError && (
+                <div className="flex items-center gap-2 text-red-600 text-xs bg-red-50 rounded-lg p-3">
+                  <AlertCircle size={14} className="shrink-0" /> {submitError}
+                </div>
+              )}
+            </div>
+          )}
+
+          {step === 'results' && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                <span className="flex items-center gap-1.5 text-emerald-600 font-semibold text-sm">
+                  <CheckCircle size={16} /> {results.filter(r => r.success).length} added
+                </span>
+                {results.some(r => !r.success) && (
+                  <span className="flex items-center gap-1.5 text-red-500 font-semibold text-sm">
+                    <XCircle size={16} /> {results.filter(r => !r.success).length} failed
+                  </span>
+                )}
+              </div>
+              <div className="border border-gray-200 rounded-xl overflow-hidden max-h-80 overflow-y-auto">
+                <table className="w-full text-xs">
+                  <thead className="bg-gray-50 sticky top-0">
+                    <tr>
+                      <th className="p-2.5 text-left font-medium text-gray-500">#</th>
+                      <th className="p-2.5 text-left font-medium text-gray-500">Name</th>
+                      <th className="p-2.5 text-left font-medium text-gray-500">Result</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {results.map((r) => (
+                      <tr key={r.row} className={`border-t border-gray-100 ${!r.success ? 'bg-red-50/50' : ''}`}>
+                        <td className="p-2.5 text-gray-400">{r.row}</td>
+                        <td className="p-2.5 text-gray-800">{r.fullname}</td>
+                        <td className={`p-2.5 ${r.success ? 'text-emerald-600' : 'text-red-500'}`}>
+                          {r.success ? <CheckCircle size={12} className="inline mr-1" /> : <XCircle size={12} className="inline mr-1" />}
+                          {r.message}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-3 p-6 pt-4 border-t border-gray-100">
+          {step === 'upload' && (
+            <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition">
+              Cancel
+            </button>
+          )}
+          {step === 'preview' && (
+            <>
+              <button
+                onClick={() => { setStep('upload'); setRows([]); }}
+                className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
+              >
+                Choose Different File
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={validRows.length === 0 || isSubmitting}
+                className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
+              >
+                {isSubmitting ? 'Uploading…' : `Upload ${validRows.length} Student${validRows.length !== 1 ? 's' : ''}`}
+              </button>
+            </>
+          )}
+          {step === 'results' && (
+            <button onClick={onClose} className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition">
+              Done
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function StudentsPage() {
   const qc = useQueryClient();
   const [page, setPage] = useState(1);
@@ -794,6 +1130,7 @@ export default function StudentsPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [modal, setModal] = useState<'add' | 'edit' | null>(null);
+  const [showBulkUpload, setShowBulkUpload] = useState(false);
   const [assignVanTarget, setAssignVanTarget] = useState<Student | null>(null);
   const [editTarget, setEditTarget] = useState<Student | null>(null);
   const [showDelete, setShowDelete] = useState(false);
@@ -873,6 +1210,12 @@ export default function StudentsPage() {
           onSuccess={() => qc.invalidateQueries({ queryKey: ['students'] })}
         />
       )}
+      {showBulkUpload && (
+        <BulkUploadModal
+          onClose={() => setShowBulkUpload(false)}
+          onSuccess={() => qc.invalidateQueries({ queryKey: ['students'] })}
+        />
+      )}
       {showDelete && (
         <DeleteConfirm
           count={selectedArr.length}
@@ -891,13 +1234,22 @@ export default function StudentsPage() {
               {total} student{total !== 1 ? 's' : ''} registered
             </p>
           </div>
-          <button
-            onClick={() => setModal('add')}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"
-          >
-            <Plus size={16} />
-            Add Student
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowBulkUpload(true)}
+              className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition"
+            >
+              <Upload size={16} />
+              Bulk Upload
+            </button>
+            <button
+              onClick={() => setModal('add')}
+              className="flex items-center gap-2 px-4 py-2.5 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"
+            >
+              <Plus size={16} />
+              Add Student
+            </button>
+          </div>
         </div>
 
         {/* Filters */}
