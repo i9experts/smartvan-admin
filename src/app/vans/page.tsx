@@ -55,10 +55,27 @@ const MANUFACTURERS = [
   'Ford', 'Volkswagen', 'Isuzu', 'Tata', 'Ashok Leyland', 'Higer', 'Yutong',
   'King Long', 'MAN', 'Other',
 ];
-const MODEL_SUGGESTIONS = [
-  'Bolan', 'Every', 'Hiace', 'Commuter', 'Urvan', 'H-1', 'Solati', 'Coaster',
-  'Rosa', 'Civilian', 'County', 'Sprinter', 'Transit', 'Crafter',
-];
+// Model suggestions, keyed by manufacturer — so the Model field's
+// suggestions actually change when a different manufacturer is picked,
+// instead of always showing the same flat, unfiltered list.
+const MODELS_BY_MANUFACTURER: Record<string, string[]> = {
+  'Suzuki': ['Bolan', 'Every', 'Carry', 'Ravi'],
+  'Toyota': ['Hiace', 'Commuter', 'Coaster', 'Land Cruiser', 'County'],
+  'Nissan': ['Urvan', 'Civilian', 'Caravan'],
+  'Hyundai': ['H-1', 'H100', 'Solati', 'Staria'],
+  'Kia': ['Grand Carnival', 'Bongo'],
+  'Mitsubishi': ['Rosa', 'L300'],
+  'Mercedes-Benz': ['Sprinter', 'Vito'],
+  'Ford': ['Transit'],
+  'Volkswagen': ['Crafter', 'Transporter'],
+  'Isuzu': ['NPR', 'Journey'],
+  'Tata': ['Winger', 'Starbus'],
+  'Ashok Leyland': ['Falcon', 'Viking'],
+  'Higer': ['Higer Bus'],
+  'Yutong': ['Yutong Bus'],
+  'King Long': ['King Long Bus'],
+  'MAN': ['MAN Bus'],
+};
 const CONDITIONS = ['Excellent','Good','Fair','Poor'];
 
 function mapVans(raw: any): { data: VanItem[]; total: number } {
@@ -200,10 +217,10 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
                   value={form.model}
                   onChange={e => setForm(f => ({ ...f, model: e.target.value }))}
                   className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white"
-                  placeholder="e.g. Coaster"
+                  placeholder={form.manufacturer ? `e.g. ${MODELS_BY_MANUFACTURER[form.manufacturer]?.[0] ?? 'Model name'}` : 'Select a manufacturer first'}
                 />
                 <datalist id="model-suggestions">
-                  {MODEL_SUGGESTIONS.map(m => <option key={m} value={m} />)}
+                  {(MODELS_BY_MANUFACTURER[form.manufacturer] ?? []).map(m => <option key={m} value={m} />)}
                 </datalist>
               </div>
             </div>
