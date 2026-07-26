@@ -17,6 +17,8 @@ interface AttendanceRecord {
   image: string | null;
   schoolId: string;
   vanNumber: string;
+  parentName: string;
+  parentPhone: string;
   attendanceStatus: 'present' | 'late' | 'absent';
   remarks: string;
   pickupTime: string | null;
@@ -107,8 +109,16 @@ export default function AttendancePage() {
   const [studentHistory, setStudentHistory] = useState<StudentHistory | null>(null);
   const [studentLoading, setStudentLoading] = useState(false);
   const [studentError, setStudentError] = useState('');
+  const [schoolName, setSchoolName] = useState('');
 
   useEffect(() => { fetchDaily(); }, [date]);
+  useEffect(() => {
+    const token = localStorage.getItem('smartvan_token');
+    if (!token) return;
+    axios.get(`${API}/Admin/getProfile`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => setSchoolName(res.data?.data?.schoolName ?? ''))
+      .catch(() => {});
+  }, []);
 
   const getToken = () => {
     const token = localStorage.getItem('smartvan_token');
@@ -196,6 +206,167 @@ export default function AttendancePage() {
     a.click();
   };
 
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  async function exportPDF() {
+    if (!report) return;
+    setIsGeneratingPdf(true);
+    try {
+      const { default: jsPDF } = await import('jspdf');
+      const autoTable = (await import('jspdf-autotable')).default;
+
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 40;
+      let y = 50;
+
+      const NAVY = '#1B2B6B';
+      const YELLOW = '#FFB800';
+      const GREEN = '#10b981';
+      const AMBER = '#f59e0b';
+      const RED = '#ef4444';
+      const GRAY = '#6b7280';
+
+      // ── Header ──────────────────────────────────────────────────────
+      doc.setFillColor(NAVY);
+      doc.rect(0, 0, pageWidth, 70, 'F');
+      doc.setTextColor('#ffffff');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(18);
+      doc.text('SmartVan', margin, 32);
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Daily Attendance Report', margin, 50);
+
+      doc.setFontSize(10);
+      const dateLabel = new Date(report.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      const dateWidth = doc.getTextWidth(dateLabel);
+      doc.text(dateLabel, pageWidth - margin - dateWidth, 32);
+      if (schoolName) {
+        const schoolWidth = doc.getTextWidth(schoolName);
+        doc.text(schoolName, pageWidth - margin - schoolWidth, 50);
+      }
+
+      y = 100;
+
+      // ── Summary cards ───────────────────────────────────────────────
+      const cardW = (pageWidth - margin * 2 - 30) / 4;
+      const cards: { label: string; value: string; color: string }[] = [
+        { label: 'Total Students', value: String(report.totalStudents), color: NAVY },
+        { label: 'Present', value: String(report.present), color: GREEN },
+        { label: 'Late', value: String(report.late), color: AMBER },
+        { label: 'Absent', value: String(report.absent), color: RED },
+      ];
+      cards.forEach((c, i) => {
+        const x = margin + i * (cardW + 10);
+        doc.setDrawColor('#e5e7eb');
+        doc.setFillColor('#f8f9fc');
+        doc.roundedRect(x, y, cardW, 60, 6, 6, 'FD');
+        doc.setTextColor(c.color);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(20);
+        doc.text(c.value, x + 12, y + 32);
+        doc.setTextColor(GRAY);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.text(c.label, x + 12, y + 48);
+      });
+      y += 80;
+
+      doc.setTextColor(NAVY);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text(`Present Rate: ${report.presentRate}%`, margin, y);
+      y += 25;
+
+      // ── Follow-up section (absent + late, parent contact front and
+      // center — this is the whole point of the report) ───────────────
+      const followUp = report.records.filter(r => r.attendanceStatus === 'absent' || r.attendanceStatus === 'late');
+      if (followUp.length > 0) {
+        doc.setFillColor('#fef2f2');
+        doc.setDrawColor('#fecaca');
+        const sectionH = 20;
+        doc.roundedRect(margin, y, pageWidth - margin * 2, sectionH, 4, 4, 'FD');
+        doc.setTextColor(RED);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text(`Needs Follow-Up (${followUp.length})`, margin + 10, y + 14);
+        y += sectionH + 10;
+
+        autoTable(doc, {
+          startY: y,
+          margin: { left: margin, right: margin },
+          head: [['Student', 'Status', 'Van', 'Parent Name', 'Parent Phone', 'Reason']],
+          body: followUp.map(r => [
+            r.fullname,
+            r.attendanceStatus === 'absent' ? 'Absent' : 'Late',
+            r.vanNumber,
+            r.parentName || 'Unknown',
+            r.parentPhone || '—',
+            r.remarks || '—',
+          ]),
+          theme: 'grid',
+          headStyles: { fillColor: [239, 68, 68], fontSize: 9 },
+          bodyStyles: { fontSize: 9 },
+          columnStyles: { 4: { fontStyle: 'bold' } },
+        });
+        y = (doc as any).lastAutoTable.finalY + 25;
+      }
+
+      // ── Full detailed table ─────────────────────────────────────────
+      if (y > doc.internal.pageSize.getHeight() - 100) {
+        doc.addPage();
+        y = 50;
+      }
+      doc.setTextColor(NAVY);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text('Full Attendance Detail', margin, y);
+      y += 12;
+
+      autoTable(doc, {
+        startY: y,
+        margin: { left: margin, right: margin },
+        head: [['Student', 'Status', 'Van', 'Pickup', 'Drop', 'Parent Name', 'Parent Phone']],
+        body: report.records.map(r => [
+          r.fullname,
+          r.attendanceStatus.charAt(0).toUpperCase() + r.attendanceStatus.slice(1),
+          r.vanNumber,
+          formatTime(r.pickupTime),
+          formatTime(r.dropTime),
+          r.parentName || 'Unknown',
+          r.parentPhone || '—',
+        ]),
+        theme: 'striped',
+        headStyles: { fillColor: [27, 43, 107], fontSize: 9 },
+        bodyStyles: { fontSize: 8.5 },
+        didParseCell: (data: any) => {
+          if (data.section === 'body' && data.column.index === 1) {
+            const status = String(data.cell.raw).toLowerCase();
+            if (status === 'absent') data.cell.styles.textColor = [239, 68, 68];
+            else if (status === 'late') data.cell.styles.textColor = [245, 158, 11];
+            else data.cell.styles.textColor = [16, 185, 129];
+          }
+        },
+      });
+
+      // ── Footer on every page ────────────────────────────────────────
+      const pageCount = doc.getNumberOfPages();
+      for (let p = 1; p <= pageCount; p++) {
+        doc.setPage(p);
+        const h = doc.internal.pageSize.getHeight();
+        doc.setFontSize(8);
+        doc.setTextColor(GRAY);
+        doc.text(`Generated ${new Date().toLocaleString()} · SmartVan`, margin, h - 20);
+        doc.text(`Page ${p} of ${pageCount}`, pageWidth - margin - 60, h - 20);
+      }
+
+      doc.save(`attendance-report-${date}.pdf`);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
@@ -204,13 +375,22 @@ export default function AttendancePage() {
           <h1 className="text-2xl font-bold text-[#1B2B6B]">Attendance</h1>
           <p className="text-gray-500 text-sm mt-1">Auto-generated from van pickup & drop logs</p>
         </div>
-        <button
-          onClick={exportCSV}
-          disabled={!report || loading}
-          className="flex items-center gap-2 px-4 py-2 bg-[#1B2B6B] text-white rounded-xl text-sm font-semibold hover:bg-[#111d4a] transition-colors disabled:opacity-40"
-        >
-          <Download size={15} /> Export CSV
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={exportPDF}
+            disabled={!report || loading || isGeneratingPdf}
+            className="flex items-center gap-2 px-4 py-2 bg-[#FFB800] text-[#1B2B6B] rounded-xl text-sm font-semibold hover:bg-[#e6a600] transition-colors disabled:opacity-40"
+          >
+            <Download size={15} /> {isGeneratingPdf ? 'Generating…' : 'Follow-Up Report (PDF)'}
+          </button>
+          <button
+            onClick={exportCSV}
+            disabled={!report || loading}
+            className="flex items-center gap-2 px-4 py-2 bg-[#1B2B6B] text-white rounded-xl text-sm font-semibold hover:bg-[#111d4a] transition-colors disabled:opacity-40"
+          >
+            <Download size={15} /> Export CSV
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
