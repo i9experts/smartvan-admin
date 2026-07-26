@@ -6,7 +6,7 @@ import axios from 'axios';
 import {
   Users, CheckCircle2, XCircle, Clock, Bus,
   Search, ChevronDown, Calendar, Download,
-  TrendingUp, AlertCircle, MapPin,
+  TrendingUp, AlertCircle, MapPin, History,
 } from 'lucide-react';
 
 const API = process.env.NEXT_PUBLIC_API_URL;
@@ -135,15 +135,16 @@ export default function AttendancePage() {
     }
   };
 
-  const fetchStudentHistory = async () => {
-    if (!kidId.trim()) { setStudentError('Please enter a Student ID.'); return; }
+  const fetchStudentHistory = async (idOverride?: string) => {
+    const targetId = idOverride ?? kidId;
+    if (!targetId.trim()) { setStudentError('Please enter a Student ID.'); return; }
     const token = getToken();
     if (!token) return;
     setStudentLoading(true);
     setStudentError('');
     setStudentHistory(null);
     try {
-      const res = await axios.get(`${API}/trips/attendance/student/${kidId.trim()}`, {
+      const res = await axios.get(`${API}/trips/attendance/student/${targetId.trim()}`, {
         headers: { Authorization: `Bearer ${token}` },
         params: { startDate, endDate },
       });
@@ -164,8 +165,21 @@ export default function AttendancePage() {
     return matchSearch && matchStatus;
   });
 
+  function viewStudentHistory(id: string) {
+    setKidId(id);
+    setTab('student');
+    fetchStudentHistory(id);
+  }
+
   const exportCSV = () => {
     if (!report) return;
+    const escapeCsvField = (value: string) => {
+      const str = String(value ?? '');
+      if (/[",\n]/.test(str)) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
     const rows = [
       ['Name', 'Status', 'Van', 'Pickup Time', 'Drop Time', 'Remarks'],
       ...report.records.map(r => [
@@ -173,7 +187,7 @@ export default function AttendancePage() {
         formatTime(r.pickupTime), formatTime(r.dropTime), r.remarks,
       ]),
     ];
-    const csv = rows.map(r => r.join(',')).join('\n');
+    const csv = rows.map(r => r.map(escapeCsvField).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -351,6 +365,7 @@ export default function AttendancePage() {
                       <th className="text-left px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide">Drop Time</th>
                       <th className="text-left px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide">Location</th>
                       <th className="text-left px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide">Remarks</th>
+                      <th className="text-left px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide"></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -398,6 +413,15 @@ export default function AttendancePage() {
                           <td className="px-5 py-3.5 text-xs text-gray-400">
                             {r.remarks || '—'}
                           </td>
+                          <td className="px-5 py-3.5">
+                            <button
+                              onClick={() => viewStudentHistory(r.kidId)}
+                              title="View attendance history"
+                              className="flex items-center gap-1 text-xs font-medium text-[#1B2B6B] hover:underline"
+                            >
+                              <History size={13} /> History
+                            </button>
+                          </td>
                         </tr>
                       );
                     })}
@@ -415,12 +439,15 @@ export default function AttendancePage() {
           {/* Search form */}
           <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-5">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">Search Student Attendance</h3>
+            <p className="text-xs text-gray-400 mb-3">
+              Tip: click <History size={11} className="inline -mt-0.5" /> History next to any student on the Daily tab for a one-click shortcut here.
+            </p>
             <div className="flex flex-wrap gap-3 items-end">
               <div className="flex-1 min-w-48">
                 <label className="text-xs text-gray-500 font-medium mb-1 block">Student ID</label>
                 <input
                   type="text"
-                  placeholder="Paste student _id from MongoDB…"
+                  placeholder="Student ID"
                   value={kidId}
                   onChange={e => setKidId(e.target.value)}
                   className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-[#1B2B6B]"
@@ -445,7 +472,7 @@ export default function AttendancePage() {
                 />
               </div>
               <button
-                onClick={fetchStudentHistory}
+                onClick={() => fetchStudentHistory()}
                 disabled={studentLoading}
                 className="px-5 py-2 bg-[#1B2B6B] text-white rounded-xl text-sm font-semibold hover:bg-[#111d4a] transition-colors disabled:opacity-50"
               >
