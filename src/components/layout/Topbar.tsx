@@ -6,6 +6,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { searchApi } from "@/lib/api";
+import { usePendingAlertsCount } from "@/hooks/usePendingAlertsCount";
 
 interface TopbarProps {
   title?: string;
@@ -35,6 +36,7 @@ export function Topbar({ title }: TopbarProps) {
   const { user: admin } = useAuth();
   const { language, setLanguage } = useLanguage();
   const router = useRouter();
+  const pendingAlertsCount = usePendingAlertsCount();
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResults | null>(null);
@@ -154,9 +156,11 @@ export function Topbar({ title }: TopbarProps) {
         {/* Alerts bell */}
         <Link href="/alerts" className="relative text-sv-muted hover:text-sv-text transition-colors">
           <Bell size={18} />
-          <span className="absolute -top-0.5 -right-1 bg-sv-red text-white text-[9px] font-medium min-w-[14px] h-[14px] rounded-full flex items-center justify-center px-1">
-            3
-          </span>
+          {pendingAlertsCount > 0 && (
+            <span className="absolute -top-0.5 -right-1 bg-sv-red text-white text-[9px] font-medium min-w-[14px] h-[14px] rounded-full flex items-center justify-center px-1">
+              {pendingAlertsCount}
+            </span>
+          )}
         </Link>
         {/* Avatar */}
         <div className="w-[30px] h-[30px] rounded-full bg-sv-navy flex items-center justify-center text-[11px] font-medium text-white">

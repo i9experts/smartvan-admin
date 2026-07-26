@@ -9,8 +9,9 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { usePendingAlertsCount } from "@/hooks/usePendingAlertsCount";
 
-const navItems: { labelKey: string; href: string; icon: any; badge?: number; roles: ("admin" | "superadmin")[] }[] = [
+const navItems: { labelKey: string; href: string; icon: any; roles: ("admin" | "superadmin")[] }[] = [
   { labelKey: "nav.overview", href: "/super-admin", icon: LayoutDashboard, roles: ["superadmin"] },
   { labelKey: "nav.overview", href: "/dashboard", icon: LayoutDashboard, roles: ["admin"] },
   { labelKey: "nav.liveTracking", href: "/tracking", icon: MapPin, roles: ["admin"] },
@@ -19,7 +20,7 @@ const navItems: { labelKey: string; href: string; icon: any; badge?: number; rol
   { labelKey: "nav.driverAccounts", href: "/drivers", icon: Users, roles: ["admin"] },
   { labelKey: "nav.parentManagement", href: "/parents", icon: Users, roles: ["admin"] },
   { labelKey: "nav.routePlanner", href: "/routes", icon: Route, roles: ["admin"] },
-  { labelKey: "nav.alertsOverview", href: "/alerts", icon: Bell, badge: 3, roles: ["admin"] },
+  { labelKey: "nav.alertsOverview", href: "/alerts", icon: Bell, roles: ["admin"] },
   { labelKey: "nav.analytics", href: "/analytics", icon: BarChart3, roles: ["admin"] },
   { labelKey: "nav.billing", href: "/billing", icon: Receipt, roles: ["admin"] },
   { labelKey: "nav.fleetManagement", href: "/fleet", icon: Wrench, roles: ["admin"] },
@@ -35,6 +36,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const { user: admin, logout } = useAuth();
   const { t, isRTL } = useLanguage();
+  const pendingAlertsCount = usePendingAlertsCount();
 
   return (
     <aside className="w-[190px] bg-white dark:bg-[var(--sv-card-bg)] border-r border-sv-border dark:border-[var(--sv-border)] flex flex-col flex-shrink-0 h-screen sticky top-0">
@@ -60,9 +62,9 @@ export function Sidebar() {
             >
               <item.icon size={16} className="flex-shrink-0" />
               <span className="flex-1 truncate">{t(item.labelKey)}</span>
-              {item.badge && !active && (
+              {item.href === '/alerts' && pendingAlertsCount > 0 && !active && (
                 <span className="bg-sv-red text-white text-[9px] font-medium px-1.5 py-0.5 rounded-full">
-                  {item.badge}
+                  {pendingAlertsCount}
                 </span>
               )}
             </Link>
