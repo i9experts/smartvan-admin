@@ -12,6 +12,9 @@ interface VanItem {
   _id: string;
   carNumber: string;
   vehicleType: string;
+  vehicleCategory?: string;
+  manufacturer?: string;
+  model?: string;
   venCapacity?: number;
   condition: string;
   status: string;
@@ -33,17 +36,29 @@ interface Driver {
   _id: string; fullname: string; email: string; phoneNo: string; image: string; status: string;
 }
 interface VanForm {
-  carNumber: string; vehicleType: string; venCapacity: string;
+  carNumber: string; vehicleCategory: string; manufacturer: string; model: string; venCapacity: string;
   condition: string; deviceId: string; assignRoute: string; ownVan: boolean;
   insuranceExpiry: string; registrationExpiry: string; fitnessExpiry: string; routePermitExpiry: string;
   insuranceDocUrl: string; registrationDocUrl: string; fitnessDocUrl: string; routePermitDocUrl: string;
 }
 const EMPTY_FORM: VanForm = {
-  carNumber: '', vehicleType: '', venCapacity: '', condition: '', deviceId: '', assignRoute: '', ownVan: false,
+  carNumber: '', vehicleCategory: '', manufacturer: '', model: '', venCapacity: '', condition: '', deviceId: '', assignRoute: '', ownVan: false,
   insuranceExpiry: '', registrationExpiry: '', fitnessExpiry: '', routePermitExpiry: '',
   insuranceDocUrl: '', registrationDocUrl: '', fitnessDocUrl: '', routePermitDocUrl: '',
 };
-const VEHICLE_TYPES = ['Suzuki Bolan','Toyota Hiace','Suzuki Carry','Honda Civic','Toyota Corolla','Hyundai H100','Datsun','Other'];
+// Structured vehicle fields — Category + Manufacturer are picked from a
+// fixed, well-known list; Model is free text (with suggestions) since new
+// models appear constantly and shouldn't ever require a software change.
+const VEHICLE_CATEGORIES = ['Van', 'Mini Bus', 'Mid-Size Bus', 'Full-Size Bus', 'Electric Vehicle', 'Other'];
+const MANUFACTURERS = [
+  'Suzuki', 'Toyota', 'Nissan', 'Hyundai', 'Kia', 'Mitsubishi', 'Mercedes-Benz',
+  'Ford', 'Volkswagen', 'Isuzu', 'Tata', 'Ashok Leyland', 'Higer', 'Yutong',
+  'King Long', 'MAN', 'Other',
+];
+const MODEL_SUGGESTIONS = [
+  'Bolan', 'Every', 'Hiace', 'Commuter', 'Urvan', 'H-1', 'Solati', 'Coaster',
+  'Rosa', 'Civilian', 'County', 'Sprinter', 'Transit', 'Crafter',
+];
 const CONDITIONS = ['Excellent','Good','Fair','Poor'];
 
 function mapVans(raw: any): { data: VanItem[]; total: number } {
@@ -52,6 +67,9 @@ function mapVans(raw: any): { data: VanItem[]; total: number } {
       _id: item.van?.id,
       carNumber: item.van?.carNumber ?? '',
       vehicleType: item.van?.vehicleType ?? '',
+      vehicleCategory: item.van?.vehicleCategory ?? '',
+      manufacturer: item.van?.manufacturer ?? '',
+      model: item.van?.model ?? '',
       venCapacity: item.van?.venCapacity,
       condition: item.van?.condition ?? '',
       status: item.van?.status ?? 'inactive',
@@ -89,7 +107,7 @@ function ConditionBadge({ condition }: { condition: string }) {
 function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?: VanItem|null; onClose: ()=>void; onSuccess: ()=>void }) {
   const [form, setForm] = useState<VanForm>(
     van ? {
-      carNumber: van.carNumber, vehicleType: van.vehicleType, venCapacity: String(van.venCapacity ?? ''), condition: van.condition,
+      carNumber: van.carNumber, vehicleCategory: van.vehicleCategory ?? '', manufacturer: van.manufacturer ?? '', model: van.model ?? '', venCapacity: String(van.venCapacity ?? ''), condition: van.condition,
       deviceId: van.deviceId ?? '', assignRoute: van.assignRoute ?? '', ownVan: van.ownVan,
       insuranceExpiry: van.insuranceExpiry ?? '', registrationExpiry: van.registrationExpiry ?? '',
       fitnessExpiry: van.fitnessExpiry ?? '', routePermitExpiry: van.routePermitExpiry ?? '',
@@ -100,7 +118,7 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
   const [error, setError] = useState('');
   const addMutation = useMutation({
     mutationFn: (f: VanForm) => vanApi.addByAdmin({
-      carNumber: f.carNumber, vehicleType: f.vehicleType, venCapacity: f.venCapacity ? Number(f.venCapacity) : undefined, condition: f.condition,
+      carNumber: f.carNumber, vehicleCategory: f.vehicleCategory || undefined, manufacturer: f.manufacturer || undefined, model: f.model || undefined, venCapacity: f.venCapacity ? Number(f.venCapacity) : undefined, condition: f.condition,
       deviceId: f.deviceId || undefined, assignRoute: f.assignRoute || undefined, ownVan: f.ownVan,
       insuranceExpiry: f.insuranceExpiry || undefined, registrationExpiry: f.registrationExpiry || undefined,
       fitnessExpiry: f.fitnessExpiry || undefined, routePermitExpiry: f.routePermitExpiry || undefined,
@@ -112,7 +130,7 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
   });
   const editMutation = useMutation({
     mutationFn: (f: VanForm) => vanApi.editByAdmin({
-      vanId: van!._id, carNumber: f.carNumber, vehicleType: f.vehicleType, venCapacity: f.venCapacity ? Number(f.venCapacity) : undefined, condition: f.condition,
+      vanId: van!._id, carNumber: f.carNumber, vehicleCategory: f.vehicleCategory || undefined, manufacturer: f.manufacturer || undefined, model: f.model || undefined, venCapacity: f.venCapacity ? Number(f.venCapacity) : undefined, condition: f.condition,
       deviceId: f.deviceId || undefined, assignRoute: f.assignRoute || undefined, ownVan: f.ownVan,
       insuranceExpiry: f.insuranceExpiry || undefined, registrationExpiry: f.registrationExpiry || undefined,
       fitnessExpiry: f.fitnessExpiry || undefined, routePermitExpiry: f.routePermitExpiry || undefined,
@@ -137,7 +155,7 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
   }
   const isLoading = addMutation.isPending || editMutation.isPending;
   function handleSubmit() {
-    if (!form.carNumber || !form.vehicleType || !form.condition) { setError('Plate number, vehicle type and condition are required.'); return; }
+    if (!form.carNumber || !form.vehicleCategory || !form.manufacturer || !form.condition) { setError('Plate number, vehicle category, manufacturer and condition are required.'); return; }
     setError('');
     mode === 'add' ? addMutation.mutate(form) : editMutation.mutate(form);
   }
@@ -160,11 +178,33 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
                 <input value={form.carNumber} onChange={e => setForm(f => ({ ...f, carNumber: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white" placeholder="e.g. KHI-1234" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Vehicle Type *</label>
-                <select value={form.vehicleType} onChange={e => setForm(f => ({ ...f, vehicleType: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white">
-                  <option value="">Select type</option>
-                  {VEHICLE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                <label className="block text-xs font-medium text-gray-600 mb-1">Vehicle Category *</label>
+                <select value={form.vehicleCategory} onChange={e => setForm(f => ({ ...f, vehicleCategory: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white">
+                  <option value="">Select category</option>
+                  {VEHICLE_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Manufacturer *</label>
+                <select value={form.manufacturer} onChange={e => setForm(f => ({ ...f, manufacturer: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white">
+                  <option value="">Select manufacturer</option>
+                  {MANUFACTURERS.map(m => <option key={m} value={m}>{m}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Model</label>
+                <input
+                  list="model-suggestions"
+                  value={form.model}
+                  onChange={e => setForm(f => ({ ...f, model: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white"
+                  placeholder="e.g. Coaster"
+                />
+                <datalist id="model-suggestions">
+                  {MODEL_SUGGESTIONS.map(m => <option key={m} value={m} />)}
+                </datalist>
               </div>
             </div>
           </div>
