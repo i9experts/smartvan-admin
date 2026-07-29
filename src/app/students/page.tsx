@@ -78,6 +78,13 @@ const EMPTY_FORM: AddStudentForm = {
   homeLng: undefined,
 };
 
+// Class/grade levels — Pre Nursery through Grade 12, matching how schools
+// actually structure early years before the numbered grades begin.
+const GRADE_LEVELS = [
+  'Pre Nursery', 'Nursery', 'KG',
+  ...Array.from({ length: 12 }, (_, i) => `G${i + 1}`),
+];
+
 // ─── API calls ────────────────────────────────────────────────────────────────
 
 async function fetchStudents(page: number, search: string, status: string) {
@@ -342,8 +349,8 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
                 className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
               >
                 <option value="">Select</option>
-                {Array.from({ length: 12 }, (_, i) => i + 1).map((g) => (
-                  <option key={g} value={g}>Grade {g}</option>
+                {GRADE_LEVELS.map((g) => (
+                  <option key={g} value={g}>{g}</option>
                 ))}
               </select>
             </div>
@@ -1398,7 +1405,7 @@ export default function StudentsPage() {
                         </div>
                       </td>
                       <td className="p-4 text-sm text-gray-600">
-                        {student.grade ? `Grade ${student.grade}` : '—'}
+                        {student.grade || '—'}
                       </td>
                       <td className="p-4 text-sm text-gray-600 capitalize">
                         {student.gender ?? '—'}
