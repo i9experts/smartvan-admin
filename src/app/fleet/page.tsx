@@ -13,8 +13,21 @@ interface VanItem {
   _id: string; carNumber: string; vehicleType: string; venCapacity?: number;
   condition: string; status: string; ownVan: boolean; deviceId?: string;
   assignRoute?: string; expiryDate?: string;
+  insuranceExpiry?: string; registrationExpiry?: string; fitnessExpiry?: string; routePermitExpiry?: string;
   driver?: { id: string | null; fullname: string; phoneNo: string; image: string };
   routes?: { id: string; title: string; tripType: string }[];
+}
+
+// The generic expiryDate field is never actually set by any create/edit
+// flow — every van has it as null. The real, populated data lives in
+// these four specific document expiry fields. This returns whichever one
+// is soonest, so the dashboard reflects the vehicle's actual nearest
+// compliance deadline instead of a field nothing ever writes to.
+function getEarliestExpiry(van: VanItem): string | null {
+  const dates = [van.insuranceExpiry, van.registrationExpiry, van.fitnessExpiry, van.routePermitExpiry]
+    .filter((d): d is string => !!d)
+    .sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+  return dates[0] ?? null;
 }
 
 function mapVans(raw: any): { data: VanItem[]; total: number } {
@@ -25,6 +38,8 @@ function mapVans(raw: any): { data: VanItem[]; total: number } {
       condition: item.van?.condition ?? 'Unknown', status: item.van?.status ?? 'inactive',
       ownVan: item.van?.ownVan ?? false, deviceId: item.van?.deviceId ?? '',
       assignRoute: item.van?.assignRoute ?? '', expiryDate: item.van?.expiryDate ?? '',
+      insuranceExpiry: item.van?.insuranceExpiry ?? '', registrationExpiry: item.van?.registrationExpiry ?? '',
+      fitnessExpiry: item.van?.fitnessExpiry ?? '', routePermitExpiry: item.van?.routePermitExpiry ?? '',
       driver: item.driver ?? null, routes: item.routes ?? [],
     })),
     total: raw.pagination?.total ?? 0,
@@ -40,8 +55,9 @@ function getHealthScore(van: VanItem): number {
   if (!van.driver?.id) score -= 15;
   if (!van.deviceId) score -= 10;
   if (!van.routes || van.routes.length === 0) score -= 10;
-  if (van.expiryDate) {
-    const days = Math.floor((new Date(van.expiryDate).getTime() - Date.now()) / 86400000);
+  const earliestExpiry = getEarliestExpiry(van);
+  if (earliestExpiry) {
+    const days = Math.floor((new Date(earliestExpiry).getTime() - Date.now()) / 86400000);
     if (days < 0) score -= 25;
     else if (days < 30) score -= 15;
   }
@@ -77,7 +93,7 @@ function getExpiryStatus(expiryDate: string) {
 function VanDetailDrawer({ van, onClose }: { van: VanItem; onClose: () => void }) {
   const score = getHealthScore(van);
   const health = getHealthColor(score);
-  const expiry = getExpiryStatus(van.expiryDate ?? '');
+  const expiry = getExpiryStatus(getEarliestExpiry(van) ?? '');
   const checks = [
     { label: 'Driver assigned', ok: !!van.driver?.id },
     { label: 'GPS device active', ok: !!van.deviceId },
@@ -200,6 +216,25 @@ function VanDetailDrawer({ van, onClose }: { van: VanItem; onClose: () => void }
               ))}
             </div>
           </div>
+          <div>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3 mt-5">Document Expiry</p>
+            <div className="space-y-2">
+              {[
+                { label: 'Insurance', date: van.insuranceExpiry },
+                { label: 'Registration', date: van.registrationExpiry },
+                { label: 'Fitness Certificate', date: van.fitnessExpiry },
+                { label: 'Route Permit', date: van.routePermitExpiry },
+              ].map((doc) => {
+                const status = getExpiryStatus(doc.date ?? '');
+                return (
+                  <div key={doc.label} className="flex items-center justify-between">
+                    <span className="text-sm text-gray-700">{doc.label}</span>
+                    <span className={`text-xs font-medium ${status.color}`}>{status.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -209,7 +244,7 @@ function VanDetailDrawer({ van, onClose }: { van: VanItem; onClose: () => void }
 function VanCard({ van, onClick }: { van: VanItem; onClick: () => void }) {
   const score = getHealthScore(van);
   const health = getHealthColor(score);
-  const expiry = getExpiryStatus(van.expiryDate ?? '');
+  const expiry = getExpiryStatus(getEarliestExpiry(van) ?? '');
   return (
     <div onClick={onClick} className={`bg-white rounded-2xl border-2 ${health.border} hover:shadow-lg transition-all cursor-pointer group relative overflow-hidden`}>
       <div className={`h-1 ${health.bg}`} style={{ width: `${score}%` }} />
@@ -291,8 +326,8 @@ export default function FleetPage() {
     const total = vans.length;
     const active = vans.filter(v => v.status === 'active').length;
     const critical = vans.filter(v => getHealthScore(v) < 40).length;
-    const overdue = vans.filter(v => v.expiryDate && new Date(v.expiryDate) < new Date()).length;
-    const expiringSoon = vans.filter(v => { if (!v.expiryDate) return false; const d = Math.floor((new Date(v.expiryDate).getTime() - Date.now()) / 86400000); return d >= 0 && d < 30; }).length;
+    const overdue = vans.filter(v => { const e = getEarliestExpiry(v); return e && new Date(e) < new Date(); }).length;
+    const expiringSoon = vans.filter(v => { const e = getEarliestExpiry(v); if (!e) return false; const d = Math.floor((new Date(e).getTime() - Date.now()) / 86400000); return d >= 0 && d < 30; }).length;
     const withGPS = vans.filter(v => !!v.deviceId).length;
     const withDriver = vans.filter(v => !!v.driver?.id).length;
     const avgHealth = total > 0 ? Math.round(vans.reduce((s, v) => s + getHealthScore(v), 0) / total) : 0;
@@ -305,7 +340,7 @@ export default function FleetPage() {
     if (filter === 'active') list = list.filter(v => v.status === 'active');
     else if (filter === 'inactive') list = list.filter(v => v.status !== 'active');
     else if (filter === 'critical') list = list.filter(v => getHealthScore(v) < 40);
-    else if (filter === 'overdue') list = list.filter(v => v.expiryDate && new Date(v.expiryDate) < new Date());
+    else if (filter === 'overdue') list = list.filter(v => { const e = getEarliestExpiry(v); return e && new Date(e) < new Date(); });
     return list;
   }, [vans, search, filter]);
 
@@ -412,7 +447,7 @@ export default function FleetPage() {
               </thead>
               <tbody>
                 {filtered.map(van => {
-                  const score = getHealthScore(van); const health = getHealthColor(score); const expiry = getExpiryStatus(van.expiryDate??'');
+                  const score = getHealthScore(van); const health = getHealthColor(score); const expiry = getExpiryStatus(getEarliestExpiry(van) ?? '');
                   return (
                     <tr key={van._id} className="border-b border-gray-50 hover:bg-gray-50/50 transition cursor-pointer" onClick={() => setSelectedVan(van)}>
                       <td className="p-4">
