@@ -27,9 +27,14 @@ interface Complaint {
   adminRemarks?: string;
   dateOfIncident?: string;
   createdAt: string;
-  parent?: { fullname?: string; email?: string; phoneNo?: string };
-  driver?: { fullname?: string; email?: string; phoneNo?: string };
-  kid?: { fullname?: string; grade?: number };
+  driverName?: string;
+  driverPhone?: string;
+  driverEmail?: string;
+  parentName?: string;
+  parentPhone?: string;
+  parentEmail?: string;
+  kidName?: string;
+  vanCarNumber?: string;
 }
 
 // ─── Status config ────────────────────────────────────────────────────────────
@@ -73,8 +78,12 @@ function DetailDrawer({ complaint, onClose, onStatusChange }: DetailDrawerProps)
     },
   });
 
-  const reporter = complaint.parent ?? complaint.driver;
-  const reporterLabel = complaint.parent ? 'Parent' : 'Driver';
+  const reporter = complaint.parentName
+    ? { fullname: complaint.parentName, phoneNo: complaint.parentPhone, email: complaint.parentEmail }
+    : complaint.driverName
+      ? { fullname: complaint.driverName, phoneNo: complaint.driverPhone, email: complaint.driverEmail }
+      : null;
+  const reporterLabel = complaint.parentName ? 'Parent' : 'Driver';
 
   return (
     <div className="fixed inset-0 z-50 flex">
@@ -129,12 +138,12 @@ function DetailDrawer({ complaint, onClose, onStatusChange }: DetailDrawerProps)
                   {reporter.phoneNo && <p className="text-xs text-gray-400">{reporter.phoneNo}</p>}
                 </div>
               </div>
-              {complaint.kid && (
+              {complaint.kidName && (
                 <div className="mt-3 flex items-center gap-2 p-2.5 bg-blue-50 rounded-xl">
                   <User size={13} className="text-blue-500" />
                   <div>
                     <p className="text-xs text-blue-600 font-medium">Student</p>
-                    <p className="text-xs text-blue-800">{complaint.kid.fullname} · Grade {complaint.kid.grade}</p>
+                    <p className="text-xs text-blue-800">{complaint.kidName}</p>
                   </div>
                 </div>
               )}
@@ -264,7 +273,7 @@ export default function ComplaintsPage() {
   });
 
   const complaints: Complaint[] = data?.data ?? [];
-  const total: number = data?.total ?? 0;
+  const total: number = data?.pagination?.total ?? 0;
   const totalPages = Math.ceil(total / 10);
 
   // Client-side search filter
@@ -390,10 +399,10 @@ export default function ComplaintsPage() {
                       </td>
                       <td className="p-4">
                         <p className="text-sm text-gray-700">
-                          {complaint.parent?.fullname ?? complaint.driver?.fullname ?? '—'}
+                          {complaint.parentName ?? complaint.driverName ?? '—'}
                         </p>
                         <p className="text-xs text-gray-400 capitalize">
-                          {complaint.parent ? 'Parent' : complaint.driver ? 'Driver' : '—'}
+                          {complaint.parentName ? 'Parent' : complaint.driverName ? 'Driver' : '—'}
                         </p>
                       </td>
                       <td className="p-4">
