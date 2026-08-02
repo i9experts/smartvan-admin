@@ -131,6 +131,12 @@ export const uploadApi = {
     return api.post('/upload/image', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
   },
 };
+export const bannerApi = {
+  getAll: () => api.get('/promotion-banner/findAll'),
+  create: (banner: any) => api.post('/promotion-banner/create', { banners: [banner] }),
+  update: (id: string, banner: any) => api.patch(`/promotion-banner/${id}`, banner),
+  remove: (id: string) => api.delete(`/promotion-banner/${id}`),
+};
 export const auditLogApi = {
   getRecent: () => api.get('/audit-log/recent'),
 };

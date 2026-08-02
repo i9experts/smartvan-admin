@@ -6,6 +6,7 @@ import Image from "next/image";
 import {
   LayoutDashboard, MapPin, School, Bus, Users, Route,
   Bell, BarChart3, Receipt, Wrench, Settings, LogOut, MessageSquare, History,
+  Image as ImageIcon,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -27,6 +28,7 @@ const navItems: { labelKey: string; href: string; icon: any; roles: ("admin" | "
   { labelKey: "nav.attendance", href: "/attendance", icon: Users, roles: ["admin"] },
   { labelKey: "nav.feeManagement", href: "/fees", icon: Users, roles: ["admin"] },
   { labelKey: "nav.schoolLeads", href: "/leads", icon: Users, roles: ["superadmin"] },
+  { labelKey: "nav.banners", href: "/banners", icon: ImageIcon, roles: ["superadmin"] },
   { labelKey: "nav.employees", href: "/employees", icon: Users, roles: ["superadmin"] },
   { labelKey: "nav.tickets", href: "/tickets", icon: MessageSquare, roles: ["superadmin"] },
   { labelKey: "nav.auditLog", href: "/audit-log", icon: History, roles: ["superadmin"] },
