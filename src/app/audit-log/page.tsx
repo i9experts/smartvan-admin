@@ -16,7 +16,7 @@ interface LogEntry {
 }
 
 const ACTION_META: Record<string, { icon: any; iconBg: string; iconText: string; describe: (l: LogEntry) => string }> = {
-  login: {
+  'logged in': {
     icon: LogIn, iconBg: 'bg-blue-50', iconText: 'text-blue-600',
     describe: (l) => `${l.actorEmail} logged in`,
   },
