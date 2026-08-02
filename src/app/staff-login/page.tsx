@@ -119,6 +119,9 @@ export default function StaffLoginPage() {
             </button>
           </div>
           <p className="text-center text-xs text-gray-400 mt-8">SmartVan Staff Portal · {new Date().getFullYear()}</p>
+          <p className="text-center text-xs text-gray-400 mt-2">
+            School admin? <a href="/auth/login" className="text-[#1B2B6B] font-medium hover:underline">Log in here</a> instead
+          </p>
         </div>
       </div>
     </div>

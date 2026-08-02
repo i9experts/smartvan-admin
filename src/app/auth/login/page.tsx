@@ -68,6 +68,9 @@ export default function LoginPage() {
             </button>
           </div>
           <p className="text-center text-xs text-gray-400 mt-8">SmartVan Admin · {new Date().getFullYear()}</p>
+          <p className="text-center text-xs text-gray-400 mt-2">
+            Staff member? <a href="/staff-login" className="text-[#1B2B6B] font-medium hover:underline">Log in here</a> instead
+          </p>
         </div>
       </div>
     </div>
