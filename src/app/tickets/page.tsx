@@ -103,7 +103,7 @@ function TicketRow({ ticket, employees }: { ticket: Ticket; employees: Employee[
             </span>
           </div>
           <p className="text-[11px] text-gray-400 mt-0.5">
-            {ticket.schoolName || 'Unknown school'}{who ? ` · ${who}` : ''}{ticket.vanCarNumber ? ` · ${ticket.vanCarNumber}` : ''} · {timeAgo(ticket.createdAt)}
+            {ticket.schoolName || 'Unknown school'}{who ? ` · ${who}` : ''}{!ticket.adminName && ticket.vanCarNumber ? ` · ${ticket.vanCarNumber}` : ''} · {timeAgo(ticket.createdAt)}
           </p>
           {ticket.description && <p className="text-[13px] text-gray-600 mt-2 leading-relaxed">{ticket.description}</p>}
 
