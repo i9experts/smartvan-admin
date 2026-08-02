@@ -6,7 +6,7 @@ import Image from "next/image";
 import {
   LayoutDashboard, MapPin, School, Bus, Users, Route,
   Bell, BarChart3, Receipt, Wrench, Settings, LogOut, MessageSquare, History,
-  Image as ImageIcon, AlertTriangle,
+  Image as ImageIcon, AlertTriangle, HelpCircle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -28,6 +28,7 @@ const navItems: { labelKey: string; href: string; icon: any; roles: ("admin" | "
   { labelKey: "nav.fleetManagement", href: "/fleet", icon: Wrench, roles: ["admin"] },
   { labelKey: "nav.attendance", href: "/attendance", icon: Users, roles: ["admin"] },
   { labelKey: "nav.feeManagement", href: "/fees", icon: Users, roles: ["admin"] },
+  { labelKey: "nav.support", href: "/support", icon: HelpCircle, roles: ["admin"] },
   { labelKey: "nav.schoolLeads", href: "/leads", icon: Users, roles: ["superadmin"] },
   { labelKey: "nav.banners", href: "/banners", icon: ImageIcon, roles: ["superadmin"] },
   { labelKey: "nav.employees", href: "/employees", icon: Users, roles: ["superadmin"] },

@@ -13,6 +13,7 @@ interface Ticket {
   status: string;
   driverName?: string;
   parentName?: string;
+  adminName?: string;
   kidName?: string;
   vanCarNumber?: string;
   assignedTo?: string;
@@ -64,7 +65,7 @@ function timeAgo(dateStr: string) {
 }
 
 async function fetchTickets(status: string): Promise<Ticket[]> {
-  const res = await reportApi.getByAdmin({ page: 1, limit: 100, ...(status ? { status } : {}) });
+  const res = await reportApi.getByAdmin({ page: 1, limit: 100, type: 'adminReport', ...(status ? { status } : {}) });
   return res.data?.data ?? [];
 }
 
@@ -84,7 +85,7 @@ function TicketRow({ ticket, employees }: { ticket: Ticket; employees: Employee[
     onSuccess: () => qc.invalidateQueries({ queryKey: ['all-tickets'] }),
   });
 
-  const who = ticket.parentName || ticket.driverName || null;
+  const who = ticket.adminName || ticket.parentName || ticket.driverName || null;
 
   return (
     <div className="relative bg-white rounded-xl border border-gray-100 shadow-[0_1px_2px_rgba(16,24,40,0.04)] overflow-hidden">
@@ -137,7 +138,7 @@ export default function TicketsPage() {
     <div className="p-6 space-y-5 max-w-4xl mx-auto">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Tickets</h1>
-        <p className="text-sm text-gray-400 mt-0.5">All complaints across every institution</p>
+        <p className="text-sm text-gray-400 mt-0.5">Platform tickets submitted by school admins — bugs, feature requests, support, training</p>
       </div>
 
       <div className="flex gap-2">

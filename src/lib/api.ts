@@ -81,6 +81,9 @@ export const reportApi = {
   getById: (reportId: string) => api.get(`/report/getComplaintById/${reportId}`),
   changeStatus: (reportId: string, status: string, adminRemarks?: string) =>
     api.post('/report/changeComplaintStatus', { reportId, status, adminRemarks }),
+  submitTicket: (issueType: string, description: string, image?: string) =>
+    api.post('/report/addReportByAdmin', { issueType, description, image }),
+  getMyTickets: () => api.get('/report/getMyTicketsByAdmin'),
 };
 
 export const alertApi = {
