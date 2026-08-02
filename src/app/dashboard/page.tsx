@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import {
   Users,
@@ -126,11 +127,12 @@ interface StatCardProps {
   icon: React.ReactNode;
   color: string;
   trend?: number;
+  href?: string;
 }
 
-function StatCard({ title, value, sub, icon, color, trend }: StatCardProps) {
-  return (
-    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col gap-3">
+function StatCard({ title, value, sub, icon, color, trend, href }: StatCardProps) {
+  const content = (
+    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col gap-3 h-full">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-gray-500">{title}</span>
         <div
@@ -154,6 +156,15 @@ function StatCard({ title, value, sub, icon, color, trend }: StatCardProps) {
       )}
     </div>
   );
+
+  if (href) {
+    return (
+      <Link href={href} className="block hover:shadow-md transition-shadow rounded-2xl">
+        {content}
+      </Link>
+    );
+  }
+  return content;
 }
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
@@ -277,6 +288,7 @@ export default function DashboardPage() {
               icon={<AlertTriangle size={20} />}
               color="#EF4444"
               trend={-8}
+              href="/complaints"
             />
           </>
         )}
