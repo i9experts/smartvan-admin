@@ -253,11 +253,12 @@ export default function ComplaintsPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
   const [selected, setSelected] = useState<Complaint | null>(null);
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['complaints', page, statusFilter],
-    queryFn: () => reportApi.getByAdmin({ page, limit: 10, status: statusFilter || undefined }),
+    queryKey: ['complaints', page, statusFilter, typeFilter],
+    queryFn: () => reportApi.getByAdmin({ page, limit: 10, status: statusFilter || undefined, type: typeFilter || undefined }),
     select: r => r.data,
     staleTime: 30_000,
   });
@@ -289,8 +290,10 @@ export default function ComplaintsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Complaints</h1>
-            <p className="text-sm text-gray-400 mt-0.5">{total} total complaint{total !== 1 ? 's' : ''}</p>
+            <h1 className="text-2xl font-bold text-gray-900">Complaints &amp; Reported Issues</h1>
+            <p className="text-sm text-gray-400 mt-0.5">
+              {total} total — includes parent complaints and issues reported by drivers
+            </p>
           </div>
           {/* Status summary */}
           <div className="flex items-center gap-2">
@@ -306,6 +309,25 @@ export default function ComplaintsPage() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Reported-by filter — parent complaints vs driver-reported issues */}
+        <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-xl p-1 w-fit">
+          {[
+            { key: '', label: 'All' },
+            { key: 'parentReport', label: 'From Parents' },
+            { key: 'driverReport', label: 'From Drivers' },
+          ].map(t => (
+            <button
+              key={t.key}
+              onClick={() => { setTypeFilter(t.key); setPage(1); }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+                typeFilter === t.key ? 'bg-[#1B2B6B] text-white' : 'text-gray-500 hover:bg-gray-50'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
 
         {/* Search */}

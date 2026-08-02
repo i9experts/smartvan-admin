@@ -76,7 +76,7 @@ export const tripApi = {
 };
 
 export const reportApi = {
-  getByAdmin: (params?: { page?: number; limit?: number; status?: string }) =>
+  getByAdmin: (params?: { page?: number; limit?: number; status?: string; type?: string }) =>
     api.get('/report/getComplainsByAdmin', { params }),
   getById: (reportId: string) => api.get(`/report/getComplaintById/${reportId}`),
   changeStatus: (reportId: string, status: string, adminRemarks?: string) =>
