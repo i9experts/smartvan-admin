@@ -10,8 +10,10 @@ interface AdminUser {
   _id: string;
   email: string;
   name?: string;
-  role: 'admin' | 'superadmin';
+  fullname?: string;
+  role: 'admin' | 'superadmin' | 'school_staff';
   schoolId?: string;
+  permissions?: string[];
 }
 
 interface AuthState {
@@ -101,6 +103,13 @@ export function useAuth() {
     []
   );
 
+  const loginWithToken = useCallback((token: string, user: AdminUser) => {
+    setLS(TOKEN_KEY, token);
+    setLS(USER_KEY, JSON.stringify(user));
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    setState({ user, token, isLoading: false, isAuthenticated: true });
+  }, []);
+
   const logout = useCallback(() => {
     clearAuth();
     router.push('/auth/login');
@@ -121,5 +130,5 @@ export function useAuth() {
     }
   }, []);
 
-  return { ...state, login, logout, refreshProfile };
+  return { ...state, login, loginWithToken, logout, refreshProfile };
 }

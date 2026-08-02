@@ -127,6 +127,16 @@ export const employeeApi = {
   assignTicket: (reportId: string, employeeId: string) =>
     api.post('/employee/assign-ticket', { reportId, employeeId }),
 };
+export const staffApi = {
+  getPermissions: () => api.get('/school-staff/permissions'),
+  getAll: () => api.get('/school-staff/all'),
+  create: (data: { fullname: string; email: string; password: string; phoneNo?: string; roleTitle?: string; permissions: string[] }) =>
+    api.post('/school-staff/create', data),
+  update: (id: string, data: { fullname?: string; phoneNo?: string; roleTitle?: string; permissions?: string[]; status?: string }) =>
+    api.patch(`/school-staff/${id}`, data),
+  remove: (id: string) => api.delete(`/school-staff/${id}`),
+  login: (email: string, password: string) => api.post('/school-staff/login', { email, password }),
+};
 export const uploadApi = {
   image: (file: File) => {
     const formData = new FormData();

@@ -12,22 +12,23 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { usePendingAlertsCount } from "@/hooks/usePendingAlertsCount";
 
-const navItems: { labelKey: string; href: string; icon: any; roles: ("admin" | "superadmin")[] }[] = [
+const navItems: { labelKey: string; href: string; icon: any; roles: ("admin" | "superadmin")[]; permission?: string }[] = [
   { labelKey: "nav.overview", href: "/super-admin", icon: LayoutDashboard, roles: ["superadmin"] },
-  { labelKey: "nav.overview", href: "/dashboard", icon: LayoutDashboard, roles: ["admin"] },
+  { labelKey: "nav.overview", href: "/dashboard", icon: LayoutDashboard, roles: ["admin"], permission: "view_dashboard" },
   { labelKey: "nav.liveTracking", href: "/tracking", icon: MapPin, roles: ["admin"] },
-  { labelKey: "nav.studentManagement", href: "/students", icon: School, roles: ["admin"] },
-  { labelKey: "nav.vanDriverMgmt", href: "/vans", icon: Bus, roles: ["admin"] },
-  { labelKey: "nav.driverAccounts", href: "/drivers", icon: Users, roles: ["admin"] },
-  { labelKey: "nav.parentManagement", href: "/parents", icon: Users, roles: ["admin"] },
-  { labelKey: "nav.routePlanner", href: "/routes", icon: Route, roles: ["admin"] },
-  { labelKey: "nav.alertsOverview", href: "/alerts", icon: Bell, roles: ["admin"] },
-  { labelKey: "nav.complaints", href: "/complaints", icon: AlertTriangle, roles: ["admin"] },
-  { labelKey: "nav.analytics", href: "/analytics", icon: BarChart3, roles: ["admin"] },
+  { labelKey: "nav.studentManagement", href: "/students", icon: School, roles: ["admin"], permission: "manage_students" },
+  { labelKey: "nav.vanDriverMgmt", href: "/vans", icon: Bus, roles: ["admin"], permission: "manage_fleet" },
+  { labelKey: "nav.driverAccounts", href: "/drivers", icon: Users, roles: ["admin"], permission: "manage_fleet" },
+  { labelKey: "nav.parentManagement", href: "/parents", icon: Users, roles: ["admin"], permission: "manage_parents" },
+  { labelKey: "nav.routePlanner", href: "/routes", icon: Route, roles: ["admin"], permission: "manage_routes" },
+  { labelKey: "nav.alertsOverview", href: "/alerts", icon: Bell, roles: ["admin"], permission: "view_alerts" },
+  { labelKey: "nav.complaints", href: "/complaints", icon: AlertTriangle, roles: ["admin"], permission: "manage_complaints" },
+  { labelKey: "nav.analytics", href: "/analytics", icon: BarChart3, roles: ["admin"], permission: "view_analytics" },
   { labelKey: "nav.billing", href: "/billing", icon: Receipt, roles: ["admin"] },
-  { labelKey: "nav.fleetManagement", href: "/fleet", icon: Wrench, roles: ["admin"] },
-  { labelKey: "nav.attendance", href: "/attendance", icon: Users, roles: ["admin"] },
-  { labelKey: "nav.feeManagement", href: "/fees", icon: Users, roles: ["admin"] },
+  { labelKey: "nav.fleetManagement", href: "/fleet", icon: Wrench, roles: ["admin"], permission: "view_fleet_health" },
+  { labelKey: "nav.attendance", href: "/attendance", icon: Users, roles: ["admin"], permission: "view_attendance" },
+  { labelKey: "nav.feeManagement", href: "/fees", icon: Users, roles: ["admin"], permission: "manage_fees" },
+  { labelKey: "nav.team", href: "/team", icon: Users, roles: ["admin"] },
   { labelKey: "nav.support", href: "/support", icon: HelpCircle, roles: ["admin"] },
   { labelKey: "nav.schoolLeads", href: "/leads", icon: Users, roles: ["superadmin"] },
   { labelKey: "nav.banners", href: "/banners", icon: ImageIcon, roles: ["superadmin"] },
@@ -51,7 +52,16 @@ export function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 py-2.5 overflow-y-auto scrollbar-hide">
-        {navItems.filter(item => item.roles.includes((admin?.role as "admin" | "superadmin") ?? "admin")).map((item) => {
+        {navItems.filter(item => {
+          if (admin?.role === "school_staff") {
+            // Staff only ever see items explicitly delegable via a
+            // permission (Team, Billing, Settings, Support, Live
+            // Tracking, and every superadmin-only item are never shown
+            // regardless of what's granted).
+            return item.roles.includes("admin") && !!item.permission && (admin?.permissions ?? []).includes(item.permission);
+          }
+          return item.roles.includes((admin?.role as "admin" | "superadmin") ?? "admin");
+        }).map((item) => {
           const active = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link
