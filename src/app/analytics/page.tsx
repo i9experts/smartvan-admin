@@ -145,13 +145,26 @@ export default function AnalyticsPage() {
   ];
 
   // ── Grade distribution ─────────────────────────────────────────────────────
-  const gradeCounts: Record<number, number> = {};
+  // Matches the real class sequence used in Student Management's grade
+  // picker. Older students may still have a bare numeric grade value from
+  // before that redesign — those sort numerically at the end via the
+  // fallback below, and display as-is (no "G" prefix added, since new
+  // values like "G5" or "KG" are already self-descriptive).
+  const GRADE_ORDER = ['Pre Nursery', 'Nursery', 'KG', ...Array.from({ length: 12 }, (_, i) => `G${i + 1}`)];
+  const gradeCounts: Record<string, number> = {};
   students.forEach((s: any) => {
     if (s.grade) gradeCounts[s.grade] = (gradeCounts[s.grade] ?? 0) + 1;
   });
   const gradeData = Object.entries(gradeCounts)
-    .sort(([a], [b]) => Number(a) - Number(b))
-    .map(([grade, count]) => ({ grade: `G${grade}`, count }));
+    .sort(([a], [b]) => {
+      const ia = GRADE_ORDER.indexOf(a);
+      const ib = GRADE_ORDER.indexOf(b);
+      if (ia !== -1 && ib !== -1) return ia - ib;
+      if (ia !== -1) return -1;
+      if (ib !== -1) return 1;
+      return Number(a) - Number(b) || a.localeCompare(b);
+    })
+    .map(([grade, count]) => ({ grade, count }));
 
   // ── Complaint status ───────────────────────────────────────────────────────
   const complaintStatusData = [
