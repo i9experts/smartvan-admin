@@ -133,6 +133,8 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
     } : EMPTY_FORM
   );
   const [error, setError] = useState('');
+  const [existingVanInfo, setExistingVanInfo] = useState<{ vanId: string; carNumber: string; homeSchoolName: string } | null>(null);
+  const [linkRequestSent, setLinkRequestSent] = useState(false);
   const addMutation = useMutation({
     mutationFn: (f: VanForm) => vanApi.addByAdmin({
       carNumber: f.carNumber, vehicleCategory: f.vehicleCategory || undefined, manufacturer: f.manufacturer || undefined, model: f.model || undefined, venCapacity: f.venCapacity ? Number(f.venCapacity) : undefined, condition: f.condition,
@@ -143,7 +145,20 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
       fitnessDocUrl: f.fitnessDocUrl || undefined, routePermitDocUrl: f.routePermitDocUrl || undefined,
     }),
     onSuccess: () => { onSuccess(); onClose(); },
-    onError: (e: any) => setError(e?.response?.data?.message ?? 'Failed to add van'),
+    onError: (e: any) => {
+      const data = e?.response?.data;
+      if (data?.existingVanFound && data?.existingVan) {
+        setExistingVanInfo(data.existingVan);
+        setError('');
+      } else {
+        setError(data?.message ?? 'Failed to add van');
+      }
+    },
+  });
+  const linkMutation = useMutation({
+    mutationFn: () => vanApi.requestLink(existingVanInfo!.vanId),
+    onSuccess: () => setLinkRequestSent(true),
+    onError: (e: any) => setError(e?.response?.data?.message ?? 'Failed to send link request'),
   });
   const editMutation = useMutation({
     mutationFn: (f: VanForm) => vanApi.editByAdmin({
@@ -298,6 +313,30 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
               <p className="text-xs text-gray-400">Check if this van is owned by the school</p>
             </div>
           </div>
+          {existingVanInfo && mode === 'add' && (
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm space-y-3">
+              <p className="text-amber-800">
+                A van with plate <strong>{existingVanInfo.carNumber}</strong> is already registered under{' '}
+                <strong>{existingVanInfo.homeSchoolName}</strong>.
+              </p>
+              <p className="text-amber-700 text-xs">
+                If this is the same van covering a route across both schools, you can request access to share it instead of creating a duplicate entry.
+              </p>
+              {linkRequestSent ? (
+                <p className="text-emerald-700 text-xs font-medium">
+                  Link request sent — {existingVanInfo.homeSchoolName} needs to approve it before this van appears in your list.
+                </p>
+              ) : (
+                <button
+                  onClick={() => linkMutation.mutate()}
+                  disabled={linkMutation.isPending}
+                  className="px-4 py-2 bg-amber-600 text-white rounded-lg text-xs font-medium hover:bg-amber-700 disabled:opacity-50"
+                >
+                  {linkMutation.isPending ? 'Sending request…' : 'Request to Link This Van'}
+                </button>
+              )}
+            </div>
+          )}
           {error && <div className="flex items-center gap-2 p-3 bg-red-50 text-red-600 rounded-xl text-xs"><AlertCircle size={14} /> {error}</div>}
         </div>
         <div className="flex gap-3 mt-6">
