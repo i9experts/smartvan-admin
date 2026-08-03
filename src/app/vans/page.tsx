@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus, Search, Pencil, Trash2, X, AlertCircle, RefreshCw,
   Bus, Filter, ChevronLeft, ChevronRight,
-  CheckCircle2, XCircle, UserCheck, MapPin, Cpu, User, Phone,
+  CheckCircle2, XCircle, UserCheck, MapPin, Cpu, User, Phone, Download,
 } from 'lucide-react';
 import { vanApi, api, uploadApi } from '@/lib/api';
 
@@ -749,6 +749,13 @@ export default function VansPage() {
             <h1 className="text-2xl font-bold text-gray-900">Vans</h1>
             <p className="text-sm text-gray-400 mt-0.5">{total} van{total !== 1 ? 's' : ''} registered</p>
           </div>
+          <a
+            href="/forms/SmartVan_Driver_Registration_Form.pdf"
+            download
+            className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition"
+          >
+            <Download size={16} /> Printable Form
+          </a>
           <button onClick={() => setShowAddDriver(true)} className="flex items-center gap-2 px-4 py-2.5 border border-[#1B2B6B] text-[#1B2B6B] text-sm font-medium rounded-xl hover:bg-[#1B2B6B]/5 transition"><Plus size={16} /> Add Driver</button>
           <button onClick={() => setModal('add')} className="flex items-center gap-2 px-4 py-2.5 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"><Plus size={16} /> Add Van</button>
         </div>

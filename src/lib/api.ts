@@ -73,6 +73,7 @@ export const vanApi = {
   respondToLinkRequest: (linkId: string, approve: boolean) =>
     api.post('/van/respondToLinkRequest', { linkId, approve }),
   getMyLinkedVans: () => api.get('/van/getMyLinkedVans'),
+  resetDriverPassword: (driverId: string) => api.post('/van/resetDriverPassword', { driverId }),
 };
 
 export const tripApi = {
