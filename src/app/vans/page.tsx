@@ -388,6 +388,10 @@ function AddDriverModal({ onClose }: { onClose: () => void }) {
     expiryDateLicense: '', expiryDateVehicleCard: '',
   });
   const [error, setError] = useState('');
+  const [existingDriverInfo, setExistingDriverInfo] = useState<{
+    driverId: string; fullname: string; homeSchoolName: string; vanId: string | null; vanCarNumber: string | null;
+  } | null>(null);
+  const [linkRequestSent, setLinkRequestSent] = useState(false);
   const f = (k: string, v: string) => setForm(prev => ({ ...prev, [k]: v }));
 
   const mutation = useMutation({
@@ -400,7 +404,21 @@ function AddDriverModal({ onClose }: { onClose: () => void }) {
       }
       onClose();
     },
-    onError: (e: any) => setError(e?.response?.data?.message ?? 'Failed to add driver'),
+    onError: (e: any) => {
+      const data = e?.response?.data;
+      if (data?.existingDriverFound && data?.existingDriver) {
+        setExistingDriverInfo(data.existingDriver);
+        setError('');
+      } else {
+        setError(data?.message ?? 'Failed to add driver');
+      }
+    },
+  });
+
+  const linkMutation = useMutation({
+    mutationFn: () => vanApi.requestLink(existingDriverInfo!.vanId!),
+    onSuccess: () => setLinkRequestSent(true),
+    onError: (e: any) => setError(e?.response?.data?.message ?? 'Failed to send link request'),
   });
 
   function handleNext() {
@@ -566,6 +584,32 @@ function AddDriverModal({ onClose }: { onClose: () => void }) {
             </>
           )}
 
+          {existingDriverInfo && (
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm space-y-3">
+              <p className="text-amber-800">
+                <strong>{existingDriverInfo.fullname}</strong> is already registered under{' '}
+                <strong>{existingDriverInfo.homeSchoolName}</strong>
+                {existingDriverInfo.vanCarNumber && <> with van <strong>{existingDriverInfo.vanCarNumber}</strong></>}.
+              </p>
+              <p className="text-amber-700 text-xs">
+                If this is the same driver covering a route across both schools, you can request access to share this van instead of creating a duplicate account.
+              </p>
+              {linkRequestSent ? (
+                <p className="text-emerald-700 text-xs font-medium">
+                  Link request sent — {existingDriverInfo.homeSchoolName} needs to approve it before this van appears in your list.
+                </p>
+              ) : existingDriverInfo.vanId ? (
+                <button
+                  onClick={() => linkMutation.mutate()}
+                  disabled={linkMutation.isPending}
+                  className="px-4 py-2 bg-amber-600 text-white rounded-lg text-xs font-medium hover:bg-amber-700 disabled:opacity-50"
+                >
+                  {linkMutation.isPending ? 'Sending request…' : 'Request to Link This Van'}
+                </button>
+              ) : null}
+            </div>
+          )}
+
           {error && <div className="flex items-center gap-2 p-3 bg-red-50 text-red-600 rounded-xl text-xs"><AlertCircle size={14} />{error}</div>}
         </div>
 
@@ -616,6 +660,22 @@ export default function VansPage() {
     staleTime: 60_000,
   });
 
+  const { data: pendingLinkRequests = [] } = useQuery({
+    queryKey: ['pending-van-links'],
+    queryFn: () => vanApi.getPendingLinkRequests(),
+    select: (r: any) => r.data?.data ?? [],
+    staleTime: 30_000,
+  });
+
+  const respondToLinkMutation = useMutation({
+    mutationFn: ({ linkId, approve }: { linkId: string; approve: boolean }) =>
+      vanApi.respondToLinkRequest(linkId, approve),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['pending-van-links'] });
+      qc.invalidateQueries({ queryKey: ['vans'] });
+    },
+  });
+
   const vans: VanItem[] = data?.data ?? [];
   const total: number = data?.total ?? 0;
   const totalPages = Math.ceil(total / 10);
@@ -653,6 +713,37 @@ export default function VansPage() {
           <button onClick={() => setShowAddDriver(true)} className="flex items-center gap-2 px-4 py-2.5 border border-[#1B2B6B] text-[#1B2B6B] text-sm font-medium rounded-xl hover:bg-[#1B2B6B]/5 transition"><Plus size={16} /> Add Driver</button>
           <button onClick={() => setModal('add')} className="flex items-center gap-2 px-4 py-2.5 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"><Plus size={16} /> Add Van</button>
         </div>
+
+        {pendingLinkRequests.length > 0 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-3">
+            <p className="text-sm font-semibold text-amber-800">
+              {pendingLinkRequests.length} pending request{pendingLinkRequests.length !== 1 ? 's' : ''} to share your van{pendingLinkRequests.length !== 1 ? 's' : ''}
+            </p>
+            {pendingLinkRequests.map((r: any) => (
+              <div key={r._id} className="flex items-center justify-between bg-white rounded-xl p-3 border border-amber-100">
+                <p className="text-sm text-gray-700">
+                  <strong>{r.requestingSchoolName}</strong> wants access to van <strong>{r.vanCarNumber}</strong>
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => respondToLinkMutation.mutate({ linkId: r._id, approve: true })}
+                    disabled={respondToLinkMutation.isPending}
+                    className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-medium hover:bg-emerald-700 disabled:opacity-50"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => respondToLinkMutation.mutate({ linkId: r._id, approve: false })}
+                    disabled={respondToLinkMutation.isPending}
+                    className="px-3 py-1.5 border border-gray-200 text-gray-500 rounded-lg text-xs font-medium hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Decline
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
