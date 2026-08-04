@@ -490,7 +490,7 @@ export default function DriversPage() {
   });
 
   const drivers: Driver[] = data?.data ?? [];
-  const total: number = data?.total ?? 0;
+  const total: number = data?.pagination?.total ?? 0;
   const totalPages = Math.ceil(total / 10);
 
   const statusMutation = useMutation({
