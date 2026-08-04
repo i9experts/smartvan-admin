@@ -156,7 +156,7 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
     },
   });
   const linkMutation = useMutation({
-    mutationFn: () => vanApi.requestLink(existingVanInfo!.vanId),
+    mutationFn: () => vanApi.requestLink({ vanId: existingVanInfo!.vanId }),
     onSuccess: () => setLinkRequestSent(true),
     onError: (e: any) => setError(e?.response?.data?.message ?? 'Failed to send link request'),
   });
@@ -455,7 +455,11 @@ function AddDriverModal({ onClose }: { onClose: () => void }) {
   });
 
   const linkMutation = useMutation({
-    mutationFn: () => vanApi.requestLink(existingDriverInfo!.vanId!),
+    mutationFn: () => vanApi.requestLink(
+      existingDriverInfo!.vanId
+        ? { vanId: existingDriverInfo!.vanId }
+        : { driverId: existingDriverInfo!.driverId }
+    ),
     onSuccess: () => setLinkRequestSent(true),
     onError: (e: any) => setError(e?.response?.data?.message ?? 'Failed to send link request'),
   });
@@ -631,21 +635,23 @@ function AddDriverModal({ onClose }: { onClose: () => void }) {
                 {existingDriverInfo.vanCarNumber && <> with van <strong>{existingDriverInfo.vanCarNumber}</strong></>}.
               </p>
               <p className="text-amber-700 text-xs">
-                If this is the same driver covering a route across both schools, you can request access to share this van instead of creating a duplicate account.
+                {existingDriverInfo.vanId
+                  ? 'If this is the same driver covering a route across both schools, you can request access to share this van instead of creating a duplicate account.'
+                  : 'This driver has no van assigned yet at their home school — you can still request access; whatever van they get assigned will show up in your list once approved.'}
               </p>
               {linkRequestSent ? (
                 <p className="text-emerald-700 text-xs font-medium">
-                  Link request sent — {existingDriverInfo.homeSchoolName} needs to approve it before this van appears in your list.
+                  Link request sent — {existingDriverInfo.homeSchoolName} needs to approve it before this driver appears in your list.
                 </p>
-              ) : existingDriverInfo.vanId ? (
+              ) : (
                 <button
                   onClick={() => linkMutation.mutate()}
                   disabled={linkMutation.isPending}
                   className="px-4 py-2 bg-amber-600 text-white rounded-lg text-xs font-medium hover:bg-amber-700 disabled:opacity-50"
                 >
-                  {linkMutation.isPending ? 'Sending request…' : 'Request to Link This Van'}
+                  {linkMutation.isPending ? 'Sending request…' : existingDriverInfo.vanId ? 'Request to Link This Van' : 'Request to Link This Driver'}
                 </button>
-              ) : null}
+              )}
             </div>
           )}
 
@@ -768,7 +774,8 @@ export default function VansPage() {
             {pendingLinkRequests.map((r: any) => (
               <div key={r._id} className="flex items-center justify-between bg-white rounded-xl p-3 border border-amber-100">
                 <p className="text-sm text-gray-700">
-                  <strong>{r.requestingSchoolName}</strong> wants access to van <strong>{r.vanCarNumber}</strong>
+                  <strong>{r.requestingSchoolName}</strong> wants access to{' '}
+                  {r.vanCarNumber ? <>van <strong>{r.vanCarNumber}</strong></> : <>driver <strong>{r.driverName ?? 'Unknown'}</strong> (no van assigned yet)</>}
                 </p>
                 <div className="flex items-center gap-2">
                   <button

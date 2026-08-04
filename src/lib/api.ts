@@ -68,7 +68,7 @@ export const vanApi = {
   removeDriverFromVan: (vanId: string) => api.post('/van/removeDriverFromVan', { vanId }),
   assignVanToDriver: (driverId: string, vanId: string) => api.post('/Admin/assignVanToDriver', { driverId, vanId }),
   removeDriversFromSchool: (driverIds: string[]) => api.post('/van/removeDriversFromScool', { driverIds }),
-  requestLink: (vanId: string) => api.post('/van/requestVanLink', { vanId }),
+  requestLink: (params: { vanId?: string; driverId?: string }) => api.post('/van/requestVanLink', params),
   getPendingLinkRequests: () => api.get('/van/getPendingLinkRequests'),
   respondToLinkRequest: (linkId: string, approve: boolean) =>
     api.post('/van/respondToLinkRequest', { linkId, approve }),
