@@ -23,7 +23,7 @@ interface MapPickerProps {
 let googleLoaded = false;
 let loadingPromise: Promise<void> | null = null;
 
-function loadGoogleMaps(): Promise<void> {
+export function loadGoogleMaps(): Promise<void> {
   if (googleLoaded) return Promise.resolve();
   if (loadingPromise) return loadingPromise;
 

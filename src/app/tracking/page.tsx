@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
+import { loadGoogleMaps } from '@/components/MapPicker';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -26,6 +27,11 @@ interface Trip {
   vanId: string;
   locations: Array<{ lat: number; long: number; time: string }>;
   createdAt: string;
+  van?: { _id?: string; carNumber?: string; vehicleType?: string };
+  driver?: { _id?: string; fullname?: string; phoneNo?: string };
+  route?: { _id?: string; title?: string; tripType?: string };
+  schoolName?: string;
+  kids?: Array<{ kidId?: string; fullname?: string; image?: string; status?: string }>;
 }
 
 interface LiveLocation {
@@ -46,12 +52,21 @@ interface TrackedTrip extends Trip {
 
 async function fetchActiveTrips(): Promise<Trip[]> {
   const res = await api.get('/trips/Get-Trips-By-Admin?page=1&limit=50&status=ongoing');
-  return res.data?.data ?? [];
+  const raw: Trip[] = res.data?.data ?? [];
+  // The backend already joins van/driver/route/school/kids — just wasn't
+  // being read here before, so every trip showed generic placeholders
+  // ("Driver 1d84") instead of real names.
+  return raw.map((trip) => ({
+    ...trip,
+    driverName: trip.driver?.fullname,
+    vanNumber: trip.van?.carNumber,
+    kidCount: trip.kids?.length ?? 0,
+  } as any));
 }
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://72.61.119.165:3002';
+const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.smartvan.pk';
 
 function useSocket(token: string | null) {
   const socketRef = useRef<Socket | null>(null);
@@ -93,23 +108,116 @@ function useSocket(token: string | null) {
   return { socket: socketRef.current, connected };
 }
 
-// ─── Simple Map Placeholder (until Mapbox/Google Maps is configured) ──────────
+// ─── Real Google Map ──────────────────────────────────────────────────────────
 
-interface MapPlaceholderProps {
+interface GoogleTrackingMapProps {
   trips: TrackedTrip[];
   selectedTripId: string | null;
   onSelectTrip: (id: string) => void;
 }
 
-function MapPlaceholder({ trips, selectedTripId, onSelectTrip }: MapPlaceholderProps) {
-  // Compute bounding box of all locations
-  const allLocations = trips.flatMap((t) => {
-    const base = t.locations ?? [];
-    const live = t.liveLocation ? [{ lat: t.liveLocation.lat, long: t.liveLocation.long }] : [];
-    return [...base.slice(-1), ...live];
-  });
+function markerIcon(color: string, selected: boolean): any {
+  const g = (window as any).google;
+  return {
+    path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z',
+    fillColor: color,
+    fillOpacity: 1,
+    strokeColor: '#ffffff',
+    strokeWeight: 1.5,
+    scale: selected ? 2 : 1.5,
+    anchor: new g.maps.Point(12, 22),
+  };
+}
 
-  if (allLocations.length === 0) {
+function GoogleTrackingMap({ trips, selectedTripId, onSelectTrip }: GoogleTrackingMapProps) {
+  const mapDivRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<any>(null);
+  const markersRef = useRef<Map<string, any>>(new Map());
+  const [ready, setReady] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const hasFitBoundsRef = useRef(false);
+
+  // Load the script + init the map once.
+  useEffect(() => {
+    let cancelled = false;
+    loadGoogleMaps()
+      .then(() => {
+        if (cancelled || !mapDivRef.current) return;
+        const g = (window as any).google;
+        mapRef.current = new g.maps.Map(mapDivRef.current, {
+          center: { lat: 24.8607, lng: 67.0011 }, // Karachi default
+          zoom: 12,
+          disableDefaultUI: true,
+          zoomControl: true,
+          streetViewControl: false,
+        });
+        setReady(true);
+      })
+      .catch(() => setLoadError(true));
+    return () => { cancelled = true; };
+  }, []);
+
+  // Sync markers whenever trips change.
+  useEffect(() => {
+    if (!ready || !mapRef.current) return;
+    const g = (window as any).google;
+    const map = mapRef.current;
+    const seen = new Set<string>();
+
+    trips.forEach((trip) => {
+      const loc = trip.liveLocation ?? trip.locations?.slice(-1)?.[0];
+      if (!loc) return;
+      seen.add(trip._id);
+      const position = { lat: loc.lat, lng: loc.long };
+      const isSelected = selectedTripId === trip._id;
+      const color = isSelected ? '#FFB800' : '#1B2B6B';
+
+      let marker = markersRef.current.get(trip._id);
+      if (!marker) {
+        marker = new g.maps.Marker({
+          position,
+          map,
+          icon: markerIcon(color, isSelected),
+          title: trip.driverName ?? 'Driver',
+        });
+        marker.addListener('click', () => onSelectTrip(trip._id));
+        markersRef.current.set(trip._id, marker);
+      } else {
+        marker.setPosition(position);
+        marker.setIcon(markerIcon(color, isSelected));
+      }
+    });
+
+    // Remove markers for trips no longer present.
+    for (const [tripId, marker] of Array.from(markersRef.current.entries())) {
+      if (!seen.has(tripId)) {
+        marker.setMap(null);
+        markersRef.current.delete(tripId);
+      }
+    }
+
+    // Fit bounds once, the first time we have real positions — don't
+    // keep re-fitting on every subsequent live update, or the map would
+    // constantly yank the admin's view around while watching a trip.
+    if (!hasFitBoundsRef.current && seen.size > 0) {
+      const bounds = new g.maps.LatLngBounds();
+      markersRef.current.forEach((m) => { const pos = m.getPosition(); if (pos) bounds.extend(pos); });
+      map.fitBounds(bounds, 80);
+      hasFitBoundsRef.current = true;
+    }
+  }, [trips, selectedTripId, ready, onSelectTrip]);
+
+  if (loadError) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50">
+        <MapPin size={40} className="mb-3 opacity-30" />
+        <p className="text-sm font-medium">Couldn&apos;t load Google Maps</p>
+        <p className="text-xs mt-1 opacity-60">Check your Google Maps API key / billing status</p>
+      </div>
+    );
+  }
+
+  if (trips.filter((t) => t.liveLocation || t.locations?.length).length === 0) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gradient-to-br from-slate-100 to-blue-50">
         <MapPin size={40} className="mb-3 opacity-30" />
@@ -119,100 +227,7 @@ function MapPlaceholder({ trips, selectedTripId, onSelectTrip }: MapPlaceholderP
     );
   }
 
-  const lats = allLocations.map((l) => l.lat);
-  const lngs = allLocations.map((l) => l.long);
-  const minLat = Math.min(...lats);
-  const maxLat = Math.max(...lats);
-  const minLng = Math.min(...lngs);
-  const maxLng = Math.max(...lngs);
-
-  const latRange = maxLat - minLat || 0.01;
-  const lngRange = maxLng - minLng || 0.01;
-
-  // Convert lat/lng to SVG canvas percentages (with padding)
-  function toXY(lat: number, lng: number) {
-    const x = ((lng - minLng) / lngRange) * 80 + 10;
-    const y = ((maxLat - lat) / latRange) * 80 + 10; // flip y
-    return { x, y };
-  }
-
-  return (
-    <div className="w-full h-full relative bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-50 overflow-hidden">
-      {/* Grid lines */}
-      <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
-        {Array.from({ length: 10 }).map((_, i) => (
-          <g key={i}>
-            <line x1={`${i * 10}%`} y1="0" x2={`${i * 10}%`} y2="100%" stroke="#1B2B6B" strokeWidth="0.5" />
-            <line x1="0" y1={`${i * 10}%`} x2="100%" y2={`${i * 10}%`} stroke="#1B2B6B" strokeWidth="0.5" />
-          </g>
-        ))}
-      </svg>
-
-      <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-        {trips.map((trip) => {
-          const pts = [...(trip.locations ?? []).slice(-20)];
-          if (trip.liveLocation) pts.push({ lat: trip.liveLocation.lat, long: trip.liveLocation.long, time: '' });
-          if (pts.length < 2) return null;
-          const d = pts
-            .map((p, i) => {
-              const { x, y } = toXY(p.lat, p.long);
-              return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
-            })
-            .join(' ');
-          return (
-            <path
-              key={trip._id}
-              d={d}
-              fill="none"
-              stroke={selectedTripId === trip._id ? '#FFB800' : '#1B2B6B'}
-              strokeWidth={selectedTripId === trip._id ? '1' : '0.5'}
-              strokeDasharray="2 1"
-              opacity="0.6"
-            />
-          );
-        })}
-      </svg>
-
-      {trips.map((trip) => {
-        const loc = trip.liveLocation ?? trip.locations?.slice(-1)?.[0];
-        if (!loc) return null;
-        const { x, y } = toXY(loc.lat, loc.long);
-        const isSelected = selectedTripId === trip._id;
-        return (
-          <button
-            key={trip._id}
-            onClick={() => onSelectTrip(trip._id)}
-            className="absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-500"
-            style={{ left: `${x}%`, top: `${y}%` }}
-          >
-            <div
-              className={`relative flex items-center justify-center rounded-full transition-all ${
-                isSelected
-                  ? 'w-10 h-10 bg-[#FFB800] shadow-lg shadow-amber-300/50'
-                  : 'w-8 h-8 bg-[#1B2B6B] shadow-md'
-              }`}
-            >
-              <Bus size={isSelected ? 18 : 14} className="text-white" />
-              {trip.liveLocation && (
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />
-              )}
-            </div>
-            {isSelected && (
-              <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white rounded-lg shadow-xl px-3 py-2 text-xs whitespace-nowrap z-10 border border-gray-100">
-                <p className="font-semibold text-gray-800">{trip.driverName ?? 'Driver'}</p>
-                <p className="text-gray-400">{trip.vanNumber ?? trip._id.slice(-6)}</p>
-              </div>
-            )}
-          </button>
-        );
-      })}
-
-      {/* Map attribution note */}
-      <div className="absolute bottom-2 left-2 text-xs text-gray-400 bg-white/80 rounded px-2 py-0.5">
-        Schematic view · Connect Mapbox for satellite map
-      </div>
-    </div>
-  );
+  return <div ref={mapDivRef} className="w-full h-full" />;
 }
 
 // ─── Trip List Item ───────────────────────────────────────────────────────────
@@ -321,19 +336,21 @@ export default function LiveTrackingPage() {
   useEffect(() => {
     if (!socket) return;
 
-    const handleLocation = (data: { userId: string; location: { lat: number; long: number }; at: string }) => {
+    const handleLocation = (data: { tripId?: string; userId: string; location: { lat: number; long: number }; at: string }) => {
+      // Backend now includes tripId directly in the broadcast — previously
+      // this blindly applied every update to whichever trip happened to be
+      // first in the map, silently corrupting positions the moment two
+      // vans were live at the same time.
+      if (!data.tripId) return;
       setTrackedTrips((prev) => {
+        if (!prev.has(data.tripId!)) return prev;
         const next = new Map(prev);
-        // Find which trip this update belongs to by scanning rooms — simplified:
-        // In production, backend should include tripId in the locationUpdated payload
-        const entries = Array.from(next.entries()); for (const [tripId, trip] of entries) {
-          next.set(tripId, {
-            ...trip,
-            liveLocation: data.location,
-            lastSeen: data.at,
-          });
-          break; // for now, assume single trip per connected socket
-        }
+        const trip = next.get(data.tripId!)!;
+        next.set(data.tripId!, {
+          ...trip,
+          liveLocation: data.location,
+          lastSeen: data.at,
+        });
         return next;
       });
       setLastRefresh(new Date());
@@ -429,7 +446,7 @@ export default function LiveTrackingPage() {
 
         {/* Map area */}
         <div className="flex-1 relative">
-          <MapPlaceholder
+          <GoogleTrackingMap
             trips={trips}
             selectedTripId={selectedTripId}
             onSelectTrip={(id) => setSelectedTripId((prev) => (prev === id ? null : id))}
