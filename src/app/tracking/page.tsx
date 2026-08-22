@@ -362,6 +362,18 @@ export default function LiveTrackingPage() {
     }
   }, [socket, connected, tripsData]);
 
+  // Surface join/auth failures instead of failing silently — this exact
+  // class of bug (admin's joinTrip rejected server-side with no visible
+  // sign of it) is why the map appeared to work but never showed motion.
+  useEffect(() => {
+    if (!socket) return;
+    const handleError = (err: { msg?: string }) => {
+      console.error('[Tracking] Socket error:', err?.msg ?? err);
+    };
+    socket.on('error', handleError);
+    return () => { socket.off('error', handleError); };
+  }, [socket]);
+
   // Listen for live location updates
   useEffect(() => {
     if (!socket) return;
