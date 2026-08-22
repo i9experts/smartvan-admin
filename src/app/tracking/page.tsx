@@ -77,7 +77,11 @@ function useSocket(token: string | null) {
 
     const socket = io(SOCKET_URL, {
       auth: { token },
-      transports: ['websocket'],
+      // Forcing websocket-only here caused a connect/disconnect loop —
+      // Railway's reverse proxy doesn't always cleanly pass through raw
+      // WebSocket upgrades. Letting it negotiate normally (starts on
+      // polling, upgrades to websocket when possible) is the same fix
+      // already applied elsewhere for this exact symptom.
       reconnectionAttempts: 5,
       reconnectionDelay: 2000,
     });
@@ -152,10 +156,36 @@ function GoogleTrackingMap({ trips, selectedTripId, onSelectTrip }: GoogleTracki
           streetViewControl: false,
         });
         setReady(true);
+
+        // Google Maps can end up thinking its container is 0x0 if it
+        // initializes before the surrounding flex layout has settled
+        // (a well-known React timing issue) — the map then renders
+        // completely blank with no error. Forcing a resize once layout
+        // has actually painted, and again on any later container
+        // resize, fixes this reliably.
+        requestAnimationFrame(() => {
+          if (!mapRef.current) return;
+          g.maps.event.trigger(mapRef.current, 'resize');
+          mapRef.current.setCenter({ lat: 24.8607, lng: 67.0011 });
+        });
       })
       .catch(() => setLoadError(true));
     return () => { cancelled = true; };
   }, []);
+
+  // Re-trigger a resize whenever the map container's actual size changes
+  // (e.g. sidebar collapse/expand, window resize) — without this the map
+  // can stay visually "stuck" at whatever size it first measured.
+  useEffect(() => {
+    if (!mapDivRef.current) return;
+    const observer = new ResizeObserver(() => {
+      if (!mapRef.current) return;
+      const g = (window as any).google;
+      g.maps.event.trigger(mapRef.current, 'resize');
+    });
+    observer.observe(mapDivRef.current);
+    return () => observer.disconnect();
+  }, [ready]);
 
   // Sync markers whenever trips change.
   useEffect(() => {
