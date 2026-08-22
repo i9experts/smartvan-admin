@@ -237,27 +237,38 @@ function GoogleTrackingMap({ trips, selectedTripId, onSelectTrip }: GoogleTracki
     }
   }, [trips, selectedTripId, ready, onSelectTrip]);
 
-  if (loadError) {
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50">
-        <MapPin size={40} className="mb-3 opacity-30" />
-        <p className="text-sm font-medium">Couldn&apos;t load Google Maps</p>
-        <p className="text-xs mt-1 opacity-60">Check your Google Maps API key / billing status</p>
-      </div>
-    );
-  }
+  const hasAnyLiveTrip = trips.filter((t) => t.liveLocation || t.locations?.length).length > 0;
 
-  if (trips.filter((t) => t.liveLocation || t.locations?.length).length === 0) {
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gradient-to-br from-slate-100 to-blue-50">
-        <MapPin size={40} className="mb-3 opacity-30" />
-        <p className="text-sm font-medium">No active trips to display</p>
-        <p className="text-xs mt-1 opacity-60">Drivers will appear here when trips are started</p>
-      </div>
-    );
-  }
+  // The map div must always be in the DOM from the very first render —
+  // this component used to conditionally return a placeholder instead of
+  // the map div whenever there was no trip data yet, and since the trips
+  // list is empty on first mount (before the query resolves), the one-time
+  // effect that creates the Google Map ran while mapDivRef was still null
+  // and gave up. By the time real trip data arrived and the map div
+  // finally existed, nothing was left to retry creating the map into it.
+  // Overlaying the placeholder on top (instead of replacing the div)
+  // keeps mapDivRef permanently attached so map creation always succeeds.
+  return (
+    <div className="w-full h-full relative">
+      <div ref={mapDivRef} className="w-full h-full" />
 
-  return <div ref={mapDivRef} className="w-full h-full" />;
+      {loadError && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
+          <MapPin size={40} className="mb-3 opacity-30" />
+          <p className="text-sm font-medium">Couldn&apos;t load Google Maps</p>
+          <p className="text-xs mt-1 opacity-60">Check your Google Maps API key / billing status</p>
+        </div>
+      )}
+
+      {!loadError && !hasAnyLiveTrip && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gradient-to-br from-slate-100 to-blue-50 pointer-events-none">
+          <MapPin size={40} className="mb-3 opacity-30" />
+          <p className="text-sm font-medium">No active trips to display</p>
+          <p className="text-xs mt-1 opacity-60">Drivers will appear here when trips are started</p>
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ─── Trip List Item ───────────────────────────────────────────────────────────
