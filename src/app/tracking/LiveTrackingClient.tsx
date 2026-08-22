@@ -121,15 +121,27 @@ interface GoogleTrackingMapProps {
 }
 
 function markerIcon(color: string, selected: boolean): any {
+  const size = selected ? 44 : 36;
+  // A rounded badge with a simple bus glyph — matches the same bus-icon
+  // style already used for vans/drivers elsewhere in the admin panel,
+  // instead of a generic map pin that doesn't read as "moving vehicle".
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 40 40">
+      <circle cx="20" cy="20" r="18" fill="${color}" stroke="#ffffff" stroke-width="2.5"/>
+      <g transform="translate(9.5, 10.5)" fill="#ffffff">
+        <rect x="0" y="0" width="21" height="14" rx="3"/>
+        <rect x="2.5" y="2.5" width="6" height="4.5" rx="1" fill="${color}"/>
+        <rect x="10" y="2.5" width="6" height="4.5" rx="1" fill="${color}"/>
+        <circle cx="5" cy="16.5" r="2.3" fill="${color === '#FFB800' ? '#1B2B6B' : '#FFB800'}"/>
+        <circle cx="16" cy="16.5" r="2.3" fill="${color === '#FFB800' ? '#1B2B6B' : '#FFB800'}"/>
+      </g>
+    </svg>
+  `.trim();
   const g = (window as any).google;
   return {
-    path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z',
-    fillColor: color,
-    fillOpacity: 1,
-    strokeColor: '#ffffff',
-    strokeWeight: 1.5,
-    scale: selected ? 2 : 1.5,
-    anchor: new g.maps.Point(12, 22),
+    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+    scaledSize: new g.maps.Size(size, size),
+    anchor: new g.maps.Point(size / 2, size / 2),
   };
 }
 
