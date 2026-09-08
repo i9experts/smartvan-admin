@@ -63,7 +63,7 @@ async function fetchLogs(): Promise<LogEntry[]> {
 }
 
 export default function AuditLogPage() {
-  const { data: logs = [], isLoading, refetch, isFetching } = useQuery({ queryKey: ['audit-logs'], queryFn: fetchLogs });
+  const { data: logs = [], isLoading, isError, refetch, isFetching } = useQuery({ queryKey: ['audit-logs'], queryFn: fetchLogs });
 
   return (
     <div className="p-6 space-y-5 max-w-3xl mx-auto">
@@ -84,6 +84,16 @@ export default function AuditLogPage() {
       {isLoading ? (
         <div className="space-y-2">
           {[1, 2, 3, 4].map((i) => <div key={i} className="h-14 bg-white rounded-xl border border-gray-100 animate-pulse" />)}
+        </div>
+      ) : isError ? (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-14 text-center">
+          <p className="text-[13.5px] font-medium text-red-700">Failed to load the audit log.</p>
+          <button
+            onClick={() => refetch()}
+            className="mt-3 text-[13px] text-red-700 underline underline-offset-2"
+          >
+            Try again
+          </button>
         </div>
       ) : logs.length === 0 ? (
         <div className="bg-white rounded-xl p-14 text-center border border-gray-100">

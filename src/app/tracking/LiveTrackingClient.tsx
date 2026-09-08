@@ -14,7 +14,7 @@ import {
   Clock,
   ChevronRight,
 } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api, BASE_URL } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { loadGoogleMaps } from '@/components/MapPicker';
 
@@ -66,7 +66,7 @@ async function fetchActiveTrips(): Promise<Trip[]> {
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.smartvan.pk';
+const SOCKET_URL = BASE_URL;
 
 function useSocket(token: string | null) {
   const socketRef = useRef<Socket | null>(null);

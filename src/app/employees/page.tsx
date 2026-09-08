@@ -94,7 +94,7 @@ export default function EmployeesPage() {
   const qc = useQueryClient();
   const [showAddModal, setShowAddModal] = useState(false);
 
-  const { data: employees = [], isLoading } = useQuery({ queryKey: ['employees'], queryFn: fetchEmployees });
+  const { data: employees = [], isLoading, isError } = useQuery({ queryKey: ['employees'], queryFn: fetchEmployees });
   const { data: availablePermissions = [] } = useQuery({ queryKey: ['employee-permissions'], queryFn: fetchPermissions });
 
   const deleteMutation = useMutation({
@@ -144,6 +144,8 @@ export default function EmployeesPage() {
           <tbody>
             {isLoading ? (
               <tr><td colSpan={5} className="p-8 text-center text-gray-400">Loading…</td></tr>
+            ) : isError ? (
+              <tr><td colSpan={5} className="p-8 text-center text-red-500">Failed to load employees. Please refresh.</td></tr>
             ) : employees.length === 0 ? (
               <tr><td colSpan={5} className="p-8 text-center text-gray-400">No employees yet</td></tr>
             ) : (

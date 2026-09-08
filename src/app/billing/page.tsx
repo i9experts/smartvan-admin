@@ -36,13 +36,13 @@ function SchoolBillingView() {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const { data: status, isLoading: statusLoading } = useQuery({
+  const { data: status, isLoading: statusLoading, isError: statusError, refetch: refetchStatus } = useQuery({
     queryKey: ['billing-status'],
     queryFn: () => api.get('/billing/status').then(r => r.data),
     staleTime: 30_000,
   });
 
-  const { data: history = [], isLoading: historyLoading } = useQuery({
+  const { data: history = [], isLoading: historyLoading, isError: historyError } = useQuery({
     queryKey: ['billing-history'],
     queryFn: () => api.get('/billing/history').then(r => r.data),
     staleTime: 60_000,
@@ -82,6 +82,19 @@ function SchoolBillingView() {
       {error && (
         <div className="flex items-center gap-2 p-4 bg-red-50 text-red-600 rounded-xl border border-red-100 text-sm">
           <AlertCircle size={16} /> {error}
+        </div>
+      )}
+
+      {statusError && (
+        <div className="flex items-center gap-2 p-4 bg-red-50 text-red-600 rounded-xl border border-red-100 text-sm">
+          <AlertCircle size={16} />
+          <span className="flex-1">
+            Couldn&apos;t load your subscription status — this is NOT a &quot;no plan&quot;
+            state, the request just failed.
+          </span>
+          <button onClick={() => refetchStatus()} className="underline underline-offset-2 shrink-0">
+            Retry
+          </button>
         </div>
       )}
 
@@ -131,7 +144,9 @@ function SchoolBillingView() {
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900">Subscription Status</p>
-              <p className={`text-xs font-medium ${isActive ? 'text-green-600' : 'text-amber-600'}`}>{status?.plan || 'No Plan'}</p>
+              <p className={`text-xs font-medium ${isActive ? 'text-green-600' : 'text-amber-600'}`}>
+                {statusError ? 'Unknown (load failed)' : (status?.plan || 'No Plan')}
+              </p>
             </div>
           </div>
           {subscription && (
@@ -148,7 +163,10 @@ function SchoolBillingView() {
               </div>
             </div>
           )}
-          {!isActive && (
+          {/* Don't offer to subscribe while the real status is unknown — a
+              failed fetch shouldn't be able to trigger a possibly-duplicate
+              subscription for a school that's actually already active. */}
+          {!isActive && !statusError && (
             <button
               onClick={handleSubscribe}
               disabled={checkoutLoading}
@@ -184,6 +202,10 @@ function SchoolBillingView() {
         <h3 className="text-sm font-bold text-gray-900 mb-4">Payment History</h3>
         {historyLoading ? (
           <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-12 bg-gray-100 rounded-xl" />)}</div>
+        ) : historyError ? (
+          <div className="text-center py-10 text-red-500">
+            <p className="text-sm">Failed to load payment history. Please refresh.</p>
+          </div>
         ) : history.length === 0 ? (
           <div className="text-center py-10 text-gray-400">
             <FileText size={32} className="mx-auto mb-2 opacity-30" />
@@ -224,7 +246,7 @@ function SchoolBillingView() {
 
 // ─── Superadmin Billing Dashboard ─────────────────────────────────────────────
 function SuperAdminBillingView() {
-  const { data: schools = [], isLoading, refetch, isRefetching } = useQuery({
+  const { data: schools = [], isLoading, isError, refetch, isRefetching } = useQuery({
     queryKey: ['all-schools-billing'],
     queryFn: () => api.get('/billing/all-schools').then(r => r.data),
     staleTime: 60_000,
@@ -239,6 +261,13 @@ function SuperAdminBillingView() {
         <h1 className="text-2xl font-bold text-gray-900">Billing Dashboard</h1>
         <p className="text-sm text-gray-400 mt-0.5">Monitor all school subscriptions</p>
       </div>
+
+      {isError && (
+        <div className="flex items-center gap-2 p-4 bg-red-50 text-red-600 rounded-xl border border-red-100 text-sm">
+          <XCircle size={16} />
+          Couldn&apos;t load subscription data — the counts below aren&apos;t reliable.
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-3 gap-5">
@@ -269,6 +298,16 @@ function SuperAdminBillingView() {
         {isLoading ? (
           <div className="p-5 animate-pulse space-y-3">
             {[1,2,3].map(i => <div key={i} className="h-14 bg-gray-100 rounded-xl" />)}
+          </div>
+        ) : isError ? (
+          <div className="text-center py-16 text-red-500">
+            <p className="text-sm font-medium">
+              Failed to load school subscriptions — this is NOT the same as zero
+              active subscriptions, the request just failed.
+            </p>
+            <button onClick={() => refetch()} className="mt-3 text-xs underline underline-offset-2">
+              Try again
+            </button>
           </div>
         ) : schools.length === 0 ? (
           <div className="text-center py-16 text-gray-400">
