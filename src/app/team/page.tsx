@@ -130,7 +130,7 @@ export default function TeamRolesPage() {
   const qc = useQueryClient();
   const [modalTarget, setModalTarget] = useState<Staff | null | 'new'>(null);
 
-  const { data: staffList = [], isLoading } = useQuery({ queryKey: ['school-staff'], queryFn: fetchStaff });
+  const { data: staffList = [], isLoading, isError } = useQuery({ queryKey: ['school-staff'], queryFn: fetchStaff });
   const { data: availablePermissions = [] } = useQuery({ queryKey: ['school-staff-permissions'], queryFn: fetchPermissions });
 
   const deleteMutation = useMutation({
@@ -181,6 +181,8 @@ export default function TeamRolesPage() {
           <tbody>
             {isLoading ? (
               <tr><td colSpan={5} className="p-8 text-center text-gray-400">Loading…</td></tr>
+            ) : isError ? (
+              <tr><td colSpan={5} className="p-8 text-center text-red-500">Failed to load team members. Please refresh.</td></tr>
             ) : staffList.length === 0 ? (
               <tr><td colSpan={5} className="p-8 text-center text-gray-400">No staff members yet</td></tr>
             ) : (

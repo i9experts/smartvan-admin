@@ -185,31 +185,51 @@ function SkeletonCard() {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const { data: students = [], isLoading: loadingStudents } = useQuery({
+  const {
+    data: students = [],
+    isLoading: loadingStudents,
+    isError: errorStudents,
+  } = useQuery({
     queryKey: ['dashboard-students'],
     queryFn: fetchStudents,
     staleTime: 60_000,
   });
 
-  const { data: vans = [], isLoading: loadingVans } = useQuery({
+  const {
+    data: vans = [],
+    isLoading: loadingVans,
+    isError: errorVans,
+  } = useQuery({
     queryKey: ['dashboard-vans'],
     queryFn: fetchVans,
     staleTime: 60_000,
   });
 
-  const { data: drivers = [], isLoading: loadingDrivers } = useQuery({
+  const {
+    data: drivers = [],
+    isLoading: loadingDrivers,
+    isError: errorDrivers,
+  } = useQuery({
     queryKey: ['dashboard-drivers'],
     queryFn: fetchDrivers,
     staleTime: 60_000,
   });
 
-  const { data: trips = [], isLoading: loadingTrips } = useQuery({
+  const {
+    data: trips = [],
+    isLoading: loadingTrips,
+    isError: errorTrips,
+  } = useQuery({
     queryKey: ['dashboard-trips'],
     queryFn: fetchTrips,
     refetchInterval: 30_000, // refresh every 30s for live feel
   });
 
-  const { data: complaints = [], isLoading: loadingComplaints } = useQuery({
+  const {
+    data: complaints = [],
+    isLoading: loadingComplaints,
+    isError: errorComplaints,
+  } = useQuery({
     queryKey: ['dashboard-complaints'],
     queryFn: fetchComplaints,
     staleTime: 60_000,
@@ -217,6 +237,17 @@ export default function DashboardPage() {
 
   const isLoading =
     loadingStudents || loadingVans || loadingDrivers || loadingTrips || loadingComplaints;
+
+  // A failed fetch otherwise falls back to [] and every KPI computed from it
+  // reads as a legitimate "0" — indistinguishable from a genuinely empty
+  // new school. Surface which counts, if any, are actually unreliable.
+  const failedMetrics = [
+    errorStudents && 'students',
+    errorVans && 'fleet',
+    errorDrivers && 'drivers',
+    errorTrips && "today's trips",
+    errorComplaints && 'complaints',
+  ].filter(Boolean) as string[];
 
   const stats = buildStats(students, vans, drivers, trips, complaints);
   const weeklyData = buildWeeklyTripData(trips);
@@ -250,6 +281,16 @@ export default function DashboardPage() {
           </span>
         </div>
       </div>
+
+      {failedMetrics.length > 0 && (
+        <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
+          <AlertTriangle size={16} className="shrink-0" />
+          <span>
+            Couldn&apos;t load {failedMetrics.join(', ')} — the counts below may be
+            showing 0 instead of the real number. Refresh to try again.
+          </span>
+        </div>
+      )}
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

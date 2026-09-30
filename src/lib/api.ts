@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://72.61.119.165:3002';
+// Single source of truth for the backend host — import this rather than
+// re-reading NEXT_PUBLIC_API_URL with a different fallback elsewhere (the
+// REST client and the live-tracking socket used to each hardcode their own
+// fallback, and could silently point at two different hosts if the env var
+// was ever missing in one build context but not another).
+export const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.smartvan.pk';
 const TOKEN_KEY = 'smartvan_token';
 
 function getToken(): string | null {
@@ -26,11 +31,33 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (error.response?.status === 403) {
+      if (typeof window !== 'undefined') window.location.href = '/no-access';
+      return Promise.reject(error);
+    }
     if (error.response?.status === 401) {
+      // The backend uses 401 for both "your token is invalid/expired" and
+      // "you're authenticated but not allowed to do this" (it never throws
+      // 403) — treating every 401 as a session expiry logged out otherwise
+      // legitimately signed-in admins/staff the moment they hit any
+      // permission-gated route or action. Only messages that actually mean
+      // "your session isn't valid" should force a re-login; anything else
+      // is a permission denial and belongs on the no-access page instead.
+      const message = (error.response?.data?.message ?? '').toString().toLowerCase();
+      const isSessionInvalid =
+        message.includes('token') ||
+        message.includes('unauthorized') ||
+        message.includes('invalid user credentials') ||
+        message.includes('user not found');
+
       if (typeof window !== 'undefined') {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem('smartvan_user');
-        window.location.href = '/auth/login';
+        if (isSessionInvalid) {
+          localStorage.removeItem(TOKEN_KEY);
+          localStorage.removeItem('smartvan_user');
+          window.location.href = '/auth/login';
+        } else {
+          window.location.href = '/no-access';
+        }
       }
     }
     return Promise.reject(error);
