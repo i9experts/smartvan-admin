@@ -21,7 +21,8 @@
     "employees": "Employees",
     "tickets": "Tickets",
     "auditLog": "Audit Log",
-    "settings": "Settings"
+    "settings": "Settings",
+    "qrCards": "Student QR Cards"
   },
   "common": {
     "save": "Save",

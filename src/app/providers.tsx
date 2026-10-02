@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import { ThemeProvider } from "@/theme/ThemeContext";
+import { SafetyAlertCenter } from "@/components/safety/SafetyAlertCenter";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -23,6 +24,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <ThemeProvider>
         <LanguageProvider>
           {children}
+          {/* Live driver safety alerts (SOS, students not dropped, overspeed, van checks) */}
+          <SafetyAlertCenter />
         </LanguageProvider>
       </ThemeProvider>
     </QueryClientProvider>

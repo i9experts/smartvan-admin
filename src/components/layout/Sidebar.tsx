@@ -6,7 +6,7 @@ import Image from "next/image";
 import {
   LayoutDashboard, MapPin, School, Bus, Users, Route,
   Bell, BarChart3, Receipt, Wrench, Settings, LogOut, MessageSquare, History,
-  Image as ImageIcon, AlertTriangle, HelpCircle,
+  Image as ImageIcon, AlertTriangle, HelpCircle, QrCode,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -17,6 +17,7 @@ const navItems: { labelKey: string; href: string; icon: any; roles: ("admin" | "
   { labelKey: "nav.overview", href: "/dashboard", icon: LayoutDashboard, roles: ["admin"], permission: "view_dashboard" },
   { labelKey: "nav.liveTracking", href: "/tracking", icon: MapPin, roles: ["admin"] },
   { labelKey: "nav.studentManagement", href: "/students", icon: School, roles: ["admin"], permission: "manage_students" },
+  { labelKey: "nav.qrCards", href: "/qr-cards", icon: QrCode, roles: ["admin"], permission: "manage_students" },
   { labelKey: "nav.vanDriverMgmt", href: "/vans", icon: Bus, roles: ["admin"], permission: "manage_fleet" },
   { labelKey: "nav.driverAccounts", href: "/drivers", icon: Users, roles: ["admin"], permission: "manage_fleet" },
   { labelKey: "nav.parentManagement", href: "/parents", icon: Users, roles: ["admin"], permission: "manage_parents" },

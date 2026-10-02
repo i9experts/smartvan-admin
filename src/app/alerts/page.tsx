@@ -53,6 +53,28 @@ const RECIPIENT_CONFIG = {
 
 // ─── Send Alert Modal ─────────────────────────────────────────────────────────
 
+// Phase 2/3 safety alerts saved for the school (type on the notification).
+const SAFETY_BADGES: Record<string, { label: string; color: string }> = {
+  sos: { label: 'SOS', color: '#DC2626' },
+  child_left_behind: { label: 'Not dropped', color: '#DC2626' },
+  overspeed: { label: 'Overspeed', color: '#EA580C' },
+  pretrip_issue: { label: 'Van check', color: '#D97706' },
+};
+
+/** Makes the Google Maps links in safety alert messages clickable. */
+function linkify(text: string) {
+  const parts = text.split(/(https:\/\/maps\.google\.com\/\?q=[-0-9.,]+)/g);
+  return parts.map((part, i) =>
+    part.startsWith('https://maps.google.com/') ? (
+      <a key={i} href={part} target="_blank" rel="noreferrer" className="text-[#1B2B6B] font-medium underline">
+        Open location
+      </a>
+    ) : (
+      <span key={i}>{part}</span>
+    ),
+  );
+}
+
 function SendAlertModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
   const [form, setForm] = useState<AlertForm>(EMPTY_FORM);
   const [error, setError] = useState('');
@@ -457,13 +479,25 @@ _Safe Ride, Every Side_`;
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-medium text-gray-900">{a.driverName || 'Driver'}</p>
+                      <p className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                        {a.driverName || 'Driver'}
+                        {SAFETY_BADGES[a.type] && (
+                          <span
+                            className="text-[10px] font-semibold px-2 py-0.5 rounded-full text-white"
+                            style={{ background: SAFETY_BADGES[a.type].color }}
+                          >
+                            {SAFETY_BADGES[a.type].label}
+                          </span>
+                        )}
+                      </p>
                       <p className="text-xs text-gray-400 shrink-0">
                         {new Date(a.date || a.createdAt).toLocaleString()}
                       </p>
                     </div>
                     {a.message && (
-                      <p className="text-sm text-gray-600 mt-1">{a.message}</p>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {linkify(a.message)}
+                      </p>
                     )}
                     {a.audioUrl && (
                       <audio controls className="mt-2 h-8 w-full max-w-xs">

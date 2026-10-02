@@ -21,7 +21,8 @@
     "employees": "الموظفين",
     "tickets": "التذاكر",
     "auditLog": "سجل النشاط",
-    "settings": "الإعدادات"
+    "settings": "الإعدادات",
+    "qrCards": "بطاقات QR للطلاب"
   },
   "common": {
     "save": "حفظ",
