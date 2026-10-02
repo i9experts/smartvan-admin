@@ -59,6 +59,7 @@ function PayMethodBadge({ method }: { method: string }) {
     cash: 'bg-green-50 text-green-700',
     jazzcash: 'bg-red-50 text-red-700',
     easypaisa: 'bg-emerald-50 text-emerald-700',
+    raast: 'bg-sky-50 text-sky-700',
     bank_transfer: 'bg-blue-50 text-blue-700',
     card: 'bg-purple-50 text-purple-700',
     other: 'bg-gray-100 text-gray-600',
@@ -676,7 +677,13 @@ export default function FeesPage() {
                           {p.discountAmount > 0 && <p className="text-xs text-emerald-600">-{formatCurrency(p.discountAmount, p.currency)} discount</p>}
                         </td>
                         <td className="p-4"><ServiceTypeBadge type={p.serviceType || 'both'} /></td>
-                        <td className="p-4"><PayMethodBadge method={p.paymentMethod} /></td>
+                        <td className="p-4">
+                          <PayMethodBadge method={p.paymentMethod} />
+                          {/* Paid by the parent in the app (Phase 3 online payments) */}
+                          {p.collectedByType === 'online' && (
+                            <span className="ml-1 px-1.5 py-0.5 text-[9px] font-semibold rounded-full bg-[#1B2B6B] text-white">Online</span>
+                          )}
+                        </td>
                         <td className="p-4"><StatusBadge status={p.status} /></td>
                         <td className="p-4 text-xs text-gray-400">
                           {p.paidAt ? new Date(p.paidAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'}
