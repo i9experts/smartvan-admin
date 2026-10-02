@@ -93,3 +93,16 @@ The app connects to `https://api.smartvanride.com` (the NestJS backend already r
 - ⏳ Week 2: Live tracking map + Flutter apps
 - ⏳ Week 3: ETA engine + SOS + geofencing
 - ⏳ Week 4: Stripe billing + Arabic + launch
+
+## Safety & QR features (backend Phase 2/3)
+
+Needs the `smartvan` backend `phase3` branch (see `docs/PHASE2_API.md`,
+`docs/PHASE3_API.md` there).
+
+- **Live safety alerts** (`src/components/safety/SafetyAlertCenter.tsx`):
+  joins the school alert room over Socket.IO. Driver SOS opens a red panel
+  with an alarm until acknowledged; students-not-dropped, overspeed and
+  failed van checks show as toasts. Alerts page tags these alert types.
+- **Student QR cards** (`/qr-cards`): print ID-size cards for the driver
+  app's scanner; issue a new card if one is lost.
+- **Fees**: Raast method and an "Online" tag for fees paid in the parent app.
