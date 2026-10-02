@@ -1,22 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Server-side env var — falls back to NEXT_PUBLIC_API_URL if a non-public
-// API_URL isn't separately set, then to the production backend host as a
-// last resort so nothing breaks if an env var is missing.
 const BACKEND_URL =
   process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'https://api.smartvan.pk';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const res = await fetch(`${BACKEND_URL}/Admin/login`, {
+    const res = await fetch(`${BACKEND_URL}/Admin/reset-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
     const data = await res.json();
     if (!res.ok) {
-      return NextResponse.json({ message: data.message ?? 'Login failed', error: 'Unauthorized', statusCode: 401 }, { status: 401 });
+      return NextResponse.json({ message: data.message ?? 'Failed to reset password' }, { status: res.status });
     }
     return NextResponse.json(data, { status: 200 });
   } catch (e: any) {
