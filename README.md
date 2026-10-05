@@ -86,7 +86,7 @@ pm2 save
 Add `SERVER_SSH_KEY` secret to GitHub repo → auto-deploys on every push to main.
 
 ## API connection
-The app connects to `https://api.smartvanride.com` (the NestJS backend already running on port 3002). All routes are already fixed with the Week 1 + Week 2 security patches.
+The app connects to `https://api.smartvan.pk` (the NestJS backend already running on port 3002). All routes are already fixed with the Week 1 + Week 2 security patches.
 
 ## Build plan progress
 - ✅ Week 1: Foundation + all 10 admin screens
