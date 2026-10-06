@@ -34,7 +34,7 @@ const MapPicker = lazy(() => import('@/components/MapPicker'));
 interface Student {
   _id: string;
   fullname: string;
-  grade: number;
+  grade: string;
   gender: string;
   age: number;
   dob: string;
@@ -124,7 +124,7 @@ async function fetchStudents(page: number, search: string, status: string) {
 async function addStudent(form: AddStudentForm) {
   return api.post('/Admin/addStudent', {
     fullname: form.fullname,
-    grade: Number(form.grade),
+    grade: form.grade,
     gender: form.gender,
     age: Number(form.age),
     dob: form.dob,
@@ -141,7 +141,7 @@ async function editStudent(kidId: string, form: Partial<AddStudentForm>) {
   return api.post('/Admin/editStudent', {
     KidId: kidId,
     fullname: form.fullname,
-    grade: Number(form.grade),
+    grade: form.grade,
     gender: form.gender,
     age: Number(form.age),
     dob: form.dob,
