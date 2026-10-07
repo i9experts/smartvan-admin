@@ -59,6 +59,7 @@ const SAFETY_BADGES: Record<string, { label: string; color: string }> = {
   child_left_behind: { label: 'Not dropped', color: '#DC2626' },
   overspeed: { label: 'Overspeed', color: '#EA580C' },
   pretrip_issue: { label: 'Van check', color: '#D97706' },
+  document_expiry: { label: 'Document expiry', color: '#7C3AED' },
 };
 
 /** Makes the Google Maps links in safety alert messages clickable. */
