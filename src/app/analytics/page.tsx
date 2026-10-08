@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   TrendingUp, TrendingDown, Users, Bus, MapPin, AlertTriangle,
-  UserCheck, Route as RouteIcon, UserX, Smartphone, PhoneOff,
+  Route as RouteIcon, UserX, Smartphone, PhoneOff,
   FileWarning, Satellite, Layers, Link2, CalendarClock, ShieldAlert,
   ChevronDown,
 } from 'lucide-react';
