@@ -5,7 +5,14 @@ import { Providers } from "./providers";
 export const metadata: Metadata = {
   title: "SmartVan — Admin Portal",
   description: "School transport management system",
-  icons: { icon: "/favicon.ico" },
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: "/favicon-180.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

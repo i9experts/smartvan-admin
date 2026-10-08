@@ -34,7 +34,7 @@ export default function EmployeeLoginPage() {
       <div className="hidden lg:flex lg:w-1/2 bg-[#1B2B6B] flex-col items-center justify-center p-12 relative overflow-hidden">
         <div className="relative z-10 text-center">
           <div className="w-80 h-80 bg-white rounded-full flex items-center justify-center shadow-xl">
-            <img src="/smartvan-logo.png" alt="SmartVan" className="w-64 object-contain" />
+            <img src="/smartvan-logo-stacked.png" alt="SmartVan" className="w-64 object-contain" />
           </div>
         </div>
       </div>

@@ -104,7 +104,7 @@ export function StudentCard({ card, schoolName }: { card: StudentCardData; schoo
         <div className="flex items-center" style={{ gap: '1.8mm' }}>
           <div className="flex items-center justify-center bg-white rounded-full" style={{ width: '9mm', height: '9mm' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/smartvan-logo.png" alt="SmartVan" style={{ width: '8.4mm', height: '8.4mm', objectFit: 'contain' }} />
+            <img src="/smartvan-mark.png" alt="SmartVan" style={{ width: '8.4mm', height: '8.4mm', objectFit: 'contain' }} />
           </div>
           <div className="leading-none">
             <div style={{ color: '#fff', fontWeight: 800, fontSize: '3.6mm', letterSpacing: '0.1mm' }}>SmartVan</div>
