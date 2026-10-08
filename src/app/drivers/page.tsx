@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Search, X, AlertCircle, Filter,
   ChevronLeft, ChevronRight, CheckCircle2, XCircle,
   Phone, Mail, MapPin, FileText, Eye, UserMinus, Bus,
-  Smartphone, RefreshCw, Pencil,
+  Smartphone, RefreshCw, Pencil, ClipboardList,
 } from 'lucide-react';
 import { vanApi, api, uploadApi } from '@/lib/api';
 
@@ -561,6 +562,13 @@ export default function DriversPage() {
             <h1 className="text-2xl font-bold text-gray-900">Drivers</h1>
             <p className="text-sm text-gray-400 mt-0.5">{total} driver{total !== 1 ? 's' : ''} registered</p>
           </div>
+          <Link
+            href="/drivers/register"
+            className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition"
+          >
+            <ClipboardList size={16} />
+            Register Report
+          </Link>
         </div>
 
         {/* Filters */}
