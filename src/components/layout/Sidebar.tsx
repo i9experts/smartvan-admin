@@ -45,7 +45,7 @@ export function Sidebar() {
   const pendingAlertsCount = usePendingAlertsCount();
 
   return (
-    <aside className="w-[190px] bg-white dark:bg-[var(--sv-card-bg)] border-r border-sv-border dark:border-[var(--sv-border)] flex flex-col flex-shrink-0 h-screen sticky top-0">
+    <aside className="print:hidden w-[190px] bg-white dark:bg-[var(--sv-card-bg)] border-r border-sv-border dark:border-[var(--sv-border)] flex flex-col flex-shrink-0 h-screen sticky top-0">
       {/* Logo */}
       <div className="px-4 py-[14px] border-b border-sv-border dark:border-[var(--sv-border)] flex items-center justify-center">
         <Image src="/smartvan-logo.png" alt="SmartVan" width={140} height={56} className="object-contain" />

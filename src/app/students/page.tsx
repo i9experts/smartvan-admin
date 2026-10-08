@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, lazy, Suspense } from 'react';
+import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Search,
@@ -22,6 +23,7 @@ import {
   FileSpreadsheet,
   CheckCircle,
   XCircle,
+  ClipboardList,
 } from "lucide-react";
 import { api, vanApi, uploadApi } from '@/lib/api';
 import type { PickedLocation } from '@/components/MapPicker';
@@ -1242,6 +1244,13 @@ export default function StudentsPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <Link
+              href="/students/register"
+              className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition"
+            >
+              <ClipboardList size={16} />
+              Register Report
+            </Link>
             <a
               href="/forms/SmartVan_Student_Registration_Form.pdf"
               download

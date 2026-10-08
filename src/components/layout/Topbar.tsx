@@ -82,7 +82,7 @@ export function Topbar({ title }: TopbarProps) {
   const hasResults = results && Object.values(results).some((arr) => arr.length > 0);
 
   return (
-    <header className="h-[50px] bg-white dark:bg-[var(--sv-card-bg)] border-b border-sv-border dark:border-[var(--sv-border)] flex items-center px-5 gap-3 flex-shrink-0 sticky top-0 z-20">
+    <header className="print:hidden h-[50px] bg-white dark:bg-[var(--sv-card-bg)] border-b border-sv-border dark:border-[var(--sv-border)] flex items-center px-5 gap-3 flex-shrink-0 sticky top-0 z-20">
       <div ref={containerRef} className="relative flex-1 max-w-[340px]">
         <div className="flex items-center gap-2 bg-sv-bg dark:bg-[var(--sv-bg)] rounded-lg px-3 py-[7px] text-[12px] text-sv-muted border border-sv-border dark:border-[var(--sv-border)]">
           <Search size={14} className="shrink-0" />
