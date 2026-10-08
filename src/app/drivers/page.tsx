@@ -48,20 +48,24 @@ function timeAgo(dateStr?: string | null): string {
   return new Date(dateStr!).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+// "Connected" previously meant "has ever logged in," which reads as
+// "online right now" — this only ever reflects when the app was last
+// opened, never live presence, so the label and the timestamp are kept
+// visually distinct instead of implied by one combined phrase.
 function AppConnectionBadge({ lastLoginAt }: { lastLoginAt?: string | null }) {
   if (lastLoginAt) {
     return (
       <span className="flex items-center gap-1.5 text-xs">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-        <span className="text-emerald-700 font-medium">Connected</span>
-        <span className="text-gray-400">· {timeAgo(lastLoginAt)}</span>
+        <span className="text-emerald-700 font-medium">App linked</span>
+        <span className="text-gray-400">· Last activity {timeAgo(lastLoginAt)}</span>
       </span>
     );
   }
   return (
     <span className="flex items-center gap-1.5 text-xs">
       <span className="w-1.5 h-1.5 rounded-full bg-gray-300" />
-      <span className="text-gray-400 font-medium">Not connected yet</span>
+      <span className="text-gray-400 font-medium">App not linked yet</span>
     </span>
   );
 }
