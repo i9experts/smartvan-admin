@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Search, X, Filter, ChevronLeft, ChevronRight,
   AlertTriangle, CheckCircle2, Clock, Eye,
-  MessageSquare, User, Calendar, Tag, Image,
+  MessageSquare, User, Calendar, Tag, Image, ClipboardList,
 } from 'lucide-react';
 import { reportApi } from '@/lib/api';
 
@@ -306,6 +307,13 @@ export default function ComplaintsPage() {
           </div>
           {/* Status summary */}
           <div className="flex items-center gap-2">
+            <Link
+              href="/complaints/register"
+              className="flex items-center gap-2 px-4 py-2 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"
+            >
+              <ClipboardList size={15} />
+              Register Report
+            </Link>
             {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
               <button
                 key={key}

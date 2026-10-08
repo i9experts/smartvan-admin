@@ -117,6 +117,7 @@ export const reportApi = {
   submitTicket: (issueType: string, description: string, image?: string) =>
     api.post('/report/addReportByAdmin', { issueType, description, image }),
   getMyTickets: () => api.get('/report/getMyTicketsByAdmin'),
+  getRegisterReport: () => api.get('/report/getComplaintRegisterReport'),
 };
 
 export const alertApi = {
