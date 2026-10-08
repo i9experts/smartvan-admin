@@ -130,7 +130,7 @@ function DetailDrawer({ complaint, onClose, onStatusChange }: DetailDrawerProps)
             <div className="p-5 border-b border-gray-100">
               <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">{reporterLabel}</h4>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] font-bold">
+                <div className="w-10 h-10 rounded-full bg-[#1B3B69]/10 flex items-center justify-center text-[#1B3B69] font-bold">
                   {(reporter.fullname ?? reporter.email)?.charAt(0)?.toUpperCase()}
                 </div>
                 <div>
@@ -232,7 +232,7 @@ function DetailDrawer({ complaint, onClose, onStatusChange }: DetailDrawerProps)
                   onChange={e => setRemarks(e.target.value)}
                   rows={3}
                   placeholder="Add admin remarks or resolution notes…"
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 resize-none"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 resize-none"
                 />
               </div>
             </div>
@@ -247,7 +247,7 @@ function DetailDrawer({ complaint, onClose, onStatusChange }: DetailDrawerProps)
           <button
             onClick={() => updateMutation.mutate()}
             disabled={updateMutation.isPending || (newStatus === complaint.status && remarks === (complaint.adminRemarks ?? ''))}
-            className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
+            className="flex-1 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
           >
             {updateMutation.isPending ? 'Saving…' : 'Save Changes'}
           </button>
@@ -309,7 +309,7 @@ export default function ComplaintsPage() {
           <div className="flex items-center gap-2">
             <Link
               href="/complaints/register"
-              className="flex items-center gap-2 px-4 py-2 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"
+              className="flex items-center gap-2 px-4 py-2 bg-[#1B3B69] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"
             >
               <ClipboardList size={15} />
               Register Report
@@ -339,7 +339,7 @@ export default function ComplaintsPage() {
               key={t.key}
               onClick={() => { setTypeFilter(t.key); setPage(1); }}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
-                typeFilter === t.key ? 'bg-[#1B2B6B] text-white' : 'text-gray-500 hover:bg-gray-50'
+                typeFilter === t.key ? 'bg-[#1B3B69] text-white' : 'text-gray-500 hover:bg-gray-50'
               }`}
             >
               {t.label}
@@ -354,7 +354,7 @@ export default function ComplaintsPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by issue or ID…"
-            className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+            className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
           />
         </div>
 

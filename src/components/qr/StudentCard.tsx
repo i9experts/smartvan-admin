@@ -108,7 +108,7 @@ export function StudentCard({ card, schoolName }: { card: StudentCardData; schoo
           </div>
           <div className="leading-none">
             <div style={{ color: '#fff', fontWeight: 800, fontSize: '3.6mm', letterSpacing: '0.1mm' }}>SmartVan</div>
-            <div style={{ color: YELLOW, fontSize: '1.9mm', marginTop: '0.6mm', fontWeight: 600 }}>Safe Ride, Every Side</div>
+            <div style={{ color: YELLOW, fontSize: '1.9mm', marginTop: '0.6mm', fontWeight: 600 }}>Track the Van. Stay Informed.</div>
           </div>
         </div>
         <div

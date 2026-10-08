@@ -207,11 +207,11 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Plate Number *</label>
-                <input value={form.carNumber} onChange={e => setForm(f => ({ ...f, carNumber: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white" placeholder="e.g. KHI-1234" />
+                <input value={form.carNumber} onChange={e => setForm(f => ({ ...f, carNumber: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white" placeholder="e.g. KHI-1234" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Vehicle Category *</label>
-                <select value={form.vehicleCategory} onChange={e => setForm(f => ({ ...f, vehicleCategory: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white">
+                <select value={form.vehicleCategory} onChange={e => setForm(f => ({ ...f, vehicleCategory: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white">
                   <option value="">Select category</option>
                   {VEHICLE_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
@@ -220,7 +220,7 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
             <div className="grid grid-cols-2 gap-3 mt-3">
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Manufacturer *</label>
-                <select value={form.manufacturer} onChange={e => setForm(f => ({ ...f, manufacturer: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white">
+                <select value={form.manufacturer} onChange={e => setForm(f => ({ ...f, manufacturer: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white">
                   <option value="">Select manufacturer</option>
                   {MANUFACTURERS.map(m => <option key={m} value={m}>{m}</option>)}
                 </select>
@@ -231,7 +231,7 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
                   list="model-suggestions"
                   value={form.model}
                   onChange={e => setForm(f => ({ ...f, model: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white"
                   placeholder={form.manufacturer ? `e.g. ${MODELS_BY_MANUFACTURER[form.manufacturer]?.[0] ?? 'Model name'}` : 'Select a manufacturer first'}
                 />
                 <datalist id="model-suggestions">
@@ -245,11 +245,11 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Seating Capacity</label>
-                <input type="number" min={1} max={50} value={form.venCapacity} onChange={e => setForm(f => ({ ...f, venCapacity: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white" placeholder="e.g. 12" />
+                <input type="number" min={1} max={50} value={form.venCapacity} onChange={e => setForm(f => ({ ...f, venCapacity: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white" placeholder="e.g. 12" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Condition *</label>
-                <select value={form.condition} onChange={e => setForm(f => ({ ...f, condition: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white">
+                <select value={form.condition} onChange={e => setForm(f => ({ ...f, condition: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white">
                   <option value="">Select condition</option>
                   {CONDITIONS.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
@@ -261,11 +261,11 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">GPS Device ID</label>
-                <input value={form.deviceId} onChange={e => setForm(f => ({ ...f, deviceId: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white" placeholder="e.g. GPS-TRK-00123" />
+                <input value={form.deviceId} onChange={e => setForm(f => ({ ...f, deviceId: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white" placeholder="e.g. GPS-TRK-00123" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Assigned Route</label>
-                <input value={form.assignRoute} onChange={e => setForm(f => ({ ...f, assignRoute: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white" placeholder="e.g. Route A - Gulshan to School" />
+                <input value={form.assignRoute} onChange={e => setForm(f => ({ ...f, assignRoute: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white" placeholder="e.g. Route A - Gulshan to School" />
               </div>
             </div>
           </div>
@@ -274,7 +274,7 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Insurance Expiry</label>
-                <input type="date" value={form.insuranceExpiry} onChange={e => setForm(f => ({ ...f, insuranceExpiry: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white" />
+                <input type="date" value={form.insuranceExpiry} onChange={e => setForm(f => ({ ...f, insuranceExpiry: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white" />
                 <label className="mt-1.5 flex items-center justify-center gap-1.5 text-xs text-gray-500 border border-dashed border-gray-300 rounded-lg py-1.5 cursor-pointer hover:bg-gray-100">
                   {uploadingField === 'insuranceDocUrl' ? 'Uploading…' : form.insuranceDocUrl ? '✓ Document uploaded' : 'Upload document'}
                   <input type="file" className="hidden" accept="image/*,.pdf" onChange={e => e.target.files?.[0] && handleFileUpload('insuranceDocUrl', e.target.files[0])} />
@@ -282,7 +282,7 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Registration Expiry</label>
-                <input type="date" value={form.registrationExpiry} onChange={e => setForm(f => ({ ...f, registrationExpiry: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white" />
+                <input type="date" value={form.registrationExpiry} onChange={e => setForm(f => ({ ...f, registrationExpiry: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white" />
                 <label className="mt-1.5 flex items-center justify-center gap-1.5 text-xs text-gray-500 border border-dashed border-gray-300 rounded-lg py-1.5 cursor-pointer hover:bg-gray-100">
                   {uploadingField === 'registrationDocUrl' ? 'Uploading…' : form.registrationDocUrl ? '✓ Document uploaded' : 'Upload document'}
                   <input type="file" className="hidden" accept="image/*,.pdf" onChange={e => e.target.files?.[0] && handleFileUpload('registrationDocUrl', e.target.files[0])} />
@@ -290,7 +290,7 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Fitness Cert. Expiry</label>
-                <input type="date" value={form.fitnessExpiry} onChange={e => setForm(f => ({ ...f, fitnessExpiry: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white" />
+                <input type="date" value={form.fitnessExpiry} onChange={e => setForm(f => ({ ...f, fitnessExpiry: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white" />
                 <label className="mt-1.5 flex items-center justify-center gap-1.5 text-xs text-gray-500 border border-dashed border-gray-300 rounded-lg py-1.5 cursor-pointer hover:bg-gray-100">
                   {uploadingField === 'fitnessDocUrl' ? 'Uploading…' : form.fitnessDocUrl ? '✓ Document uploaded' : 'Upload document'}
                   <input type="file" className="hidden" accept="image/*,.pdf" onChange={e => e.target.files?.[0] && handleFileUpload('fitnessDocUrl', e.target.files[0])} />
@@ -298,7 +298,7 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Route Permit Expiry</label>
-                <input type="date" value={form.routePermitExpiry} onChange={e => setForm(f => ({ ...f, routePermitExpiry: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white" />
+                <input type="date" value={form.routePermitExpiry} onChange={e => setForm(f => ({ ...f, routePermitExpiry: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white" />
                 <label className="mt-1.5 flex items-center justify-center gap-1.5 text-xs text-gray-500 border border-dashed border-gray-300 rounded-lg py-1.5 cursor-pointer hover:bg-gray-100">
                   {uploadingField === 'routePermitDocUrl' ? 'Uploading…' : form.routePermitDocUrl ? '✓ Document uploaded' : 'Upload document'}
                   <input type="file" className="hidden" accept="image/*,.pdf" onChange={e => e.target.files?.[0] && handleFileUpload('routePermitDocUrl', e.target.files[0])} />
@@ -307,7 +307,7 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
             </div>
           </div>
           <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-            <input type="checkbox" id="ownVan" checked={form.ownVan} onChange={e => setForm(f => ({ ...f, ownVan: e.target.checked }))} className="w-4 h-4 rounded border-gray-300 accent-[#1B2B6B]" />
+            <input type="checkbox" id="ownVan" checked={form.ownVan} onChange={e => setForm(f => ({ ...f, ownVan: e.target.checked }))} className="w-4 h-4 rounded border-gray-300 accent-[#1B3B69]" />
             <div>
               <label htmlFor="ownVan" className="text-sm font-medium text-gray-700 cursor-pointer">School-owned vehicle</label>
               <p className="text-xs text-gray-400">Check if this van is owned by the school</p>
@@ -341,7 +341,7 @@ function VanModal({ mode, van, onClose, onSuccess }: { mode: 'add'|'edit'; van?:
         </div>
         <div className="flex gap-3 mt-6">
           <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition">Cancel</button>
-          <button onClick={handleSubmit} disabled={isLoading} className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50">{isLoading ? 'Saving…' : mode === 'add' ? 'Add Van' : 'Save Changes'}</button>
+          <button onClick={handleSubmit} disabled={isLoading} className="flex-1 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50">{isLoading ? 'Saving…' : mode === 'add' ? 'Add Van' : 'Save Changes'}</button>
         </div>
       </div>
     </div>
@@ -383,18 +383,18 @@ function AssignDriverModal({ van, drivers, onClose, onSuccess }: { van: VanItem;
           {activeDrivers.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-6">No active drivers available</p>
           ) : activeDrivers.map(d => (
-            <label key={d._id} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${selectedDriver === d._id ? 'border-[#1B2B6B] bg-[#1B2B6B]/5' : 'border-gray-200 hover:bg-gray-50'}`}>
+            <label key={d._id} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${selectedDriver === d._id ? 'border-[#1B3B69] bg-[#1B3B69]/5' : 'border-gray-200 hover:bg-gray-50'}`}>
               <input type="radio" name="driver" value={d._id} checked={selectedDriver === d._id} onChange={() => setSelectedDriver(d._id)} className="hidden" />
-              <div className="w-9 h-9 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] font-bold text-sm shrink-0">{d.fullname?.[0]?.toUpperCase()}</div>
+              <div className="w-9 h-9 rounded-full bg-[#1B3B69]/10 flex items-center justify-center text-[#1B3B69] font-bold text-sm shrink-0">{d.fullname?.[0]?.toUpperCase()}</div>
               <div className="flex-1 min-w-0"><p className="text-sm font-medium text-gray-900">{d.fullname}</p><p className="text-xs text-gray-400">{d.phoneNo}</p></div>
-              {selectedDriver === d._id && <CheckCircle2 size={16} className="text-[#1B2B6B] shrink-0" />}
+              {selectedDriver === d._id && <CheckCircle2 size={16} className="text-[#1B3B69] shrink-0" />}
             </label>
           ))}
         </div>
         {error && <div className="flex items-center gap-2 p-3 bg-red-50 text-red-600 rounded-xl text-xs mt-3"><AlertCircle size={14} />{error}</div>}
         <div className="flex gap-3 mt-5">
           <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">Cancel</button>
-          <button onClick={() => assignMutation.mutate()} disabled={!selectedDriver || assignMutation.isPending} className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] disabled:opacity-50">{assignMutation.isPending ? 'Assigning…' : 'Assign Driver'}</button>
+          <button onClick={() => assignMutation.mutate()} disabled={!selectedDriver || assignMutation.isPending} className="flex-1 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-medium hover:bg-[#162356] disabled:opacity-50">{assignMutation.isPending ? 'Assigning…' : 'Assign Driver'}</button>
         </div>
       </div>
     </div>
@@ -476,7 +476,7 @@ function AddDriverModal({ onClose }: { onClose: () => void }) {
     setError(''); mutation.mutate();
   }
 
-  const inputClass = "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white";
+  const inputClass = "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white";
   const labelClass = "block text-xs font-medium text-gray-600 mb-1";
 
   return (
@@ -495,9 +495,9 @@ function AddDriverModal({ onClose }: { onClose: () => void }) {
           <div className="flex items-center gap-3">
             {[{ n: 1, label: 'Personal Info' }, { n: 2, label: 'Legal Documents' }].map((s, i) => (
               <div key={s.n} className="flex items-center gap-2 flex-1">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${step >= s.n ? 'bg-[#1B2B6B] text-white' : 'bg-gray-100 text-gray-400'}`}>{s.n}</div>
-                <span className={`text-xs font-medium ${step >= s.n ? 'text-[#1B2B6B]' : 'text-gray-400'}`}>{s.label}</span>
-                {i < 1 && <div className={`flex-1 h-0.5 ${step > s.n ? 'bg-[#1B2B6B]' : 'bg-gray-200'}`} />}
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${step >= s.n ? 'bg-[#1B3B69] text-white' : 'bg-gray-100 text-gray-400'}`}>{s.n}</div>
+                <span className={`text-xs font-medium ${step >= s.n ? 'text-[#1B3B69]' : 'text-gray-400'}`}>{s.label}</span>
+                {i < 1 && <div className={`flex-1 h-0.5 ${step > s.n ? 'bg-[#1B3B69]' : 'bg-gray-200'}`} />}
               </div>
             ))}
           </div>
@@ -608,8 +608,8 @@ function AddDriverModal({ onClose }: { onClose: () => void }) {
               </div>
 
               {/* Compliance Summary */}
-              <div className="p-3 bg-[#1B2B6B]/5 border border-[#1B2B6B]/10 rounded-xl">
-                <p className="text-xs font-semibold text-[#1B2B6B] mb-2">Compliance Checklist</p>
+              <div className="p-3 bg-[#1B3B69]/5 border border-[#1B3B69]/10 rounded-xl">
+                <p className="text-xs font-semibold text-[#1B3B69] mb-2">Compliance Checklist</p>
                 <div className="space-y-1.5">
                   {[
                     { label: 'CNIC provided', ok: !!form.NIC },
@@ -662,13 +662,13 @@ function AddDriverModal({ onClose }: { onClose: () => void }) {
           {step === 1 ? (
             <>
               <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">Cancel</button>
-              <button onClick={handleNext} className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356]">Next: Documents →</button>
+              <button onClick={handleNext} className="flex-1 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-medium hover:bg-[#162356]">Next: Documents →</button>
             </>
           ) : (
             <>
               <button onClick={() => { setStep(1); setError(''); }} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">← Back</button>
               <button onClick={handleSubmit} disabled={mutation.isPending}
-                className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] disabled:opacity-50 flex items-center justify-center gap-2">
+                className="flex-1 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-medium hover:bg-[#162356] disabled:opacity-50 flex items-center justify-center gap-2">
                 {mutation.isPending ? <RefreshCw size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
                 {mutation.isPending ? 'Adding Driver…' : 'Add Driver'}
               </button>
@@ -762,8 +762,8 @@ export default function VansPage() {
           >
             <Download size={16} /> Printable Form
           </a>
-          <button onClick={() => setShowAddDriver(true)} className="flex items-center gap-2 px-4 py-2.5 border border-[#1B2B6B] text-[#1B2B6B] text-sm font-medium rounded-xl hover:bg-[#1B2B6B]/5 transition"><Plus size={16} /> Add Driver</button>
-          <button onClick={() => setModal('add')} className="flex items-center gap-2 px-4 py-2.5 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"><Plus size={16} /> Add Van</button>
+          <button onClick={() => setShowAddDriver(true)} className="flex items-center gap-2 px-4 py-2.5 border border-[#1B3B69] text-[#1B3B69] text-sm font-medium rounded-xl hover:bg-[#1B3B69]/5 transition"><Plus size={16} /> Add Driver</button>
+          <button onClick={() => setModal('add')} className="flex items-center gap-2 px-4 py-2.5 bg-[#1B3B69] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"><Plus size={16} /> Add Van</button>
         </div>
 
         {pendingLinkRequests.length > 0 && (
@@ -801,12 +801,12 @@ export default function VansPage() {
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="Search by plate or type…" className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30" />
+            <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="Search by plate or type…" className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30" />
           </div>
           <div className="flex items-center gap-2">
             <Filter size={14} className="text-gray-400" />
             {(['','active','inActive'] as const).map(s => (
-              <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className={`px-3 py-1.5 text-xs font-medium rounded-full transition ${statusFilter === s ? 'bg-[#1B2B6B] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+              <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className={`px-3 py-1.5 text-xs font-medium rounded-full transition ${statusFilter === s ? 'bg-[#1B3B69] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
                 {s === '' ? 'All' : s === 'active' ? 'Active' : 'Inactive'}
               </button>
             ))}
@@ -814,8 +814,8 @@ export default function VansPage() {
         </div>
 
         {selected.size > 0 && (
-          <div className="flex items-center gap-3 p-3 bg-[#1B2B6B]/5 rounded-xl">
-            <span className="text-sm font-medium text-[#1B2B6B]">{selected.size} selected</span>
+          <div className="flex items-center gap-3 p-3 bg-[#1B3B69]/5 rounded-xl">
+            <span className="text-sm font-medium text-[#1B3B69]">{selected.size} selected</span>
             <div className="flex gap-2 ml-auto">
               <button onClick={() => statusMutation.mutate({ ids: selectedArr, status: 'active' })} disabled={statusMutation.isPending} className="px-3 py-1.5 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition">Activate</button>
               <button onClick={() => statusMutation.mutate({ ids: selectedArr, status: 'inActive' })} disabled={statusMutation.isPending} className="px-3 py-1.5 text-xs font-medium bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition">Deactivate</button>
@@ -862,7 +862,7 @@ export default function VansPage() {
                       {van.driver?.id ? (
                         <div><p className="text-sm font-medium text-gray-900">{van.driver.fullname}</p><p className="text-xs text-gray-400 flex items-center gap-1"><Phone size={10} />{van.driver.phoneNo}</p></div>
                       ) : (
-                        <button onClick={() => { setTarget(van); setModal('assign'); }} className="flex items-center gap-1 text-xs text-[#1B2B6B] hover:underline font-medium"><UserCheck size={12} /> Assign</button>
+                        <button onClick={() => { setTarget(van); setModal('assign'); }} className="flex items-center gap-1 text-xs text-[#1B3B69] hover:underline font-medium"><UserCheck size={12} /> Assign</button>
                       )}
                     </td>
                     <td className="p-4">
@@ -899,7 +899,7 @@ export default function VansPage() {
                 <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1 || isFetching} className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40"><ChevronLeft size={14} /></button>
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                   const p = Math.max(1, Math.min(page - 2, totalPages - 4)) + i;
-                  return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition ${page === p ? 'bg-[#1B2B6B] text-white' : 'border border-gray-200 text-gray-600 hover:bg-gray-50'}`}>{p}</button>;
+                  return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition ${page === p ? 'bg-[#1B3B69] text-white' : 'border border-gray-200 text-gray-600 hover:bg-gray-50'}`}>{p}</button>;
                 })}
                 <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages || isFetching} className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40"><ChevronRight size={14} /></button>
               </div>

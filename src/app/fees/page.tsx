@@ -106,11 +106,11 @@ function RecordPaymentModal({ payment, onClose }: { payment: any; onClose: () =>
           </div>
           <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"><X size={16} /></button>
         </div>
-        <div className="p-4 bg-[#1B2B6B]/5 rounded-xl mb-5 border border-[#1B2B6B]/10">
+        <div className="p-4 bg-[#1B3B69]/5 rounded-xl mb-5 border border-[#1B3B69]/10">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-400">Amount Due</p>
-              <p className="text-2xl font-bold text-[#1B2B6B]">{formatCurrency(payment.amount, payment.currency)}</p>
+              <p className="text-2xl font-bold text-[#1B3B69]">{formatCurrency(payment.amount, payment.currency)}</p>
             </div>
             <div className="text-right">
               <p className="text-xs text-gray-400">Service</p>
@@ -125,7 +125,7 @@ function RecordPaymentModal({ payment, onClose }: { payment: any; onClose: () =>
             <div className="grid grid-cols-3 gap-2">
               {PAYMENT_METHODS.map(m => (
                 <button key={m.value} onClick={() => setMethod(m.value)}
-                  className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border-2 text-xs font-medium transition ${method === m.value ? 'border-[#1B2B6B] bg-[#1B2B6B]/5 text-[#1B2B6B]' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}>
+                  className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border-2 text-xs font-medium transition ${method === m.value ? 'border-[#1B3B69] bg-[#1B3B69]/5 text-[#1B3B69]' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}>
                   <m.icon size={16} />{m.label}
                 </button>
               ))}
@@ -134,7 +134,7 @@ function RecordPaymentModal({ payment, onClose }: { payment: any; onClose: () =>
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Notes (optional)</label>
             <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 resize-none"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 resize-none"
               placeholder="Add payment notes..." />
           </div>
           {error && <div className="flex items-center gap-2 p-3 bg-red-50 text-red-600 rounded-xl text-xs"><AlertCircle size={14} />{error}</div>}
@@ -142,7 +142,7 @@ function RecordPaymentModal({ payment, onClose }: { payment: any; onClose: () =>
         <div className="flex gap-3 mt-6">
           <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">Cancel</button>
           <button onClick={() => mutation.mutate()} disabled={mutation.isPending}
-            className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] disabled:opacity-50 flex items-center justify-center gap-2">
+            className="flex-1 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-medium hover:bg-[#162356] disabled:opacity-50 flex items-center justify-center gap-2">
             {mutation.isPending ? <RefreshCw size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
             {mutation.isPending ? 'Recording…' : 'Mark as Paid'}
           </button>
@@ -211,8 +211,8 @@ function FeeConfigModal({ existing, schoolId, defaultCurrency = 'PKR', onClose }
             <div className="grid grid-cols-3 gap-2">
               {SERVICE_TYPES.map(s => (
                 <button key={s.value} onClick={() => f('serviceType', s.value)}
-                  className={`p-3 rounded-xl border-2 text-left transition ${form.serviceType === s.value ? 'border-[#1B2B6B] bg-[#1B2B6B]/5' : 'border-gray-200 hover:border-gray-300'}`}>
-                  <p className={`text-xs font-semibold ${form.serviceType === s.value ? 'text-[#1B2B6B]' : 'text-gray-700'}`}>{s.label}</p>
+                  className={`p-3 rounded-xl border-2 text-left transition ${form.serviceType === s.value ? 'border-[#1B3B69] bg-[#1B3B69]/5' : 'border-gray-200 hover:border-gray-300'}`}>
+                  <p className={`text-xs font-semibold ${form.serviceType === s.value ? 'text-[#1B3B69]' : 'text-gray-700'}`}>{s.label}</p>
                   <p className="text-[10px] text-gray-400 mt-0.5">{s.desc}</p>
                 </button>
               ))}
@@ -226,14 +226,14 @@ function FeeConfigModal({ existing, schoolId, defaultCurrency = 'PKR', onClose }
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Currency</label>
                 <select value={form.currency} onChange={e => f('currency', e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white">
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white">
                   {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Billing Cycle</label>
                 <select value={form.billingCycle} onChange={e => f('billingCycle', e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white capitalize">
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white capitalize">
                   {BILLING_CYCLES.map(c => <option key={c} value={c} className="capitalize">{c.replace('_', ' ')}</option>)}
                 </select>
               </div>
@@ -242,26 +242,26 @@ function FeeConfigModal({ existing, schoolId, defaultCurrency = 'PKR', onClose }
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Pick & Drop Amount *</label>
                 <input type="number" value={form.amount} onChange={e => f('amount', e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white"
                   placeholder="e.g. 3000" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Pick Only</label>
                 <input type="number" value={form.pickOnlyAmount} onChange={e => f('pickOnlyAmount', e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white"
                   placeholder="e.g. 1800" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Drop Only</label>
                 <input type="number" value={form.dropOnlyAmount} onChange={e => f('dropOnlyAmount', e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white"
                   placeholder="e.g. 1800" />
               </div>
             </div>
             <div className="mt-3">
               <label className="block text-xs font-medium text-gray-600 mb-1">Description</label>
               <input value={form.description} onChange={e => f('description', e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white"
                 placeholder="e.g. Monthly transport fee - Gulshan Route" />
             </div>
           </div>
@@ -273,25 +273,25 @@ function FeeConfigModal({ existing, schoolId, defaultCurrency = 'PKR', onClose }
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Sibling Discount %</label>
                 <input type="number" min="0" max="100" value={form.siblingDiscountPercent} onChange={e => f('siblingDiscountPercent', e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white"
                   placeholder="e.g. 10" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Early Payment Discount %</label>
                 <input type="number" min="0" max="100" value={form.earlyPaymentDiscountPercent} onChange={e => f('earlyPaymentDiscountPercent', e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white"
                   placeholder="e.g. 5" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Early Payment Before Day</label>
                 <input type="number" min="1" max="31" value={form.earlyPaymentDeadlineDay} onChange={e => f('earlyPaymentDeadlineDay', e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white"
                   placeholder="5" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Late Payment Deadline Day</label>
                 <input type="number" min="1" max="31" value={form.lateFeeAfterDay} onChange={e => f('lateFeeAfterDay', e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white"
                   placeholder="10" />
               </div>
             </div>
@@ -303,7 +303,7 @@ function FeeConfigModal({ existing, schoolId, defaultCurrency = 'PKR', onClose }
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Late Fee Amount ({form.currency})</label>
               <input type="number" value={form.lateFeeAmount} onChange={e => f('lateFeeAmount', e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 bg-white"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white"
                 placeholder="e.g. 200" />
               <p className="text-xs text-gray-400 mt-1">Applied after day {form.lateFeeAfterDay} of each month</p>
             </div>
@@ -313,7 +313,7 @@ function FeeConfigModal({ existing, schoolId, defaultCurrency = 'PKR', onClose }
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Internal Notes</label>
             <textarea value={form.notes} onChange={e => f('notes', e.target.value)} rows={2}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 resize-none"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 resize-none"
               placeholder="Any internal notes about this fee structure..." />
           </div>
 
@@ -323,7 +323,7 @@ function FeeConfigModal({ existing, schoolId, defaultCurrency = 'PKR', onClose }
           <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">Cancel</button>
           <button onClick={() => { if (!form.amount) { setError('Base amount is required'); return; } setError(''); mutation.mutate(); }}
             disabled={mutation.isPending}
-            className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] disabled:opacity-50 flex items-center justify-center gap-2">
+            className="flex-1 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-medium hover:bg-[#162356] disabled:opacity-50 flex items-center justify-center gap-2">
             {mutation.isPending ? <RefreshCw size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
             {mutation.isPending ? 'Saving…' : existing ? 'Update Fee' : 'Save Fee Structure'}
           </button>
@@ -487,7 +487,7 @@ export default function FeesPage() {
               <RefreshCw size={14} /> Refresh
             </button>
             <button onClick={() => { setEditingFee(null); setShowFeeConfig(true); }}
-              className="flex items-center gap-2 px-4 py-2 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 bg-[#1B3B69] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition disabled:opacity-50"
               disabled={isProfileLoading}>
               {isProfileLoading ? <RefreshCw size={16} className="animate-spin" /> : <Plus size={16} />}
               {isProfileLoading ? 'Loading…' : 'Configure Fee'}
@@ -522,7 +522,7 @@ export default function FeesPage() {
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'Total Billed', value: formatCurrency(summary.totalCollected + summary.totalPending + summary.totalOverdue), sub: `${summary.total} students`, icon: DollarSign, color: 'text-[#1B2B6B]', light: 'bg-blue-50' },
+            { label: 'Total Billed', value: formatCurrency(summary.totalCollected + summary.totalPending + summary.totalOverdue), sub: `${summary.total} students`, icon: DollarSign, color: 'text-[#1B3B69]', light: 'bg-blue-50' },
             { label: 'Collected', value: formatCurrency(summary.totalCollected), sub: `${summary.paid} payments · ${summary.collectionRate}% rate`, icon: CheckCircle2, color: 'text-emerald-600', light: 'bg-emerald-50' },
             { label: 'Pending', value: formatCurrency(summary.totalPending), sub: `${summary.pending} students`, icon: Clock, color: 'text-amber-600', light: 'bg-amber-50' },
             { label: 'Overdue', value: formatCurrency(summary.totalOverdue), sub: `${summary.overdue} students`, icon: AlertCircle, color: 'text-red-600', light: 'bg-red-50' },
@@ -546,10 +546,10 @@ export default function FeesPage() {
         <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-semibold text-gray-700">Collection Rate — {month}</p>
-            <p className="text-sm font-bold text-[#1B2B6B]">{summary.collectionRate}%</p>
+            <p className="text-sm font-bold text-[#1B3B69]">{summary.collectionRate}%</p>
           </div>
           <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full bg-[#1B2B6B] rounded-full transition-all duration-700" style={{ width: `${summary.collectionRate}%` }} />
+            <div className="h-full bg-[#1B3B69] rounded-full transition-all duration-700" style={{ width: `${summary.collectionRate}%` }} />
           </div>
           <div className="flex items-center justify-between mt-2 text-xs text-gray-400">
             <span>{summary.paid} paid</span>
@@ -561,7 +561,7 @@ export default function FeesPage() {
         <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 w-fit">
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id as any)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${tab === t.id ? 'bg-white text-[#1B2B6B] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${tab === t.id ? 'bg-white text-[#1B3B69] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
               <t.icon size={14} />{t.label}
             </button>
           ))}
@@ -573,14 +573,14 @@ export default function FeesPage() {
             <div className="relative flex-1 min-w-[200px] max-w-sm">
               <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search student or parent…"
-                className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30" />
+                className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30" />
             </div>
             {tab === 'payments' && (
               <div className="flex items-center gap-2">
                 <Filter size={14} className="text-gray-400" />
                 {['', 'paid', 'pending', 'overdue'].map(s => (
                   <button key={s} onClick={() => setStatusFilter(s)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-full transition ${statusFilter === s ? 'bg-[#1B2B6B] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                    className={`px-3 py-1.5 text-xs font-medium rounded-full transition ${statusFilter === s ? 'bg-[#1B3B69] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
                     {s === '' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
                   </button>
                 ))}
@@ -609,7 +609,7 @@ export default function FeesPage() {
                         <m.icon size={14} className="text-gray-400 shrink-0" />
                         <span className="text-sm text-gray-600 w-24 capitalize">{m.label}</span>
                         <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-[#1B2B6B] rounded-full" style={{ width: `${pct}%` }} />
+                          <div className="h-full bg-[#1B3B69] rounded-full" style={{ width: `${pct}%` }} />
                         </div>
                         <span className="text-xs text-gray-400 w-8 text-right">{count}</span>
                       </div>
@@ -681,7 +681,7 @@ export default function FeesPage() {
                           <PayMethodBadge method={p.paymentMethod} />
                           {/* Paid by the parent in the app (Phase 3 online payments) */}
                           {p.collectedByType === 'online' && (
-                            <span className="ml-1 px-1.5 py-0.5 text-[9px] font-semibold rounded-full bg-[#1B2B6B] text-white">Online</span>
+                            <span className="ml-1 px-1.5 py-0.5 text-[9px] font-semibold rounded-full bg-[#1B3B69] text-white">Online</span>
                           )}
                         </td>
                         <td className="p-4"><StatusBadge status={p.status} /></td>
@@ -691,7 +691,7 @@ export default function FeesPage() {
                         <td className="p-4">
                           {p.status !== 'paid' && (
                             <button onClick={() => setSelectedPayment(p)}
-                              className="px-3 py-1.5 bg-[#1B2B6B] text-white text-xs font-medium rounded-lg hover:bg-[#162356] transition">
+                              className="px-3 py-1.5 bg-[#1B3B69] text-white text-xs font-medium rounded-lg hover:bg-[#162356] transition">
                               Collect
                             </button>
                           )}
@@ -731,7 +731,7 @@ export default function FeesPage() {
                       <tr key={u._id} className="border-b border-gray-50 hover:bg-gray-50/50 transition">
                         <td className="p-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] font-bold text-sm">
+                            <div className="w-8 h-8 rounded-full bg-[#1B3B69]/10 flex items-center justify-center text-[#1B3B69] font-bold text-sm">
                               {u.studentName?.[0]?.toUpperCase() || '?'}
                             </div>
                             <p className="text-sm font-medium text-gray-900">{u.studentName || '—'}</p>
@@ -757,7 +757,7 @@ export default function FeesPage() {
                         </td>
                         <td className="p-4">
                           <button onClick={() => setSelectedPayment(u)}
-                            className="px-3 py-1.5 bg-[#1B2B6B] text-white text-xs font-medium rounded-lg hover:bg-[#162356] transition">
+                            className="px-3 py-1.5 bg-[#1B3B69] text-white text-xs font-medium rounded-lg hover:bg-[#162356] transition">
                             Collect
                           </button>
                         </td>
@@ -776,7 +776,7 @@ export default function FeesPage() {
             <div className="flex items-center justify-between">
               <p className="text-sm text-gray-500">{(feeConfigs ?? []).length} fee structure{(feeConfigs ?? []).length !== 1 ? 's' : ''} configured</p>
               <button onClick={() => { setEditingFee(null); setShowFeeConfig(true); }}
-                className="flex items-center gap-2 px-4 py-2 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-[#1B3B69] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition disabled:opacity-50"
                 disabled={isProfileLoading}>
                 <Plus size={15} /> Add Fee Structure
               </button>
@@ -808,9 +808,9 @@ export default function FeesPage() {
                       </button>
                     </div>
                     <div className="grid grid-cols-3 gap-3">
-                      <div className="p-3 bg-[#1B2B6B]/5 rounded-xl text-center">
+                      <div className="p-3 bg-[#1B3B69]/5 rounded-xl text-center">
                         <p className="text-xs text-gray-400">Pick & Drop</p>
-                        <p className="text-lg font-bold text-[#1B2B6B]">{formatCurrency(fee.amount, fee.currency)}</p>
+                        <p className="text-lg font-bold text-[#1B3B69]">{formatCurrency(fee.amount, fee.currency)}</p>
                       </div>
                       {fee.pickOnlyAmount && (
                         <div className="p-3 bg-purple-50 rounded-xl text-center">

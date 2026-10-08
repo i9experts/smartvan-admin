@@ -41,7 +41,7 @@ const ACTION_META: Record<string, { icon: any; iconBg: string; iconText: string;
     describe: (l) => `Updated permissions (${(l.metadata?.newPermissions ?? []).join(', ')})`,
   },
   ticket_assigned: {
-    icon: Send, iconBg: 'bg-[#1B2B6B]/5', iconText: 'text-[#1B2B6B]',
+    icon: Send, iconBg: 'bg-[#1B3B69]/5', iconText: 'text-[#1B3B69]',
     describe: (l) => `Assigned a ticket to ${l.metadata?.employeeName ?? 'a team member'}`,
   },
 };
@@ -97,8 +97,8 @@ export default function AuditLogPage() {
         </div>
       ) : logs.length === 0 ? (
         <div className="bg-white rounded-xl p-14 text-center border border-gray-100">
-          <div className="w-12 h-12 rounded-full bg-[#1B2B6B]/5 flex items-center justify-center mx-auto mb-3.5">
-            <History size={20} className="text-[#1B2B6B]" />
+          <div className="w-12 h-12 rounded-full bg-[#1B3B69]/5 flex items-center justify-center mx-auto mb-3.5">
+            <History size={20} className="text-[#1B3B69]" />
           </div>
           <p className="text-[13.5px] font-medium text-gray-700">No activity yet</p>
         </div>

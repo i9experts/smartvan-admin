@@ -103,7 +103,7 @@ async function downloadPdf(schoolName: string, complaints: RegisterComplaint[]) 
 
   const doc = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'landscape' });
   const margin = 32;
-  const NAVY = '#1B2B6B';
+  const NAVY = '#1B3B69';
 
   doc.setTextColor(NAVY);
   doc.setFont('helvetica', 'bold');
@@ -206,7 +206,7 @@ export default function ComplaintRegisterPage() {
           <button
             onClick={() => downloadCsv(schoolName, complaints)}
             disabled={isLoading || complaints.length === 0}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#1B3B69] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition disabled:opacity-50"
           >
             <FileSpreadsheet size={16} />
             Download CSV
@@ -215,7 +215,7 @@ export default function ComplaintRegisterPage() {
       </div>
 
       <div className="hidden print:block mb-4">
-        <h1 className="text-xl font-bold text-[#1B2B6B]">{schoolName || 'SmartVan'}</h1>
+        <h1 className="text-xl font-bold text-[#1B3B69]">{schoolName || 'SmartVan'}</h1>
         <p className="text-sm text-gray-600">Complaints &amp; Issues Register · Generated {generatedOn} · {complaints.length} records</p>
       </div>
 

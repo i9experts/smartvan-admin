@@ -301,11 +301,11 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
         <div className="space-y-3">
           <div className="flex justify-center mb-1">
             <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center overflow-hidden">
+              <div className="w-20 h-20 rounded-full bg-[#1B3B69]/10 flex items-center justify-center overflow-hidden">
                 {form.image ? (
                   <img src={form.image} alt="Student" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-2xl font-semibold text-[#1B2B6B]">
+                  <span className="text-2xl font-semibold text-[#1B3B69]">
                     {form.fullname?.charAt(0)?.toUpperCase() ?? '?'}
                   </span>
                 )}
@@ -323,7 +323,7 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
               />
               <label
                 htmlFor="student-photo-input"
-                className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#1B2B6B] rounded-full flex items-center justify-center shadow-md cursor-pointer">
+                className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#1B3B69] rounded-full flex items-center justify-center shadow-md cursor-pointer">
                 {isUploadingPhoto ? (
                   <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
@@ -337,7 +337,7 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
             <input
               value={form.fullname}
               onChange={(e) => setForm((f) => ({ ...f, fullname: e.target.value }))}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               placeholder="e.g. Ahmed Khan"
             />
           </div>
@@ -348,7 +348,7 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
               <select
                 value={form.grade}
                 onChange={(e) => setForm((f) => ({ ...f, grade: e.target.value }))}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               >
                 <option value="">Select</option>
                 {GRADE_LEVELS.map((g) => (
@@ -361,7 +361,7 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
               <select
                 value={form.gender}
                 onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               >
                 <option value="">Select</option>
                 <option value="male">Male</option>
@@ -379,7 +379,7 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
                 max={20}
                 value={form.age}
                 onChange={(e) => setForm((f) => ({ ...f, age: e.target.value }))}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
                 placeholder="e.g. 10"
               />
             </div>
@@ -389,7 +389,7 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
                 type="date"
                 value={form.dob}
                 onChange={(e) => setForm((f) => ({ ...f, dob: e.target.value }))}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               />
             </div>
           </div>
@@ -399,8 +399,8 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
             <button
               type="button"
               onClick={() => setShowMapPicker(true)}
-              className="w-full flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-left hover:border-[#1B2B6B]/40 transition">
-              <MapPin size={15} className={form.homeAddress ? 'text-[#1B2B6B]' : 'text-gray-400'} />
+              className="w-full flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-left hover:border-[#1B3B69]/40 transition">
+              <MapPin size={15} className={form.homeAddress ? 'text-[#1B3B69]' : 'text-gray-400'} />
               <span className={form.homeAddress ? 'text-gray-800 truncate' : 'text-gray-400'}>
                 {form.homeAddress || 'Tap to pick location on map'}
               </span>
@@ -419,7 +419,7 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
                 type="email"
                 value={form.parentEmail}
                 onChange={(e) => setForm((f) => ({ ...f, parentEmail: e.target.value }))}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
                 placeholder="parent@example.com"
               />
               <p className="text-xs text-gray-400 mt-1">
@@ -433,7 +433,7 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
                   type="tel"
                   value={form.parentPhone}
                   onChange={(e) => setForm((f) => ({ ...f, parentPhone: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
                   placeholder="e.g. 03001234567"
                 />
                 <p className="text-xs text-gray-400 mt-1">
@@ -461,7 +461,7 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
           <button
             onClick={handleSubmit}
             disabled={isLoading}
-            className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
+            className="flex-1 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
           >
             {isLoading ? 'Saving…' : mode === 'add' ? 'Add Student' : 'Save Changes'}
           </button>
@@ -472,7 +472,7 @@ function StudentModal({ mode, student, onClose, onSuccess }: StudentModalProps) 
         <Suspense fallback={
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50">
             <div className="bg-white rounded-2xl p-8 flex items-center gap-3">
-              <Loader2 size={24} className="animate-spin text-[#1B2B6B]" />
+              <Loader2 size={24} className="animate-spin text-[#1B3B69]" />
               <span className="text-sm font-medium text-gray-700">Loading map…</span>
             </div>
           </div>
@@ -592,8 +592,8 @@ function AssignVanModal({ student, onClose, onSuccess }: { student: any; onClose
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#1B2B6B]/10 rounded-xl flex items-center justify-center">
-              <Bus size={18} className="text-[#1B2B6B]" />
+            <div className="w-9 h-9 bg-[#1B3B69]/10 rounded-xl flex items-center justify-center">
+              <Bus size={18} className="text-[#1B3B69]" />
             </div>
             <div>
               <h2 className="text-lg font-bold text-gray-900">Van & Route Assignment</h2>
@@ -611,7 +611,7 @@ function AssignVanModal({ student, onClose, onSuccess }: { student: any; onClose
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition ${tab === t ? 'border-[#1B2B6B] text-[#1B2B6B]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition ${tab === t ? 'border-[#1B3B69] text-[#1B3B69]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
             >
               {t === 'current' ? `Current Routes (${studentRoutes.length})` : t === 'van' ? 'Assign Van' : 'Assign New Route'}
             </button>
@@ -640,7 +640,7 @@ function AssignVanModal({ student, onClose, onSuccess }: { student: any; onClose
                         onClick={() => setSelectedVanId(item.van?.id)}
                         className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition ${
                           selectedVanId === item.van?.id
-                            ? 'border-[#1B2B6B] bg-[#1B2B6B]/5'
+                            ? 'border-[#1B3B69] bg-[#1B3B69]/5'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
@@ -651,7 +651,7 @@ function AssignVanModal({ student, onClose, onSuccess }: { student: any; onClose
                           </p>
                         </div>
                         {selectedVanId === item.van?.id && (
-                          <div className="w-5 h-5 rounded-full bg-[#1B2B6B] flex items-center justify-center shrink-0">
+                          <div className="w-5 h-5 rounded-full bg-[#1B3B69] flex items-center justify-center shrink-0">
                             <CheckCircle2 size={12} className="text-white" />
                           </div>
                         )}
@@ -668,7 +668,7 @@ function AssignVanModal({ student, onClose, onSuccess }: { student: any; onClose
                 <button
                   onClick={handleAssignVan}
                   disabled={vanLoading || !selectedVanId}
-                  className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
+                  className="flex-1 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
                 >
                   {vanLoading ? 'Assigning...' : 'Assign Van'}
                 </button>
@@ -679,7 +679,7 @@ function AssignVanModal({ student, onClose, onSuccess }: { student: any; onClose
               <div className="text-center py-8 text-gray-400">
                 <Bus size={32} className="mx-auto mb-2 opacity-30" />
                 <p className="text-sm">No routes assigned yet</p>
-                <button onClick={() => setTab('assign')} className="mt-3 text-xs text-[#1B2B6B] font-medium hover:underline">
+                <button onClick={() => setTab('assign')} className="mt-3 text-xs text-[#1B3B69] font-medium hover:underline">
                   Assign to a route →
                 </button>
               </div>
@@ -717,7 +717,7 @@ function AssignVanModal({ student, onClose, onSuccess }: { student: any; onClose
                         onClick={() => setSelectedRouteId(route._id)}
                         className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition ${
                           selectedRouteId === route._id
-                            ? 'border-[#1B2B6B] bg-[#1B2B6B]/5'
+                            ? 'border-[#1B3B69] bg-[#1B3B69]/5'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
@@ -728,7 +728,7 @@ function AssignVanModal({ student, onClose, onSuccess }: { student: any; onClose
                           </p>
                         </div>
                         {selectedRouteId === route._id && (
-                          <div className="w-5 h-5 rounded-full bg-[#1B2B6B] flex items-center justify-center shrink-0">
+                          <div className="w-5 h-5 rounded-full bg-[#1B3B69] flex items-center justify-center shrink-0">
                             <CheckCircle2 size={12} className="text-white" />
                           </div>
                         )}
@@ -745,7 +745,7 @@ function AssignVanModal({ student, onClose, onSuccess }: { student: any; onClose
                 <button
                   onClick={handleAssign}
                   disabled={loading || !selectedRouteId}
-                  className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
+                  className="flex-1 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
                 >
                   {loading ? 'Assigning...' : 'Assign to Route'}
                 </button>
@@ -952,21 +952,21 @@ function BulkUploadModal({ onClose, onSuccess }: { onClose: () => void; onSucces
             <div className="space-y-4">
               <button
                 onClick={downloadTemplate}
-                className="w-full flex items-center justify-between p-4 border border-dashed border-[#1B2B6B]/30 rounded-xl hover:bg-[#1B2B6B]/5 transition text-left"
+                className="w-full flex items-center justify-between p-4 border border-dashed border-[#1B3B69]/30 rounded-xl hover:bg-[#1B3B69]/5 transition text-left"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#1B2B6B]/10 flex items-center justify-center">
-                    <FileSpreadsheet size={18} className="text-[#1B2B6B]" />
+                  <div className="w-10 h-10 rounded-lg bg-[#1B3B69]/10 flex items-center justify-center">
+                    <FileSpreadsheet size={18} className="text-[#1B3B69]" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">Download template</p>
                     <p className="text-xs text-gray-400">Start with the correct column headers</p>
                   </div>
                 </div>
-                <Download size={16} className="text-[#1B2B6B]" />
+                <Download size={16} className="text-[#1B3B69]" />
               </button>
 
-              <label className="flex flex-col items-center justify-center gap-2 p-10 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-[#1B2B6B]/40 hover:bg-gray-50 transition">
+              <label className="flex flex-col items-center justify-center gap-2 p-10 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-[#1B3B69]/40 hover:bg-gray-50 transition">
                 <Upload size={28} className="text-gray-400" />
                 <p className="text-sm font-medium text-gray-700">Click to upload a .xlsx or .csv file</p>
                 <p className="text-xs text-gray-400">Up to 500 students per upload</p>
@@ -1115,14 +1115,14 @@ function BulkUploadModal({ onClose, onSuccess }: { onClose: () => void; onSucces
               <button
                 onClick={handleSubmit}
                 disabled={validRows.length === 0 || isSubmitting}
-                className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
+                className="flex-1 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
               >
                 {isSubmitting ? 'Uploading…' : `Upload ${validRows.length} Student${validRows.length !== 1 ? 's' : ''}`}
               </button>
             </>
           )}
           {step === 'results' && (
-            <button onClick={onClose} className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition">
+            <button onClick={onClose} className="flex-1 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition">
               Done
             </button>
           )}
@@ -1275,7 +1275,7 @@ export default function StudentsPage() {
             </button>
             <button
               onClick={() => setModal('add')}
-              className="flex items-center gap-2 px-4 py-2.5 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"
+              className="flex items-center gap-2 px-4 py-2.5 bg-[#1B3B69] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"
             >
               <Plus size={16} />
               Add Student
@@ -1291,7 +1291,7 @@ export default function StudentsPage() {
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               placeholder="Search student, parent, driver or van…"
-              className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -1302,7 +1302,7 @@ export default function StudentsPage() {
                 onClick={() => { setStatusFilter(s); setPage(1); }}
                 className={`px-3 py-1.5 text-xs font-medium rounded-full transition ${
                   statusFilter === s
-                    ? 'bg-[#1B2B6B] text-white'
+                    ? 'bg-[#1B3B69] text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -1314,8 +1314,8 @@ export default function StudentsPage() {
 
         {/* Bulk Actions */}
         {selected.size > 0 && (
-          <div className="flex items-center gap-3 p-3 bg-[#1B2B6B]/5 rounded-xl">
-            <span className="text-sm font-medium text-[#1B2B6B]">
+          <div className="flex items-center gap-3 p-3 bg-[#1B3B69]/5 rounded-xl">
+            <span className="text-sm font-medium text-[#1B3B69]">
               {selected.size} selected
             </span>
             <div className="flex gap-2 ml-auto">
@@ -1413,7 +1413,7 @@ export default function StudentsPage() {
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] font-semibold text-sm shrink-0 overflow-hidden">
+                          <div className="w-9 h-9 rounded-full bg-[#1B3B69]/10 flex items-center justify-center text-[#1B3B69] font-semibold text-sm shrink-0 overflow-hidden">
                             {student.image ? (
                               <img src={student.image} alt={student.fullname} className="w-full h-full object-cover" />
                             ) : (
@@ -1513,7 +1513,7 @@ export default function StudentsPage() {
                       onClick={() => setPage(p)}
                       className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition ${
                         page === p
-                          ? 'bg-[#1B2B6B] text-white'
+                          ? 'bg-[#1B3B69] text-white'
                           : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
                       }`}
                     >

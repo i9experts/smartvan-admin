@@ -106,7 +106,7 @@ function VanDetailDrawer({ van, onClose }: { van: VanItem; onClose: () => void }
     <div className="fixed inset-0 z-50 flex">
       <div className="flex-1 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <div className="w-full max-w-md bg-white shadow-2xl overflow-y-auto flex flex-col">
-        <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-[#1B2B6B] to-[#2d3d7a]">
+        <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-[#1B3B69] to-[#2d3d7a]">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
@@ -164,7 +164,7 @@ function VanDetailDrawer({ van, onClose }: { van: VanItem; onClose: () => void }
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Assigned Driver</p>
             {van.driver?.id ? (
               <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                <div className="w-10 h-10 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] font-bold">{van.driver.fullname?.[0]?.toUpperCase()}</div>
+                <div className="w-10 h-10 rounded-full bg-[#1B3B69]/10 flex items-center justify-center text-[#1B3B69] font-bold">{van.driver.fullname?.[0]?.toUpperCase()}</div>
                 <div>
                   <p className="text-sm font-medium text-gray-900">{van.driver.fullname}</p>
                   <p className="text-xs text-gray-400 flex items-center gap-1"><Phone size={10} />{van.driver.phoneNo}</p>
@@ -184,7 +184,7 @@ function VanDetailDrawer({ van, onClose }: { van: VanItem; onClose: () => void }
               <div className="space-y-2">
                 {van.routes.map(r => (
                   <div key={r.id} className="flex items-center gap-2 p-2.5 bg-gray-50 rounded-lg">
-                    <MapPin size={12} className="text-[#1B2B6B] shrink-0" />
+                    <MapPin size={12} className="text-[#1B3B69] shrink-0" />
                     <span className="text-sm text-gray-700 flex-1 truncate">{r.title}</span>
                     <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${r.tripType === 'pick' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>{r.tripType}</span>
                   </div>
@@ -284,7 +284,7 @@ function VanCard({ van, onClick }: { van: VanItem; onClick: () => void }) {
         <div className="flex items-center gap-2 mb-2">
           {van.driver?.id ? (
             <>
-              <div className="w-5 h-5 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] text-[9px] font-bold shrink-0">{van.driver.fullname?.[0]?.toUpperCase()}</div>
+              <div className="w-5 h-5 rounded-full bg-[#1B3B69]/10 flex items-center justify-center text-[#1B3B69] text-[9px] font-bold shrink-0">{van.driver.fullname?.[0]?.toUpperCase()}</div>
               <span className="text-xs text-gray-600 truncate">{van.driver.fullname}</span>
               <BadgeCheck size={12} className="text-emerald-500 shrink-0 ml-auto" />
             </>
@@ -360,7 +360,7 @@ export default function FleetPage() {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'Total Fleet', value: stats.total, sub: `${stats.active} active`, icon: Bus, light: 'bg-blue-50', text: 'text-[#1B2B6B]' },
+            { label: 'Total Fleet', value: stats.total, sub: `${stats.active} active`, icon: Bus, light: 'bg-blue-50', text: 'text-[#1B3B69]' },
             { label: 'Fleet Health', value: `${stats.avgHealth}%`, sub: 'Average score', icon: Activity, light: 'bg-emerald-50', text: 'text-emerald-600' },
             { label: 'Critical Vans', value: stats.critical, sub: 'Need attention', icon: AlertTriangle, light: 'bg-red-50', text: 'text-red-600' },
             { label: 'Doc Issues', value: stats.overdue + stats.expiringSoon, sub: `${stats.overdue} expired · ${stats.expiringSoon} soon`, icon: FileText, light: 'bg-amber-50', text: 'text-amber-600' },
@@ -404,17 +404,17 @@ export default function FleetPage() {
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[220px] max-w-sm">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by plate, type or driver…" className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by plate, type or driver…" className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30" />
           </div>
           <div className="flex items-center gap-2">
             <Filter size={14} className="text-gray-400" />
             {([{key:'all',label:'All'},{key:'active',label:'Active'},{key:'inactive',label:'Inactive'},{key:'critical',label:'⚠ Critical'},{key:'overdue',label:'📄 Overdue'}] as const).map(f => (
-              <button key={f.key} onClick={() => setFilter(f.key)} className={`px-3 py-1.5 text-xs font-medium rounded-full transition ${filter===f.key?'bg-[#1B2B6B] text-white':'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{f.label}</button>
+              <button key={f.key} onClick={() => setFilter(f.key)} className={`px-3 py-1.5 text-xs font-medium rounded-full transition ${filter===f.key?'bg-[#1B3B69] text-white':'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{f.label}</button>
             ))}
           </div>
           <div className="ml-auto flex items-center gap-1 border border-gray-200 rounded-lg p-1">
-            <button onClick={() => setView('grid')} className={`p-1.5 rounded-md transition ${view==='grid'?'bg-[#1B2B6B] text-white':'text-gray-400 hover:text-gray-600'}`}><BarChart3 size={14} /></button>
-            <button onClick={() => setView('list')} className={`p-1.5 rounded-md transition ${view==='list'?'bg-[#1B2B6B] text-white':'text-gray-400 hover:text-gray-600'}`}><Filter size={14} /></button>
+            <button onClick={() => setView('grid')} className={`p-1.5 rounded-md transition ${view==='grid'?'bg-[#1B3B69] text-white':'text-gray-400 hover:text-gray-600'}`}><BarChart3 size={14} /></button>
+            <button onClick={() => setView('list')} className={`p-1.5 rounded-md transition ${view==='list'?'bg-[#1B3B69] text-white':'text-gray-400 hover:text-gray-600'}`}><Filter size={14} /></button>
           </div>
         </div>
 

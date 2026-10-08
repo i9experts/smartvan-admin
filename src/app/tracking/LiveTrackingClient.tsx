@@ -132,8 +132,8 @@ function markerIcon(color: string, selected: boolean): any {
         <rect x="0" y="0" width="21" height="14" rx="3"/>
         <rect x="2.5" y="2.5" width="6" height="4.5" rx="1" fill="${color}"/>
         <rect x="10" y="2.5" width="6" height="4.5" rx="1" fill="${color}"/>
-        <circle cx="5" cy="16.5" r="2.3" fill="${color === '#FFB800' ? '#1B2B6B' : '#FFB800'}"/>
-        <circle cx="16" cy="16.5" r="2.3" fill="${color === '#FFB800' ? '#1B2B6B' : '#FFB800'}"/>
+        <circle cx="5" cy="16.5" r="2.3" fill="${color === '#FFB800' ? '#1B3B69' : '#FFB800'}"/>
+        <circle cx="16" cy="16.5" r="2.3" fill="${color === '#FFB800' ? '#1B3B69' : '#FFB800'}"/>
       </g>
     </svg>
   `.trim();
@@ -212,7 +212,7 @@ function GoogleTrackingMap({ trips, selectedTripId, onSelectTrip }: GoogleTracki
       seen.add(trip._id);
       const position = { lat: loc.lat, lng: loc.long };
       const isSelected = selectedTripId === trip._id;
-      const color = isSelected ? '#FFB800' : '#1B2B6B';
+      const color = isSelected ? '#FFB800' : '#1B3B69';
 
       let marker = markersRef.current.get(trip._id);
       if (!marker) {
@@ -306,17 +306,17 @@ function TripItem({
       onClick={onClick}
       className={`w-full text-left p-3 rounded-xl transition-all ${
         isSelected
-          ? 'bg-[#1B2B6B] text-white shadow-md shadow-blue-900/20'
+          ? 'bg-[#1B3B69] text-white shadow-md shadow-blue-900/20'
           : 'hover:bg-gray-50 border border-gray-100'
       }`}
     >
       <div className="flex items-center gap-3">
         <div
           className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-            isSelected ? 'bg-white/20' : 'bg-[#1B2B6B]/10'
+            isSelected ? 'bg-white/20' : 'bg-[#1B3B69]/10'
           }`}
         >
-          <Bus size={18} className={isSelected ? 'text-white' : 'text-[#1B2B6B]'} />
+          <Bus size={18} className={isSelected ? 'text-white' : 'text-[#1B3B69]'} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
@@ -472,9 +472,9 @@ export default function LiveTrackingClient() {
         <div className="w-80 flex flex-col border-r border-gray-100 bg-white">
           {/* Stats */}
           <div className="grid grid-cols-2 gap-2 p-4 border-b border-gray-100">
-            <div className="p-3 bg-[#1B2B6B]/5 rounded-xl text-center">
+            <div className="p-3 bg-[#1B3B69]/5 rounded-xl text-center">
               <p className="text-xs text-gray-500 mb-1">Active Trips</p>
-              <p className="text-2xl font-bold text-[#1B2B6B]">{trips.length}</p>
+              <p className="text-2xl font-bold text-[#1B3B69]">{trips.length}</p>
             </div>
             <div className="p-3 bg-emerald-50 rounded-xl text-center">
               <p className="text-xs text-gray-500 mb-1">Live Now</p>
@@ -522,7 +522,7 @@ export default function LiveTrackingClient() {
             <div className="absolute bottom-4 right-4 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 w-72">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-[#1B2B6B] rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-[#1B3B69] rounded-lg flex items-center justify-center">
                     <Bus size={16} className="text-white" />
                   </div>
                   <div>
@@ -573,7 +573,7 @@ export default function LiveTrackingClient() {
                 <span className="text-xs text-gray-500">
                   {selectedTrip.kidCount ?? '?'} students on board
                 </span>
-                <span className="ml-auto text-xs font-medium text-[#1B2B6B] capitalize">
+                <span className="ml-auto text-xs font-medium text-[#1B3B69] capitalize">
                   {selectedTrip.status}
                 </span>
               </div>

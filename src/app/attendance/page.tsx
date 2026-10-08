@@ -81,7 +81,7 @@ function Avatar({ name, image, size = 36 }: { name: string; image?: string | nul
     />
   );
   return (
-    <div className="rounded-full bg-[#1B2B6B] flex items-center justify-center text-white font-bold flex-shrink-0"
+    <div className="rounded-full bg-[#1B3B69] flex items-center justify-center text-white font-bold flex-shrink-0"
       style={{ width: size, height: size, fontSize: size * 0.38 }}>
       {name?.[0]?.toUpperCase() || '?'}
     </div>
@@ -220,7 +220,7 @@ export default function AttendancePage() {
       const margin = 40;
       let y = 50;
 
-      const NAVY = '#1B2B6B';
+      const NAVY = '#1B3B69';
       const YELLOW = '#FFB800';
       const GREEN = '#10b981';
       const AMBER = '#f59e0b';
@@ -372,21 +372,21 @@ export default function AttendancePage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#1B2B6B]">Attendance</h1>
+          <h1 className="text-2xl font-bold text-[#1B3B69]">Attendance</h1>
           <p className="text-gray-500 text-sm mt-1">Auto-generated from van pickup & drop logs</p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={exportPDF}
             disabled={!report || loading || isGeneratingPdf}
-            className="flex items-center gap-2 px-4 py-2 bg-[#FFB800] text-[#1B2B6B] rounded-xl text-sm font-semibold hover:bg-[#e6a600] transition-colors disabled:opacity-40"
+            className="flex items-center gap-2 px-4 py-2 bg-[#FFB800] text-[#1B3B69] rounded-xl text-sm font-semibold hover:bg-[#e6a600] transition-colors disabled:opacity-40"
           >
             <Download size={15} /> {isGeneratingPdf ? 'Generating…' : 'Follow-Up Report (PDF)'}
           </button>
           <button
             onClick={exportCSV}
             disabled={!report || loading}
-            className="flex items-center gap-2 px-4 py-2 bg-[#1B2B6B] text-white rounded-xl text-sm font-semibold hover:bg-[#111d4a] transition-colors disabled:opacity-40"
+            className="flex items-center gap-2 px-4 py-2 bg-[#1B3B69] text-white rounded-xl text-sm font-semibold hover:bg-[#111d4a] transition-colors disabled:opacity-40"
           >
             <Download size={15} /> Export CSV
           </button>
@@ -404,7 +404,7 @@ export default function AttendancePage() {
             onClick={() => setTab(t.key as any)}
             className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
               tab === t.key
-                ? 'bg-[#1B2B6B] text-white shadow-sm'
+                ? 'bg-[#1B3B69] text-white shadow-sm'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -453,7 +453,7 @@ export default function AttendancePage() {
           {report && (
             <div className="grid grid-cols-4 gap-4 mb-5">
               {[
-                { label: 'Total Students', value: report.totalStudents, color: '#1B2B6B', icon: <Users size={18} /> },
+                { label: 'Total Students', value: report.totalStudents, color: '#1B3B69', icon: <Users size={18} /> },
                 { label: 'Present', value: report.present, color: '#10b981', icon: <CheckCircle2 size={18} /> },
                 { label: 'Late', value: report.late, color: '#f59e0b', icon: <Clock size={18} /> },
                 { label: 'Absent', value: report.absent, color: '#ef4444', icon: <XCircle size={18} /> },
@@ -584,7 +584,7 @@ export default function AttendancePage() {
                                 href={`https://maps.google.com/?q=${r.pickupLat},${r.pickupLng}`}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="flex items-center gap-1 text-xs text-[#1B2B6B] hover:underline"
+                                className="flex items-center gap-1 text-xs text-[#1B3B69] hover:underline"
                               >
                                 <MapPin size={12} /> View Map
                               </a>
@@ -597,7 +597,7 @@ export default function AttendancePage() {
                             <button
                               onClick={() => viewStudentHistory(r.kidId)}
                               title="View attendance history"
-                              className="flex items-center gap-1 text-xs font-medium text-[#1B2B6B] hover:underline"
+                              className="flex items-center gap-1 text-xs font-medium text-[#1B3B69] hover:underline"
                             >
                               <History size={13} /> History
                             </button>
@@ -630,7 +630,7 @@ export default function AttendancePage() {
                   placeholder="Student ID"
                   value={kidId}
                   onChange={e => setKidId(e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-[#1B2B6B]"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-[#1B3B69]"
                 />
               </div>
               <div>
@@ -639,7 +639,7 @@ export default function AttendancePage() {
                   type="date"
                   value={startDate}
                   onChange={e => setStartDate(e.target.value)}
-                  className="border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-[#1B2B6B]"
+                  className="border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-[#1B3B69]"
                 />
               </div>
               <div>
@@ -648,13 +648,13 @@ export default function AttendancePage() {
                   type="date"
                   value={endDate}
                   onChange={e => setEndDate(e.target.value)}
-                  className="border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-[#1B2B6B]"
+                  className="border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-[#1B3B69]"
                 />
               </div>
               <button
                 onClick={() => fetchStudentHistory()}
                 disabled={studentLoading}
-                className="px-5 py-2 bg-[#1B2B6B] text-white rounded-xl text-sm font-semibold hover:bg-[#111d4a] transition-colors disabled:opacity-50"
+                className="px-5 py-2 bg-[#1B3B69] text-white rounded-xl text-sm font-semibold hover:bg-[#111d4a] transition-colors disabled:opacity-50"
               >
                 {studentLoading ? 'Loading…' : 'Search'}
               </button>
@@ -674,13 +674,13 @@ export default function AttendancePage() {
                 <div className="flex items-center gap-4">
                   <Avatar name={studentHistory.kid.fullname} image={studentHistory.kid.image} size={52} />
                   <div className="flex-1">
-                    <h2 className="text-lg font-bold text-[#1B2B6B]">{studentHistory.kid.fullname}</h2>
+                    <h2 className="text-lg font-bold text-[#1B3B69]">{studentHistory.kid.fullname}</h2>
                     <p className="text-xs text-gray-400 mt-0.5">
                       {studentHistory.period.from} → {studentHistory.period.to}
                     </p>
                   </div>
                   <div className="text-right">
-                    <div className="text-3xl font-bold text-[#1B2B6B]">
+                    <div className="text-3xl font-bold text-[#1B3B69]">
                       {studentHistory.summary.attendanceRate}%
                     </div>
                     <div className="text-xs text-gray-400">Attendance Rate</div>
@@ -690,7 +690,7 @@ export default function AttendancePage() {
                 {/* Summary stats */}
                 <div className="grid grid-cols-3 gap-3 mt-4">
                   {[
-                    { label: 'Total Days', value: studentHistory.summary.totalDays, color: '#1B2B6B' },
+                    { label: 'Total Days', value: studentHistory.summary.totalDays, color: '#1B3B69' },
                     { label: 'Present', value: studentHistory.summary.presentDays, color: '#10b981' },
                     { label: 'Absent', value: studentHistory.summary.absentDays, color: '#ef4444' },
                   ].map(s => (

@@ -15,7 +15,7 @@ const config: Config = {
           yellow: "#FFB800",
           "yellow-light": "#FFF8E6",
           "yellow-dark": "#CC9200",
-          navy: "#1B2B6B",
+          navy: "#1B3B69",
           "navy-light": "#EEF0F8",
           teal: "#00C48C",
           "teal-light": "#E6FAF4",
@@ -38,7 +38,7 @@ const config: Config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#1B2B6B",
+          DEFAULT: "#1B3B69",
           foreground: "#FFFFFF",
         },
         secondary: {

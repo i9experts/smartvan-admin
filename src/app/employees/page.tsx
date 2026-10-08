@@ -80,7 +80,7 @@ function AddEmployeeModal({ availablePermissions, onClose, onSuccess }: { availa
           <button
             onClick={() => { setError(''); mutation.mutate(); }}
             disabled={mutation.isPending || !name || !email || !password}
-            className="w-full py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-semibold disabled:opacity-50"
+            className="w-full py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-semibold disabled:opacity-50"
           >
             {mutation.isPending ? 'Creating…' : 'Create Employee'}
           </button>
@@ -124,7 +124,7 @@ export default function EmployeesPage() {
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-[#1B2B6B] text-white rounded-xl text-sm font-semibold"
+          className="flex items-center gap-2 px-4 py-2 bg-[#1B3B69] text-white rounded-xl text-sm font-semibold"
         >
           <UserPlus size={16} /> Add Employee
         </button>

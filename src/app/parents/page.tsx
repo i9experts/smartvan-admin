@@ -65,7 +65,7 @@ function ParentDetailDrawer({
           <div className="flex items-center gap-1.5">
             <button
               onClick={onEdit}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#1B2B6B] border border-[#1B2B6B]/20 rounded-lg hover:bg-[#1B2B6B]/5 transition"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#1B3B69] border border-[#1B3B69]/20 rounded-lg hover:bg-[#1B3B69]/5 transition"
             >
               <Pencil size={12} /> Edit
             </button>
@@ -77,7 +77,7 @@ function ParentDetailDrawer({
 
         {/* Avatar + name */}
         <div className="flex flex-col items-center pt-8 pb-6 px-5 border-b border-gray-100">
-          <div className="w-20 h-20 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] text-3xl font-bold mb-3 overflow-hidden">
+          <div className="w-20 h-20 rounded-full bg-[#1B3B69]/10 flex items-center justify-center text-[#1B3B69] text-3xl font-bold mb-3 overflow-hidden">
             {parent.image ? (
               <img src={parent.image} alt={parent.fullname} className="w-full h-full object-cover" />
             ) : (
@@ -87,7 +87,7 @@ function ParentDetailDrawer({
           <h3 className="text-xl font-bold text-gray-900">{parent.fullname ?? 'Unknown Parent'}</h3>
           <p className="text-sm text-gray-400 mt-1">{parent.email}</p>
           <div className="flex items-center gap-2 mt-3">
-            <span className="px-3 py-1 bg-[#1B2B6B]/10 text-[#1B2B6B] text-xs font-medium rounded-full">
+            <span className="px-3 py-1 bg-[#1B3B69]/10 text-[#1B3B69] text-xs font-medium rounded-full">
               {parent.kids.length} student{parent.kids.length !== 1 ? 's' : ''}
             </span>
             <span className="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-full">
@@ -143,7 +143,7 @@ function ParentDetailDrawer({
           <div className="space-y-2">
             {parent.kids.map(kid => (
               <div key={kid._id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                <div className="w-8 h-8 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] font-semibold text-xs shrink-0">
+                <div className="w-8 h-8 rounded-full bg-[#1B3B69]/10 flex items-center justify-center text-[#1B3B69] font-semibold text-xs shrink-0">
                   {kid.fullname?.charAt(0)?.toUpperCase() ?? '?'}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -237,12 +237,12 @@ function EditParentModal({
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="flex justify-center mb-1">
             <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center overflow-hidden">
+              <div className="w-20 h-20 rounded-full bg-[#1B3B69]/10 flex items-center justify-center overflow-hidden">
                 {form.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={form.image} alt="Parent" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-2xl font-semibold text-[#1B2B6B]">
+                  <span className="text-2xl font-semibold text-[#1B3B69]">
                     {(form.fullname || form.email).charAt(0).toUpperCase()}
                   </span>
                 )}
@@ -259,7 +259,7 @@ function EditParentModal({
               />
               <label
                 htmlFor="parent-photo-input"
-                className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#1B2B6B] rounded-full flex items-center justify-center shadow-md cursor-pointer"
+                className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#1B3B69] rounded-full flex items-center justify-center shadow-md cursor-pointer"
               >
                 {isUploadingPhoto ? (
                   <Loader2 size={12} className="text-white animate-spin" />
@@ -275,7 +275,7 @@ function EditParentModal({
             <input
               value={form.fullname}
               onChange={(e) => setForm((f) => ({ ...f, fullname: e.target.value }))}
-              className="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              className="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
             />
           </div>
           <div>
@@ -284,7 +284,7 @@ function EditParentModal({
               type="email"
               value={form.email}
               onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-              className="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              className="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -293,7 +293,7 @@ function EditParentModal({
               <input
                 value={form.phoneNo}
                 onChange={(e) => setForm((f) => ({ ...f, phoneNo: e.target.value }))}
-                className="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               />
             </div>
             <div>
@@ -301,7 +301,7 @@ function EditParentModal({
               <input
                 value={form.alternatePhoneNo}
                 onChange={(e) => setForm((f) => ({ ...f, alternatePhoneNo: e.target.value }))}
-                className="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               />
             </div>
           </div>
@@ -310,7 +310,7 @@ function EditParentModal({
             <input
               value={form.address}
               onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
-              className="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              className="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
             />
           </div>
 
@@ -327,7 +327,7 @@ function EditParentModal({
             <button
               type="submit"
               disabled={mutation.isPending || isUploadingPhoto}
-              className="flex-1 px-4 py-2.5 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2.5 bg-[#1B3B69] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {mutation.isPending && <Loader2 size={14} className="animate-spin" />}
               Save Changes
@@ -416,7 +416,7 @@ export default function ParentsPage() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search by name, email or phone…"
-            className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+            className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
           />
         </form>
 
@@ -447,12 +447,12 @@ export default function ParentsPage() {
             {parents.map(parent => (
               <div
                 key={parent._id}
-                className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-[#1B2B6B]/20 transition-all cursor-pointer group"
+                className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-[#1B3B69]/20 transition-all cursor-pointer group"
                 onClick={() => setDetailParent(parent)}
               >
                 {/* Avatar + name */}
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] text-lg font-bold shrink-0 overflow-hidden">
+                  <div className="w-12 h-12 rounded-full bg-[#1B3B69]/10 flex items-center justify-center text-[#1B3B69] text-lg font-bold shrink-0 overflow-hidden">
                     {parent.image ? (
                       <img src={parent.image} alt={parent.fullname} className="w-full h-full object-cover" />
                     ) : (
@@ -484,7 +484,7 @@ export default function ParentsPage() {
                 {/* Kids summary */}
                 <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                   <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <Users size={12} className="text-[#1B2B6B]" />
+                    <Users size={12} className="text-[#1B3B69]" />
                     <span>
                       <span className="font-semibold text-gray-800">{parent.kids.length}</span> student{parent.kids.length !== 1 ? 's' : ''}
                     </span>
@@ -505,7 +505,7 @@ export default function ParentsPage() {
                       </div>
                     )}
                   </div>
-                  <Eye size={14} className="text-gray-300 group-hover:text-[#1B2B6B] transition" />
+                  <Eye size={14} className="text-gray-300 group-hover:text-[#1B3B69] transition" />
                 </div>
               </div>
             ))}
@@ -533,7 +533,7 @@ export default function ParentsPage() {
                     key={p}
                     onClick={() => setPage(p)}
                     className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition ${
-                      page === p ? 'bg-[#1B2B6B] text-white' : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
+                      page === p ? 'bg-[#1B3B69] text-white' : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
                     }`}
                   >
                     {p}

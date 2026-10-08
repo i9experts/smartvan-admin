@@ -70,7 +70,7 @@ interface AnalyticsResponse {
   };
 }
 
-const PIE_COLORS = ['#1B2B6B', '#FFB800', '#10B981', '#EF4444'];
+const PIE_COLORS = ['#1B3B69', '#FFB800', '#10B981', '#EF4444'];
 
 // ─── Small building blocks ─────────────────────────────────────────────────────
 
@@ -161,7 +161,7 @@ function InsightSection({ label, count, total, columns, rows, emptyText }: Insig
           {rows.length > 5 && (
             <button
               onClick={() => setExpanded((e) => !e)}
-              className="flex items-center gap-1 text-[11px] text-[#1B2B6B] font-medium mt-1"
+              className="flex items-center gap-1 text-[11px] text-[#1B3B69] font-medium mt-1"
             >
               <ChevronDown size={11} className={expanded ? 'rotate-180 transition-transform' : 'transition-transform'} />
               {expanded ? 'Show less' : `+${rows.length - 5} more`}
@@ -273,7 +273,7 @@ export default function AnalyticsPage() {
               title="Total Students"
               value={fm.studentStatus.total}
               sub={`${fm.studentStatus.registration.active} active reg. · ${fm.studentStatus.verification.verified} verified · ${fm.studentStatus.assignment.assigned} assigned`}
-              icon={<Users size={20} />} color="#1B2B6B"
+              icon={<Users size={20} />} color="#1B3B69"
               trend={fm.trends.students}
             />
             <StatCard
@@ -307,7 +307,7 @@ export default function AnalyticsPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-gray-700">Trip Activity — Last 7 Days</h2>
             <div className="flex items-center gap-3 text-xs text-gray-400">
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#1B2B6B] inline-block" /> Total</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#1B3B69] inline-block" /> Total</span>
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#10B981] inline-block" /> Completed</span>
             </div>
           </div>
@@ -318,8 +318,8 @@ export default function AnalyticsPage() {
               <AreaChart data={tripsByDay} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="gTrips" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#1B2B6B" stopOpacity={0.15} />
-                    <stop offset="95%" stopColor="#1B2B6B" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#1B3B69" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#1B3B69" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="gCompleted" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#10B981" stopOpacity={0.15} />
@@ -330,7 +330,7 @@ export default function AnalyticsPage() {
                 <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} allowDecimals={false} />
                 <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #E5E7EB', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
-                <Area type="monotone" dataKey="trips" stroke="#1B2B6B" strokeWidth={2} fill="url(#gTrips)" dot={{ fill: '#1B2B6B', r: 3 }} />
+                <Area type="monotone" dataKey="trips" stroke="#1B3B69" strokeWidth={2} fill="url(#gTrips)" dot={{ fill: '#1B3B69', r: 3 }} />
                 <Area type="monotone" dataKey="completed" stroke="#10B981" strokeWidth={2} fill="url(#gCompleted)" dot={{ fill: '#10B981', r: 3 }} />
               </AreaChart>
             </ResponsiveContainer>
@@ -350,7 +350,7 @@ export default function AnalyticsPage() {
                 <XAxis dataKey="grade" tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} />
                 <YAxis tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} allowDecimals={false} />
                 <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #E5E7EB' }} />
-                <Bar dataKey="count" fill="#1B2B6B" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="count" fill="#1B3B69" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -408,7 +408,7 @@ export default function AnalyticsPage() {
               </div>
               <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#1B2B6B] rounded-full"
+                  className="h-full bg-[#1B3B69] rounded-full"
                   style={{ width: `${Math.min(fm.seatCapacity.utilizationPercent ?? 0, 100)}%` }}
                 />
               </div>
@@ -541,7 +541,7 @@ export default function AnalyticsPage() {
 
             <InsightCard
               title="Students by Van and Route"
-              icon={Layers} color="#1B2B6B"
+              icon={Layers} color="#1B3B69"
               actionHint="Review workload distribution across the fleet"
               sections={[{
                 label: 'Vans', count: ins.studentsByVanAndRoute.length,
@@ -610,8 +610,8 @@ export default function AnalyticsPage() {
       {/* Registration activity */}
       <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
         <div className="flex items-center gap-2.5 mb-4">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-[#1B2B6B15]">
-            <CalendarClock size={16} className="text-[#1B2B6B]" />
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-[#1B3B6915]">
+            <CalendarClock size={16} className="text-[#1B3B69]" />
           </div>
           <div>
             <p className="text-sm font-semibold text-gray-800">Registration Activity</p>
@@ -634,7 +634,7 @@ export default function AnalyticsPage() {
                 iconType="circle" iconSize={8}
                 formatter={(v) => <span style={{ fontSize: 11, color: '#6B7280' }}>{v}</span>}
               />
-              <Bar dataKey="newStudents" name="New students" fill="#1B2B6B" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="newStudents" name="New students" fill="#1B3B69" radius={[4, 4, 0, 0]} />
               <Bar dataKey="stillUnassigned" name="Still unassigned" fill="#F59E0B" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

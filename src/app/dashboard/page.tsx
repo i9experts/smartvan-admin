@@ -257,7 +257,7 @@ export default function DashboardPage() {
     { name: 'Inactive', value: stats.totalStudents - stats.activeStudents },
   ];
 
-  const PIE_COLORS = ['#1B2B6B', '#FFB800'];
+  const PIE_COLORS = ['#1B3B69', '#FFB800'];
 
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -303,7 +303,7 @@ export default function DashboardPage() {
               value={stats.totalStudents}
               sub={`${stats.activeStudents} active`}
               icon={<Users size={20} />}
-              color="#1B2B6B"
+              color="#1B3B69"
               trend={4}
             />
             <StatCard
@@ -377,8 +377,8 @@ export default function DashboardPage() {
               <AreaChart data={weeklyData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorTrips" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#1B2B6B" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#1B2B6B" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#1B3B69" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#1B3B69" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -394,10 +394,10 @@ export default function DashboardPage() {
                 <Area
                   type="monotone"
                   dataKey="trips"
-                  stroke="#1B2B6B"
+                  stroke="#1B3B69"
                   strokeWidth={2.5}
                   fill="url(#colorTrips)"
-                  dot={{ fill: '#1B2B6B', strokeWidth: 0, r: 4 }}
+                  dot={{ fill: '#1B3B69', strokeWidth: 0, r: 4 }}
                   activeDot={{ r: 6, fill: '#FFB800' }}
                 />
               </AreaChart>
@@ -451,14 +451,14 @@ export default function DashboardPage() {
             <h2 className="text-sm font-semibold text-gray-700">Fleet Summary</h2>
             <a
               href="/vans"
-              className="text-xs text-[#1B2B6B] hover:underline font-medium"
+              className="text-xs text-[#1B3B69] hover:underline font-medium"
             >
               View all →
             </a>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { label: 'Total Drivers', val: stats.totalDrivers, color: '#1B2B6B' },
+              { label: 'Total Drivers', val: stats.totalDrivers, color: '#1B3B69' },
               { label: 'Active Drivers', val: stats.activeDrivers, color: '#10B981' },
               { label: 'Total Vans', val: stats.totalVans, color: '#6366F1' },
               { label: 'Active Vans', val: stats.activeVans, color: '#F59E0B' },

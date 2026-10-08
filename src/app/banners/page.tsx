@@ -69,7 +69,7 @@ function BannerModal({ banner, onClose, onSuccess }: { banner: Banner | null; on
         <div className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Banner Image *</label>
-            <label className="flex flex-col items-center justify-center gap-2 h-36 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-[#1B2B6B]/40 hover:bg-gray-50 transition overflow-hidden relative">
+            <label className="flex flex-col items-center justify-center gap-2 h-36 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-[#1B3B69]/40 hover:bg-gray-50 transition overflow-hidden relative">
               {imageUrl ? (
                 <img src={imageUrl} alt="Banner" className="w-full h-full object-cover" />
               ) : (
@@ -96,7 +96,7 @@ function BannerModal({ banner, onClose, onSuccess }: { banner: Banner | null; on
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               placeholder="e.g. Refer a Friend, Get 1 Month Free"
             />
           </div>
@@ -106,7 +106,7 @@ function BannerModal({ banner, onClose, onSuccess }: { banner: Banner | null; on
             <input
               value={redirectUrl}
               onChange={(e) => setRedirectUrl(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               placeholder="https://…"
             />
           </div>
@@ -117,7 +117,7 @@ function BannerModal({ banner, onClose, onSuccess }: { banner: Banner | null; on
               type="number"
               value={priority}
               onChange={(e) => setPriority(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
             />
           </div>
 
@@ -135,7 +135,7 @@ function BannerModal({ banner, onClose, onSuccess }: { banner: Banner | null; on
           <button
             onClick={handleSubmit}
             disabled={mutation.isPending || isUploading}
-            className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
+            className="flex-1 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
           >
             {mutation.isPending ? 'Saving…' : 'Save Banner'}
           </button>
@@ -181,7 +181,7 @@ export default function BannersPage() {
         </div>
         <button
           onClick={() => setModal('add')}
-          className="flex items-center gap-2 px-4 py-2.5 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"
+          className="flex items-center gap-2 px-4 py-2.5 bg-[#1B3B69] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"
         >
           <Plus size={16} />
           Add Banner

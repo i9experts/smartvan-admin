@@ -98,7 +98,7 @@ export default function MapPicker({ title = 'Pick Location', initial, onConfirm,
           url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="52" viewBox="0 0 40 52">
               <ellipse cx="20" cy="48" rx="8" ry="3" fill="rgba(0,0,0,0.2)"/>
-              <path d="M20 0C9 0 0 9 0 20c0 15 20 32 20 32S40 35 40 20C40 9 31 0 20 0z" fill="#1B2B6B"/>
+              <path d="M20 0C9 0 0 9 0 20c0 15 20 32 20 32S40 35 40 20C40 9 31 0 20 0z" fill="#1B3B69"/>
               <circle cx="20" cy="20" r="8" fill="white"/>
             </svg>
           `),
@@ -197,8 +197,8 @@ export default function MapPicker({ title = 'Pick Location', initial, onConfirm,
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#1B2B6B]/10 rounded-xl flex items-center justify-center">
-              <MapPin size={18} className="text-[#1B2B6B]" />
+            <div className="w-9 h-9 bg-[#1B3B69]/10 rounded-xl flex items-center justify-center">
+              <MapPin size={18} className="text-[#1B3B69]" />
             </div>
             <h2 className="text-base font-bold text-gray-900">{title}</h2>
           </div>
@@ -216,7 +216,7 @@ export default function MapPicker({ title = 'Pick Location', initial, onConfirm,
               value={searchValue}
               onChange={e => setSearchValue(e.target.value)}
               placeholder="Search for a street, area, or landmark…"
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 focus:border-[#1B2B6B]"
+              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 focus:border-[#1B3B69]"
             />
           </div>
         </div>
@@ -226,7 +226,7 @@ export default function MapPicker({ title = 'Pick Location', initial, onConfirm,
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-50 z-10">
               <div className="flex flex-col items-center gap-3 text-gray-500">
-                <Loader2 size={32} className="animate-spin text-[#1B2B6B]" />
+                <Loader2 size={32} className="animate-spin text-[#1B3B69]" />
                 <p className="text-sm">Loading Google Maps…</p>
               </div>
             </div>
@@ -244,7 +244,7 @@ export default function MapPicker({ title = 'Pick Location', initial, onConfirm,
             className="absolute bottom-4 right-4 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition z-10"
             title="Use my location"
           >
-            <Navigation size={18} className="text-[#1B2B6B]" />
+            <Navigation size={18} className="text-[#1B3B69]" />
           </button>
 
           {/* Tap hint */}
@@ -261,7 +261,7 @@ export default function MapPicker({ title = 'Pick Location', initial, onConfirm,
             <div className="flex items-center gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-start gap-2">
-                  <MapPin size={16} className="text-[#1B2B6B] shrink-0 mt-0.5" />
+                  <MapPin size={16} className="text-[#1B3B69] shrink-0 mt-0.5" />
                   <div className="min-w-0">
                     {addressLoading ? (
                       <div className="flex items-center gap-2">
@@ -280,7 +280,7 @@ export default function MapPicker({ title = 'Pick Location', initial, onConfirm,
               <button
                 onClick={() => onConfirm(picked)}
                 disabled={addressLoading}
-                className="flex items-center gap-2 px-5 py-2.5 bg-[#1B2B6B] text-white text-sm font-semibold rounded-xl hover:bg-[#162356] transition disabled:opacity-50 shrink-0"
+                className="flex items-center gap-2 px-5 py-2.5 bg-[#1B3B69] text-white text-sm font-semibold rounded-xl hover:bg-[#162356] transition disabled:opacity-50 shrink-0"
               >
                 <Check size={16} /> Confirm
               </button>

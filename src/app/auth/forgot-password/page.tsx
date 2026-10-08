@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
             </div>
             <h2 className="text-lg font-semibold text-gray-900 mb-1.5">Password reset</h2>
             <p className="text-sm text-gray-500 mb-6">Your password has been updated. Sign in with your new password.</p>
-            <a href="/auth/login" className="inline-block w-full py-3 bg-[#1B2B6B] text-white font-semibold rounded-xl hover:bg-[#162356] transition">
+            <a href="/auth/login" className="inline-block w-full py-3 bg-[#1B3B69] text-white font-semibold rounded-xl hover:bg-[#162356] transition">
               Go to login
             </a>
           </div>
@@ -83,13 +83,13 @@ export default function ForgotPasswordPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendOtp()}
                 placeholder="admin@school.com"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               />
               {error && <div className="flex items-center gap-2 p-3 bg-red-50 text-red-600 rounded-xl text-sm"><AlertCircle size={16} />{error}</div>}
               <button
                 onClick={handleSendOtp}
                 disabled={loading}
-                className="w-full py-3 bg-[#1B2B6B] text-white font-semibold rounded-xl hover:bg-[#162356] transition disabled:opacity-60 flex items-center justify-center gap-2"
+                className="w-full py-3 bg-[#1B3B69] text-white font-semibold rounded-xl hover:bg-[#162356] transition disabled:opacity-60 flex items-center justify-center gap-2"
               >
                 {loading ? <><Loader2 size={18} className="animate-spin" />Sending…</> : 'Send reset code'}
               </button>
@@ -104,7 +104,7 @@ export default function ForgotPasswordPage() {
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 placeholder="6-digit code"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               />
               <input
                 type="password"
@@ -112,7 +112,7 @@ export default function ForgotPasswordPage() {
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="New password"
                 autoComplete="new-password"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               />
               <input
                 type="password"
@@ -121,13 +121,13 @@ export default function ForgotPasswordPage() {
                 onKeyDown={(e) => e.key === 'Enter' && handleReset()}
                 placeholder="Confirm new password"
                 autoComplete="new-password"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               />
               {error && <div className="flex items-center gap-2 p-3 bg-red-50 text-red-600 rounded-xl text-sm"><AlertCircle size={16} />{error}</div>}
               <button
                 onClick={handleReset}
                 disabled={loading}
-                className="w-full py-3 bg-[#1B2B6B] text-white font-semibold rounded-xl hover:bg-[#162356] transition disabled:opacity-60 flex items-center justify-center gap-2"
+                className="w-full py-3 bg-[#1B3B69] text-white font-semibold rounded-xl hover:bg-[#162356] transition disabled:opacity-60 flex items-center justify-center gap-2"
               >
                 {loading ? <><Loader2 size={18} className="animate-spin" />Resetting…</> : 'Reset password'}
               </button>

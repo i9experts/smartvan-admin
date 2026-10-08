@@ -132,7 +132,7 @@ export function SafetyAlertCenter() {
                         href={`https://maps.google.com/?q=${a.location.lat},${a.location.lng}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 text-sm font-medium bg-[#1B2B6B] text-white rounded-lg py-2"
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 text-sm font-medium bg-[#1B3B69] text-white rounded-lg py-2"
                       >
                         <MapPin size={15} /> Open location
                       </a>
@@ -175,7 +175,7 @@ export function SafetyAlertCenter() {
                       href={`https://maps.google.com/?q=${a.location.lat},${a.location.lng}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-xs text-[#1B2B6B] font-medium inline-flex items-center gap-1 mt-1"
+                      className="text-xs text-[#1B3B69] font-medium inline-flex items-center gap-1 mt-1"
                     >
                       <MapPin size={12} /> Location
                     </a>

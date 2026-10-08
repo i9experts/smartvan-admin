@@ -186,7 +186,7 @@ export default function SuperAdminPage() {
               value={data?.institutions.total ?? 0}
               sub={`${data?.institutions.active ?? 0} active · ${data?.institutions.inactive ?? 0} inactive`}
               icon={<Building2 size={20} />}
-              color="#1B2B6B"
+              color="#1B3B69"
             />
             <StatCard
               title="Total Fleet"
@@ -235,7 +235,7 @@ export default function SuperAdminPage() {
               value={`${data?.billing.currency ?? 'PKR'} ${(data?.billing.estimatedMonthlyRevenue ?? 0).toLocaleString()}`}
               sub={`${data?.billing.activeSubscriptions ?? 0} active subscriptions`}
               icon={<Wallet size={20} />}
-              color="#1B2B6B"
+              color="#1B3B69"
             />
           </>
         )}
@@ -289,7 +289,7 @@ export default function SuperAdminPage() {
       {/* App Connection Status */}
       <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
         <div className="flex items-center gap-2 mb-4">
-          <Smartphone size={18} className="text-[#1B2B6B]" />
+          <Smartphone size={18} className="text-[#1B3B69]" />
           <h2 className="text-lg font-semibold text-gray-900">App Connection Status</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
@@ -302,7 +302,7 @@ export default function SuperAdminPage() {
             </div>
             <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#1B2B6B] rounded-full transition-all"
+                className="h-full bg-[#1B3B69] rounded-full transition-all"
                 style={{ width: `${data?.appConnections.parents.rate ?? 0}%` }}
               />
             </div>

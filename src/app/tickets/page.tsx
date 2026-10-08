@@ -50,7 +50,7 @@ function categoryMeta(issueType?: string) {
   if (t.includes('vehicle')) {
     return { icon: Wrench, accent: 'bg-slate-400', iconBg: 'bg-slate-50', iconText: 'text-slate-600' };
   }
-  return { icon: MessageSquare, accent: 'bg-[#1B2B6B]', iconBg: 'bg-[#1B2B6B]/5', iconText: 'text-[#1B2B6B]' };
+  return { icon: MessageSquare, accent: 'bg-[#1B3B69]', iconBg: 'bg-[#1B3B69]/5', iconText: 'text-[#1B3B69]' };
 }
 
 function timeAgo(dateStr: string) {
@@ -113,7 +113,7 @@ function TicketRow({ ticket, employees }: { ticket: Ticket; employees: Employee[
               defaultValue={ticket.assignedTo || ''}
               onChange={(e) => e.target.value && assignMutation.mutate(e.target.value)}
               disabled={assignMutation.isPending}
-              className="text-[12px] text-gray-700 border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/20 bg-white"
+              className="text-[12px] text-gray-700 border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/20 bg-white"
             >
               <option value="">Unassigned</option>
               {employees.map((e) => (
@@ -147,7 +147,7 @@ export default function TicketsPage() {
             key={f}
             onClick={() => setStatusFilter(f)}
             className={`text-xs px-3 py-1.5 rounded-lg font-medium transition ${
-              statusFilter === f ? 'bg-[#1B2B6B] text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+              statusFilter === f ? 'bg-[#1B3B69] text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
             }`}
           >
             {f ? (STATUS_META[f]?.label ?? f) : 'All'}

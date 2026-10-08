@@ -133,7 +133,7 @@ function DriverDetailDrawer({ driver, onClose, onEdit }: { driver: Driver; onClo
         <div className="flex items-center justify-between p-5 border-b border-gray-100 sticky top-0 bg-white z-10">
           <h2 className="text-lg font-bold text-gray-900">Driver Profile</h2>
           <div className="flex items-center gap-2">
-            <button onClick={onEdit} className="flex items-center gap-1.5 px-3 py-1.5 border border-[#1B2B6B]/20 text-[#1B2B6B] rounded-lg text-xs font-medium hover:bg-[#1B2B6B]/5 transition">
+            <button onClick={onEdit} className="flex items-center gap-1.5 px-3 py-1.5 border border-[#1B3B69]/20 text-[#1B3B69] rounded-lg text-xs font-medium hover:bg-[#1B3B69]/5 transition">
               <Pencil size={12} /> Edit
             </button>
             <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
@@ -144,7 +144,7 @@ function DriverDetailDrawer({ driver, onClose, onEdit }: { driver: Driver; onClo
 
         {/* Avatar + name */}
         <div className="flex flex-col items-center pt-8 pb-6 px-5 border-b border-gray-100">
-          <div className="w-20 h-20 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] text-3xl font-bold mb-3 overflow-hidden">
+          <div className="w-20 h-20 rounded-full bg-[#1B3B69]/10 flex items-center justify-center text-[#1B3B69] text-3xl font-bold mb-3 overflow-hidden">
             {driver.image ? (
               <img src={driver.image} alt={driver.fullname} className="w-full h-full object-cover" />
             ) : (
@@ -190,7 +190,7 @@ function DriverDetailDrawer({ driver, onClose, onEdit }: { driver: Driver; onClo
           <div className="p-3.5 bg-gray-50 rounded-xl space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <Smartphone size={16} className="text-[#1B2B6B]" />
+                <Smartphone size={16} className="text-[#1B3B69]" />
                 <div>
                   <p className="text-xs text-gray-400">Login Username</p>
                   <p className="text-sm font-medium text-gray-800">{driver.phoneNo || driver.NIC || driver.email}</p>
@@ -202,7 +202,7 @@ function DriverDetailDrawer({ driver, onClose, onEdit }: { driver: Driver; onClo
             <button
               onClick={() => { setResetResult(null); setResetError(''); resetMutation.mutate(); }}
               disabled={resetMutation.isPending}
-              className="w-full flex items-center justify-center gap-2 py-2 border border-[#1B2B6B]/20 text-[#1B2B6B] rounded-lg text-sm font-medium hover:bg-[#1B2B6B]/5 transition disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 py-2 border border-[#1B3B69]/20 text-[#1B3B69] rounded-lg text-sm font-medium hover:bg-[#1B3B69]/5 transition disabled:opacity-50"
             >
               <RefreshCw size={13} className={resetMutation.isPending ? 'animate-spin' : ''} />
               {resetMutation.isPending ? 'Resetting…' : 'Reset Password & Resend via WhatsApp'}
@@ -244,7 +244,7 @@ function DriverDetailDrawer({ driver, onClose, onEdit }: { driver: Driver; onClo
                   rel="noopener noreferrer"
                   className="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition"
                 >
-                  <FileText size={20} className="text-[#1B2B6B]" />
+                  <FileText size={20} className="text-[#1B3B69]" />
                   <span className="text-xs text-gray-600 text-center">{doc.label}</span>
                 </a>
               ))}
@@ -327,11 +327,11 @@ function EditDriverModal({ driver, onClose, onSuccess }: { driver: Driver; onClo
         <div className="space-y-3">
           <div className="flex justify-center mb-1">
             <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center overflow-hidden">
+              <div className="w-20 h-20 rounded-full bg-[#1B3B69]/10 flex items-center justify-center overflow-hidden">
                 {form.image ? (
                   <img src={form.image} alt="Driver" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-2xl font-semibold text-[#1B2B6B]">
+                  <span className="text-2xl font-semibold text-[#1B3B69]">
                     {form.fullname?.charAt(0)?.toUpperCase() ?? 'D'}
                   </span>
                 )}
@@ -349,7 +349,7 @@ function EditDriverModal({ driver, onClose, onSuccess }: { driver: Driver; onClo
               />
               <label
                 htmlFor="driver-photo-input"
-                className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#1B2B6B] rounded-full flex items-center justify-center shadow-md cursor-pointer">
+                className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#1B3B69] rounded-full flex items-center justify-center shadow-md cursor-pointer">
                 {isUploadingPhoto ? (
                   <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
@@ -363,7 +363,7 @@ function EditDriverModal({ driver, onClose, onSuccess }: { driver: Driver; onClo
             <input
               value={form.fullname}
               onChange={e => f('fullname', e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -372,7 +372,7 @@ function EditDriverModal({ driver, onClose, onSuccess }: { driver: Driver; onClo
               <input
                 value={form.phoneNo}
                 onChange={e => f('phoneNo', e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
                 placeholder="03xx-xxxxxxx"
               />
             </div>
@@ -381,7 +381,7 @@ function EditDriverModal({ driver, onClose, onSuccess }: { driver: Driver; onClo
               <input
                 value={form.alternatePhoneNo}
                 onChange={e => f('alternatePhoneNo', e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               />
             </div>
           </div>
@@ -390,7 +390,7 @@ function EditDriverModal({ driver, onClose, onSuccess }: { driver: Driver; onClo
             <input
               value={form.NIC}
               onChange={e => f('NIC', e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
             />
           </div>
           <div>
@@ -398,7 +398,7 @@ function EditDriverModal({ driver, onClose, onSuccess }: { driver: Driver; onClo
             <input
               value={form.address}
               onChange={e => f('address', e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -408,7 +408,7 @@ function EditDriverModal({ driver, onClose, onSuccess }: { driver: Driver; onClo
                 type="date"
                 value={form.expiryDateLicense}
                 onChange={e => f('expiryDateLicense', e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               />
             </div>
             <div>
@@ -417,7 +417,7 @@ function EditDriverModal({ driver, onClose, onSuccess }: { driver: Driver; onClo
                 type="date"
                 value={form.expiryDateVehicleCard}
                 onChange={e => f('expiryDateVehicleCard', e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               />
             </div>
           </div>
@@ -436,7 +436,7 @@ function EditDriverModal({ driver, onClose, onSuccess }: { driver: Driver; onClo
           <button
             onClick={handleSubmit}
             disabled={mutation.isPending}
-            className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
+            className="flex-1 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50"
           >
             {mutation.isPending ? 'Saving…' : 'Save Changes'}
           </button>
@@ -579,7 +579,7 @@ export default function DriversPage() {
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               placeholder="Search by name or email…"
-              className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -589,7 +589,7 @@ export default function DriversPage() {
                 key={s}
                 onClick={() => { setStatusFilter(s); setPage(1); }}
                 className={`px-3 py-1.5 text-xs font-medium rounded-full transition ${
-                  statusFilter === s ? 'bg-[#1B2B6B] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  statusFilter === s ? 'bg-[#1B3B69] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
                 {s === '' ? 'All' : s === 'active' ? 'Active' : 'Inactive'}
@@ -600,8 +600,8 @@ export default function DriversPage() {
 
         {/* Bulk actions */}
         {selected.size > 0 && (
-          <div className="flex items-center gap-3 p-3 bg-[#1B2B6B]/5 rounded-xl">
-            <span className="text-sm font-medium text-[#1B2B6B]">{selected.size} selected</span>
+          <div className="flex items-center gap-3 p-3 bg-[#1B3B69]/5 rounded-xl">
+            <span className="text-sm font-medium text-[#1B3B69]">{selected.size} selected</span>
             <div className="flex gap-2 ml-auto">
               <button
                 onClick={() => statusMutation.mutate({ ids: selectedArr, status: 'active' })}
@@ -672,7 +672,7 @@ export default function DriversPage() {
                         </td>
                         <td className="p-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] font-semibold text-sm shrink-0 overflow-hidden">
+                            <div className="w-9 h-9 rounded-full bg-[#1B3B69]/10 flex items-center justify-center text-[#1B3B69] font-semibold text-sm shrink-0 overflow-hidden">
                               {driver.image ? (
                                 <img src={driver.image} alt={driver.fullname} className="w-full h-full object-cover" />
                               ) : (

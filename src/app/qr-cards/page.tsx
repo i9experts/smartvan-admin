@@ -108,7 +108,7 @@ export default function QrCardsPage() {
           <button
             onClick={() => window.print()}
             disabled={!shown.length}
-            className="inline-flex items-center gap-2 bg-[#1B2B6B] text-white text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-40"
+            className="inline-flex items-center gap-2 bg-[#1B3B69] text-white text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-40"
           >
             <Printer size={16} /> Print {shown.length ? `(${shown.length})` : ''}
           </button>

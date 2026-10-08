@@ -45,7 +45,7 @@ function categoryMeta(issueType?: string) {
   if (t.includes('vehicle')) {
     return { icon: Wrench, accent: 'bg-slate-400', iconBg: 'bg-slate-50', iconText: 'text-slate-600' };
   }
-  return { icon: MessageSquare, accent: 'bg-[#1B2B6B]', iconBg: 'bg-[#1B2B6B]/5', iconText: 'text-[#1B2B6B]' };
+  return { icon: MessageSquare, accent: 'bg-[#1B3B69]', iconBg: 'bg-[#1B3B69]/5', iconText: 'text-[#1B3B69]' };
 }
 
 function timeAgo(dateStr: string) {
@@ -100,7 +100,7 @@ function TicketCard({ ticket }: { ticket: Ticket }) {
             value={ticket.status}
             onChange={(e) => statusMutation.mutate(e.target.value)}
             disabled={statusMutation.isPending}
-            className="text-[12px] font-medium text-gray-700 border border-gray-200 rounded-lg pl-2.5 pr-7 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/20 bg-white"
+            className="text-[12px] font-medium text-gray-700 border border-gray-200 rounded-lg pl-2.5 pr-7 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/20 bg-white"
           >
             {STATUS_OPTIONS.map((s) => (
               <option key={s} value={s}>{STATUS_META[s].label}</option>
@@ -108,7 +108,7 @@ function TicketCard({ ticket }: { ticket: Ticket }) {
           </select>
           <button
             onClick={() => setShowRemarks((v) => !v)}
-            className="flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-[#1B2B6B] transition px-2 py-1.5"
+            className="flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-[#1B3B69] transition px-2 py-1.5"
           >
             <MessageSquare size={13} />
             {ticket.adminRemarks ? 'Edit note' : 'Add note'}
@@ -122,11 +122,11 @@ function TicketCard({ ticket }: { ticket: Ticket }) {
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               placeholder="What did you do about this?"
-              className="flex-1 text-[12.5px] border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/20"
+              className="flex-1 text-[12.5px] border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/20"
             />
             <button
               onClick={() => { statusMutation.mutate(ticket.status); setShowRemarks(false); }}
-              className="text-[12px] font-medium px-3.5 py-2 bg-[#1B2B6B] text-white rounded-lg hover:bg-[#162356] transition"
+              className="text-[12px] font-medium px-3.5 py-2 bg-[#1B3B69] text-white rounded-lg hover:bg-[#162356] transition"
             >
               Save note
             </button>
@@ -152,7 +152,7 @@ export default function EmployeeTicketsPage() {
         </div>
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <p className="text-lg font-bold text-[#1B2B6B] leading-none">{active.length}</p>
+            <p className="text-lg font-bold text-[#1B3B69] leading-none">{active.length}</p>
             <p className="text-[10.5px] text-gray-400 mt-1">Active</p>
           </div>
           <div className="w-px h-8 bg-gray-200" />
@@ -171,8 +171,8 @@ export default function EmployeeTicketsPage() {
         </div>
       ) : tickets.length === 0 ? (
         <div className="bg-white rounded-xl p-14 text-center border border-gray-100">
-          <div className="w-12 h-12 rounded-full bg-[#1B2B6B]/5 flex items-center justify-center mx-auto mb-3.5">
-            <Inbox size={20} className="text-[#1B2B6B]" />
+          <div className="w-12 h-12 rounded-full bg-[#1B3B69]/5 flex items-center justify-center mx-auto mb-3.5">
+            <Inbox size={20} className="text-[#1B3B69]" />
           </div>
           <p className="text-[13.5px] font-medium text-gray-700">Nothing assigned yet</p>
           <p className="text-[12.5px] text-gray-400 mt-1">Tickets routed to you will show up here.</p>

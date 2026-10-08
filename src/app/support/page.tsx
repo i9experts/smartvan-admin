@@ -117,11 +117,11 @@ export default function SupportPage() {
                   key={c.value}
                   onClick={() => setCategory(c.value)}
                   className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border transition ${
-                    active ? 'border-[#1B2B6B] bg-[#1B2B6B]/5' : 'border-gray-200 hover:bg-gray-50'
+                    active ? 'border-[#1B3B69] bg-[#1B3B69]/5' : 'border-gray-200 hover:bg-gray-50'
                   }`}
                 >
-                  <Icon size={18} color={active ? '#1B2B6B' : c.color} />
-                  <span className={`text-[11px] font-medium text-center leading-tight ${active ? 'text-[#1B2B6B]' : 'text-gray-600'}`}>
+                  <Icon size={18} color={active ? '#1B3B69' : c.color} />
+                  <span className={`text-[11px] font-medium text-center leading-tight ${active ? 'text-[#1B3B69]' : 'text-gray-600'}`}>
                     {c.value}
                   </span>
                 </button>
@@ -137,7 +137,7 @@ export default function SupportPage() {
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
             placeholder="Describe your issue in as much detail as possible…"
-            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 resize-none"
+            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 resize-none"
           />
         </div>
 
@@ -182,7 +182,7 @@ export default function SupportPage() {
         <button
           onClick={handleSubmit}
           disabled={submitMutation.isPending || isUploading}
-          className="flex items-center gap-2 px-5 py-2.5 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition disabled:opacity-50"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#1B3B69] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition disabled:opacity-50"
         >
           <Send size={15} />
           {submitMutation.isPending ? 'Submitting…' : 'Submit Ticket'}

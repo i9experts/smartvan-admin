@@ -102,7 +102,7 @@ function SchoolBillingView() {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-pulse h-48" />
       ) : bill && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="bg-gradient-to-r from-[#1B2B6B] to-[#2D4099] p-6">
+          <div className="bg-gradient-to-r from-[#1B3B69] to-[#2D4099] p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-white/70 text-sm">Monthly Bill</p>
@@ -120,8 +120,8 @@ function SchoolBillingView() {
               {bill.breakdown.map((item: any, i: number) => (
                 <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 bg-[#1B2B6B]/10 rounded-xl flex items-center justify-center">
-                      <Bus size={18} className="text-[#1B2B6B]" />
+                    <div className="w-9 h-9 bg-[#1B3B69]/10 rounded-xl flex items-center justify-center">
+                      <Bus size={18} className="text-[#1B3B69]" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-900">{item.carNumber}</p>
@@ -170,7 +170,7 @@ function SchoolBillingView() {
             <button
               onClick={handleSubscribe}
               disabled={checkoutLoading}
-              className="mt-4 w-full py-3 bg-[#1B2B6B] text-white text-sm font-semibold rounded-xl hover:bg-[#162356] transition disabled:opacity-50 flex items-center justify-center gap-2"
+              className="mt-4 w-full py-3 bg-[#1B3B69] text-white text-sm font-semibold rounded-xl hover:bg-[#162356] transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <Zap size={16} />
               {checkoutLoading ? 'Redirecting to payment...' : 'Subscribe Now'}
@@ -272,7 +272,7 @@ function SuperAdminBillingView() {
       {/* KPI Cards */}
       <div className="grid grid-cols-3 gap-5">
         {[
-          { label: 'Total Schools', value: schools.length, icon: <Building2 size={20} />, color: 'text-[#1B2B6B]', bg: 'bg-blue-50' },
+          { label: 'Total Schools', value: schools.length, icon: <Building2 size={20} />, color: 'text-[#1B3B69]', bg: 'bg-blue-50' },
           { label: 'Active', value: active, icon: <CheckCircle2 size={20} />, color: 'text-green-600', bg: 'bg-green-50' },
           { label: 'Inactive', value: inactive, icon: <XCircle size={20} />, color: 'text-red-500', bg: 'bg-red-50' },
         ].map((kpi, i) => (
@@ -329,7 +329,7 @@ function SuperAdminBillingView() {
                 <tr key={school.schoolId} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-[#1B2B6B]/10 rounded-lg flex items-center justify-center text-[#1B2B6B] font-bold text-sm">
+                      <div className="w-8 h-8 bg-[#1B3B69]/10 rounded-lg flex items-center justify-center text-[#1B3B69] font-bold text-sm">
                         {school.schoolName?.[0] || 'S'}
                       </div>
                       <p className="text-sm font-medium text-gray-900">{school.schoolName}</p>

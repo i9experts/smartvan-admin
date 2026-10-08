@@ -92,8 +92,8 @@ function saveNotifPrefs(p: NotifPrefs) {
 function SectionHeader({ icon, title, description }: { icon: React.ReactNode; title: string; description?: string }) {
   return (
     <div className="flex items-start gap-3 mb-6">
-      <div className="w-10 h-10 bg-[#1B2B6B]/10 rounded-xl flex items-center justify-center shrink-0">
-        <span className="text-[#1B2B6B]">{icon}</span>
+      <div className="w-10 h-10 bg-[#1B3B69]/10 rounded-xl flex items-center justify-center shrink-0">
+        <span className="text-[#1B3B69]">{icon}</span>
       </div>
       <div>
         <h2 className="text-base font-bold text-gray-900">{title}</h2>
@@ -110,7 +110,7 @@ function Toggle({ value, onChange, disabled }: { value: boolean; onChange: (v: b
     <button
       onClick={() => !disabled && onChange(!value)}
       disabled={disabled}
-      className={`relative w-11 h-6 rounded-full transition-all duration-200 ${value ? 'bg-[#1B2B6B]' : 'bg-gray-200'} ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+      className={`relative w-11 h-6 rounded-full transition-all duration-200 ${value ? 'bg-[#1B3B69]' : 'bg-gray-200'} ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
     >
       <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${value ? 'translate-x-5' : 'translate-x-0'}`} />
     </button>
@@ -134,11 +134,11 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 function SaveBanner({ show, loading, onSave, onDiscard }: { show: boolean; loading: boolean; onSave: () => void; onDiscard: () => void }) {
   if (!show) return null;
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 bg-[#1B2B6B] text-white px-6 py-3.5 rounded-2xl shadow-2xl">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 bg-[#1B3B69] text-white px-6 py-3.5 rounded-2xl shadow-2xl">
       <span className="text-sm font-medium">You have unsaved changes</span>
       <div className="flex gap-2">
         <button onClick={onDiscard} className="px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition">Discard</button>
-        <button onClick={onSave} disabled={loading} className="flex items-center gap-2 px-4 py-1.5 bg-[#FFB800] text-[#1B2B6B] font-semibold rounded-lg text-sm hover:bg-[#e5a600] transition disabled:opacity-60">
+        <button onClick={onSave} disabled={loading} className="flex items-center gap-2 px-4 py-1.5 bg-[#FFB800] text-[#1B3B69] font-semibold rounded-lg text-sm hover:bg-[#e5a600] transition disabled:opacity-60">
           {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
           {loading ? 'Saving…' : 'Save Changes'}
         </button>
@@ -372,7 +372,7 @@ export default function SettingsPage() {
     saveNotifPrefs(updated);
   }
 
-  const inputClass = "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 focus:border-[#1B2B6B] transition";
+  const inputClass = "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 focus:border-[#1B3B69] transition";
 
   return (
     <div className="flex h-full min-h-screen">
@@ -387,7 +387,7 @@ export default function SettingsPage() {
                 onClick={() => setActiveSection(s.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition text-left ${
                   activeSection === s.id
-                    ? 'bg-[#1B2B6B] text-white shadow-sm'
+                    ? 'bg-[#1B3B69] text-white shadow-sm'
                     : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
@@ -401,7 +401,7 @@ export default function SettingsPage() {
         {/* Plan info */}
         {school && (
           <div className="mx-4 mb-4 p-3 bg-[#FFB800]/10 rounded-xl border border-[#FFB800]/20">
-            <p className="text-xs font-semibold text-[#1B2B6B] mb-1">{school.currentPlan ?? 'Free Plan'}</p>
+            <p className="text-xs font-semibold text-[#1B3B69] mb-1">{school.currentPlan ?? 'Free Plan'}</p>
             <div className="space-y-1 text-xs text-gray-500">
               <p>Vans: {school.allowedVans ?? '—'}</p>
               <p>Students: {school.allowedStudents ?? '—'}</p>
@@ -452,11 +452,11 @@ export default function SettingsPage() {
                   {/* School image */}
                   <div className="flex items-center gap-5">
                     <div className="relative">
-                      <div className="w-20 h-20 rounded-2xl bg-[#1B2B6B]/10 flex items-center justify-center overflow-hidden">
+                      <div className="w-20 h-20 rounded-2xl bg-[#1B3B69]/10 flex items-center justify-center overflow-hidden">
                         {schoolForm.schoolImage || school.schoolImage ? (
                           <img src={schoolForm.schoolImage ?? school.schoolImage} alt="School" className="w-full h-full object-cover" />
                         ) : (
-                          <Building2 size={32} className="text-[#1B2B6B]/40" />
+                          <Building2 size={32} className="text-[#1B3B69]/40" />
                         )}
                       </div>
                       <input
@@ -474,7 +474,7 @@ export default function SettingsPage() {
                         type="button"
                         onClick={() => logoInputRef.current?.click()}
                         disabled={isUploadingLogo}
-                        className="absolute -bottom-1.5 -right-1.5 w-7 h-7 bg-[#1B2B6B] rounded-full flex items-center justify-center shadow-md hover:bg-[#162356] transition disabled:opacity-60">
+                        className="absolute -bottom-1.5 -right-1.5 w-7 h-7 bg-[#1B3B69] rounded-full flex items-center justify-center shadow-md hover:bg-[#162356] transition disabled:opacity-60">
                         {isUploadingLogo ? (
                           <Loader2 size={13} className="text-white animate-spin" />
                         ) : (
@@ -557,7 +557,7 @@ export default function SettingsPage() {
                         { label: 'Max Routes', val: school.allowedRoutes, icon: <Route size={14} /> },
                       ].map(item => (
                         <div key={item.label} className="flex items-center gap-2 p-2 bg-white rounded-lg">
-                          <span className="text-[#1B2B6B]">{item.icon}</span>
+                          <span className="text-[#1B3B69]">{item.icon}</span>
                           <div>
                             <p className="text-xs text-gray-400">{item.label}</p>
                             <p className="text-sm font-bold text-gray-800">{item.val ?? '—'}</p>
@@ -578,7 +578,7 @@ export default function SettingsPage() {
               <div className="space-y-5">
                 <div className="flex items-center gap-5">
                   <div className="relative">
-                    <div className="w-20 h-20 rounded-full bg-[#1B2B6B] flex items-center justify-center text-white text-3xl font-bold overflow-hidden">
+                    <div className="w-20 h-20 rounded-full bg-[#1B3B69] flex items-center justify-center text-white text-3xl font-bold overflow-hidden">
                       {adminForm.image ? (
                         <img src={adminForm.image} alt="Profile" className="w-full h-full object-cover" />
                       ) : (
@@ -611,7 +611,7 @@ export default function SettingsPage() {
                   <div>
                     <p className="text-base font-bold text-gray-900">{adminForm.name || 'Admin'}</p>
                     <p className="text-sm text-gray-400">{adminForm.email}</p>
-                    <span className="mt-1 px-2.5 py-0.5 bg-[#1B2B6B]/10 text-[#1B2B6B] text-xs font-medium rounded-full capitalize inline-block">
+                    <span className="mt-1 px-2.5 py-0.5 bg-[#1B3B69]/10 text-[#1B3B69] text-xs font-medium rounded-full capitalize inline-block">
                       {JSON.parse(localStorage.getItem('smartvan_user') ?? '{}').role ?? 'admin'}
                     </span>
                   </div>
@@ -668,8 +668,8 @@ export default function SettingsPage() {
 
                 {/* Visual preview */}
                 {(tripForm.startTime || tripForm.endTime) && (
-                  <div className="p-4 bg-[#1B2B6B]/5 rounded-xl border border-[#1B2B6B]/10">
-                    <p className="text-xs font-semibold text-[#1B2B6B] mb-3">Trip Schedule Preview</p>
+                  <div className="p-4 bg-[#1B3B69]/5 rounded-xl border border-[#1B3B69]/10">
+                    <p className="text-xs font-semibold text-[#1B3B69] mb-3">Trip Schedule Preview</p>
                     <div className="flex items-center gap-2 text-sm">
                       <div className="flex items-center gap-2 px-3 py-2 bg-emerald-100 text-emerald-700 rounded-lg font-medium">
                         <Bus size={14} /> Morning: {tripForm.startTime || '—'}
@@ -705,8 +705,8 @@ export default function SettingsPage() {
                   ].map(item => (
                     <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 bg-[#1B2B6B]/10 rounded-xl flex items-center justify-center">
-                          <span className="text-[#1B2B6B]">{item.icon}</span>
+                        <div className="w-9 h-9 bg-[#1B3B69]/10 rounded-xl flex items-center justify-center">
+                          <span className="text-[#1B3B69]">{item.icon}</span>
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-gray-800">{item.label}</p>
@@ -947,7 +947,7 @@ export default function SettingsPage() {
                   <button
                     onClick={handlePwChange}
                     disabled={changePwMutation.isPending}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-semibold hover:bg-[#162356] transition disabled:opacity-50"
+                    className="flex items-center gap-2 px-5 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-semibold hover:bg-[#162356] transition disabled:opacity-50"
                   >
                     {changePwMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : <Shield size={16} />}
                     {changePwMutation.isPending ? 'Changing…' : 'Change Password'}
@@ -998,13 +998,13 @@ export default function SettingsPage() {
                         key={t.value}
                         onClick={() => setTheme(t.value)}
                         className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition ${
-                          theme === t.value ? 'border-[#1B2B6B] bg-[#1B2B6B]/5' : 'border-gray-200 hover:border-gray-300'
+                          theme === t.value ? 'border-[#1B3B69] bg-[#1B3B69]/5' : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
-                        <span className={theme === t.value ? 'text-[#1B2B6B]' : 'text-gray-400'}>{t.icon}</span>
-                        <span className={`text-sm font-semibold ${theme === t.value ? 'text-[#1B2B6B]' : 'text-gray-600'}`}>{t.label}</span>
+                        <span className={theme === t.value ? 'text-[#1B3B69]' : 'text-gray-400'}>{t.icon}</span>
+                        <span className={`text-sm font-semibold ${theme === t.value ? 'text-[#1B3B69]' : 'text-gray-600'}`}>{t.label}</span>
                         <span className="text-xs text-gray-400">{t.desc}</span>
-                        {theme === t.value && <CheckCircle2 size={14} className="text-[#1B2B6B]" />}
+                        {theme === t.value && <CheckCircle2 size={14} className="text-[#1B3B69]" />}
                       </button>
                     ))}
                   </div>
@@ -1015,10 +1015,10 @@ export default function SettingsPage() {
                   <p className="text-sm font-semibold text-gray-700 mb-3">Brand Colors</p>
                   <div className="flex gap-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-[#1B2B6B] shadow" />
+                      <div className="w-8 h-8 rounded-lg bg-[#1B3B69] shadow" />
                       <div>
                         <p className="text-xs font-medium text-gray-700">Primary</p>
-                        <p className="text-xs text-gray-400">#1B2B6B</p>
+                        <p className="text-xs text-gray-400">#1B3B69</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">

@@ -91,11 +91,11 @@ function MapTriggerButton({
         onClick={onClick}
         className={`w-full flex items-center gap-3 px-4 py-3 border rounded-xl text-left transition ${
           value
-            ? 'border-[#1B2B6B]/40 bg-[#1B2B6B]/5'
-            : 'border-gray-200 hover:border-[#1B2B6B]/30 hover:bg-gray-50'
+            ? 'border-[#1B3B69]/40 bg-[#1B3B69]/5'
+            : 'border-gray-200 hover:border-[#1B3B69]/30 hover:bg-gray-50'
         }`}
       >
-        <MapPin size={18} className={value ? 'text-[#1B2B6B] shrink-0' : 'text-gray-400 shrink-0'} />
+        <MapPin size={18} className={value ? 'text-[#1B3B69] shrink-0' : 'text-gray-400 shrink-0'} />
         <div className="flex-1 min-w-0">
           {value ? (
             <>
@@ -111,7 +111,7 @@ function MapTriggerButton({
           )}
         </div>
         {value && (
-          <span className="text-xs text-[#1B2B6B] font-medium shrink-0">Change</span>
+          <span className="text-xs text-[#1B3B69] font-medium shrink-0">Change</span>
         )}
       </button>
     </div>
@@ -128,7 +128,7 @@ function DayPills({ days }: { days?: Record<string, boolean> }) {
   return (
     <div className="flex gap-1 flex-wrap">
       {active.map(d => (
-        <span key={d} className="px-1.5 py-0.5 bg-[#1B2B6B]/10 text-[#1B2B6B] text-xs font-medium rounded">
+        <span key={d} className="px-1.5 py-0.5 bg-[#1B3B69]/10 text-[#1B3B69] text-xs font-medium rounded">
           {DAY_LABELS[d]}
         </span>
       ))}
@@ -146,8 +146,8 @@ function RouteDetailDrawer({ route, onClose, onEdit }: { route: RouteData; onClo
       <div className="w-full max-w-md bg-white shadow-2xl overflow-y-auto flex flex-col">
         <div className="flex items-center justify-between p-5 border-b border-gray-100 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#1B2B6B]/10 rounded-xl flex items-center justify-center">
-              <Route size={18} className="text-[#1B2B6B]" />
+            <div className="w-9 h-9 bg-[#1B3B69]/10 rounded-xl flex items-center justify-center">
+              <Route size={18} className="text-[#1B3B69]" />
             </div>
             <div>
               <h2 className="text-base font-bold text-gray-900">{route.title ?? 'Untitled Route'}</h2>
@@ -155,7 +155,7 @@ function RouteDetailDrawer({ route, onClose, onEdit }: { route: RouteData; onClo
             </div>
           </div>
           <div className="flex gap-2">
-            <button onClick={onEdit} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1B2B6B] text-white text-xs font-medium rounded-lg">
+            <button onClick={onEdit} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1B3B69] text-white text-xs font-medium rounded-lg">
               <Pencil size={12} /> Edit
             </button>
             <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
@@ -196,7 +196,7 @@ function RouteDetailDrawer({ route, onClose, onEdit }: { route: RouteData; onClo
             <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Schedule</h4>
             <div className="flex gap-1.5 flex-wrap">
               {DAYS.map(day => (
-                <span key={day} className={`px-2.5 py-1.5 rounded-lg text-xs font-medium ${route.tripDays?.[day] ? 'bg-[#1B2B6B] text-white' : 'bg-gray-100 text-gray-400'}`}>
+                <span key={day} className={`px-2.5 py-1.5 rounded-lg text-xs font-medium ${route.tripDays?.[day] ? 'bg-[#1B3B69] text-white' : 'bg-gray-100 text-gray-400'}`}>
                   {DAY_LABELS[day]}
                 </span>
               ))}
@@ -243,7 +243,7 @@ function RouteDetailDrawer({ route, onClose, onEdit }: { route: RouteData; onClo
               <div className="space-y-2">
                 {stops.map((stop, i) => (
                   <div key={String(stop.kidId)} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                    <div className="w-7 h-7 bg-[#1B2B6B] rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">{i + 1}</div>
+                    <div className="w-7 h-7 bg-[#1B3B69] rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">{i + 1}</div>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-gray-800">{stop.kidName ?? `Stop ${i + 1}`}</p>
                       <p className="text-xs font-mono text-gray-400">{stop.lat.toFixed(5)}, {stop.long.toFixed(5)}</p>
@@ -423,7 +423,7 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
         <Suspense fallback={
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50">
             <div className="bg-white rounded-2xl p-8 flex items-center gap-3">
-              <Loader2 size={24} className="animate-spin text-[#1B2B6B]" />
+              <Loader2 size={24} className="animate-spin text-[#1B3B69]" />
               <span className="text-sm font-medium text-gray-700">Loading map…</span>
             </div>
           </div>
@@ -467,7 +467,7 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={`flex items-center gap-1.5 px-4 py-3 text-xs font-medium border-b-2 transition -mb-px ${
-                  activeTab === tab.key ? 'border-[#1B2B6B] text-[#1B2B6B]' : 'border-transparent text-gray-500 hover:text-gray-700'
+                  activeTab === tab.key ? 'border-[#1B3B69] text-[#1B3B69]' : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
                 {tab.icon} {tab.label}
@@ -485,7 +485,7 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
                     value={form.title}
                     onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                     placeholder="e.g. Morning Route A"
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
                   />
                 </div>
 
@@ -504,14 +504,14 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1.5">Start Time</label>
                     <input type="datetime-local" value={form.startTime} onChange={e => setForm(f => ({ ...f, startTime: e.target.value }))}
-                      className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30" />
+                      className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30" />
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">Assign Van</label>
                   <select value={form.vanId} onChange={e => setForm(f => ({ ...f, vanId: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30">
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30">
                     <option value="">No van assigned</option>
                     {vans.map(v => <option key={v._id} value={v._id}>{v.carNumber ?? v._id?.slice(-6)} {v.vehicleType ? `· ${v.vehicleType}` : ''}</option>)}
                   </select>
@@ -538,7 +538,7 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
                 <div className="grid grid-cols-7 gap-2">
                   {DAYS.map(day => (
                     <button key={day} onClick={() => toggleDay(day)}
-                      className={`flex flex-col items-center py-3 rounded-xl text-xs font-medium transition ${form.tripDays[day] ? 'bg-[#1B2B6B] text-white shadow-md' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+                      className={`flex flex-col items-center py-3 rounded-xl text-xs font-medium transition ${form.tripDays[day] ? 'bg-[#1B3B69] text-white shadow-md' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
                       <span>{DAY_LABELS[day]}</span>
                       {form.tripDays[day] && <CheckCircle2 size={12} className="mt-1" />}
                     </button>
@@ -546,7 +546,7 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
                 </div>
                 <div className="flex gap-2 mt-4">
                   <button onClick={() => setForm(f => ({ ...f, tripDays: Object.fromEntries(DAYS.map(d => [d, true])) }))}
-                    className="px-3 py-1.5 text-xs font-medium bg-[#1B2B6B]/10 text-[#1B2B6B] rounded-lg hover:bg-[#1B2B6B]/20 transition">Select All</button>
+                    className="px-3 py-1.5 text-xs font-medium bg-[#1B3B69]/10 text-[#1B3B69] rounded-lg hover:bg-[#1B3B69]/20 transition">Select All</button>
                   <button onClick={() => setForm(f => ({ ...f, tripDays: Object.fromEntries(DAYS.map(d => [d, false])) }))}
                     className="px-3 py-1.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition">Clear All</button>
                   <button onClick={() => setForm(f => ({ ...f, tripDays: { monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: false, sunday: false } }))}
@@ -568,15 +568,15 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
                     ) : (
                       availableStudents.map(s => (
                         <button key={s._id} onClick={() => addStop(s)}
-                          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#1B2B6B]/5 text-left transition">
-                          <div className="w-6 h-6 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center text-[#1B2B6B] text-xs font-bold shrink-0">
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#1B3B69]/5 text-left transition">
+                          <div className="w-6 h-6 rounded-full bg-[#1B3B69]/10 flex items-center justify-center text-[#1B3B69] text-xs font-bold shrink-0">
                             {s.fullname?.charAt(0) ?? '?'}
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-medium text-gray-800 truncate">{s.fullname}</p>
                             <p className="text-xs text-gray-400">Grade {s.grade}</p>
                           </div>
-                          <Plus size={14} className="text-[#1B2B6B] shrink-0" />
+                          <Plus size={14} className="text-[#1B3B69] shrink-0" />
                         </button>
                       ))
                     )}
@@ -589,7 +589,7 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
                     {form.kidLocations.map((stop, i) => (
                       <div key={stop.kidId} className="bg-gray-50 rounded-xl p-3">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="w-6 h-6 bg-[#1B2B6B] rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">{i + 1}</span>
+                          <span className="w-6 h-6 bg-[#1B3B69] rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">{i + 1}</span>
                           <p className="text-sm font-medium text-gray-800 flex-1">{stop.kidName ?? stop.kidId?.slice(-6)}</p>
                           <div className="flex gap-1">
                             <button onClick={() => moveStop(i, 'up')} disabled={i === 0} className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-200 disabled:opacity-30">
@@ -606,16 +606,16 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
                         <button
                           onClick={() => setMapTarget({ kidId: stop.kidId })}
                           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg border text-left transition ${
-                            stop.lat ? 'border-[#1B2B6B]/30 bg-[#1B2B6B]/5' : 'border-gray-200 hover:bg-gray-100'
+                            stop.lat ? 'border-[#1B3B69]/30 bg-[#1B3B69]/5' : 'border-gray-200 hover:bg-gray-100'
                           }`}
                         >
-                          <MapPin size={14} className={stop.lat ? 'text-[#1B2B6B]' : 'text-gray-400'} />
+                          <MapPin size={14} className={stop.lat ? 'text-[#1B3B69]' : 'text-gray-400'} />
                           {stop.lat ? (
                             <span className="text-xs font-mono text-gray-600">{stop.lat.toFixed(5)}, {stop.long.toFixed(5)}</span>
                           ) : (
                             <span className="text-xs text-gray-400">Tap to pick location on map</span>
                           )}
-                          {stop.lat && <span className="text-xs text-[#1B2B6B] font-medium ml-auto">Change</span>}
+                          {stop.lat && <span className="text-xs text-[#1B3B69] font-medium ml-auto">Change</span>}
                         </button>
                       </div>
                     ))}
@@ -634,7 +634,7 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
           <div className="p-5 border-t border-gray-100 flex gap-3">
             <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition">Cancel</button>
             <button onClick={handleSubmit} disabled={isLoading}
-              className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50">
+              className="flex-1 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50">
               {isLoading ? 'Saving…' : mode === 'add' ? 'Create Route' : 'Save Changes'}
             </button>
           </div>
@@ -789,7 +789,7 @@ export default function RoutesPage() {
             <p className="text-sm text-gray-400 mt-0.5">{filtered.length} route{filtered.length !== 1 ? 's' : ''} configured</p>
           </div>
           <button onClick={() => { setEditTarget(null); setModal('add'); }}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition">
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#1B3B69] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition">
             <Plus size={16} /> Create Route
           </button>
         </div>
@@ -798,12 +798,12 @@ export default function RoutesPage() {
           <div className="relative flex-1 min-w-[200px] max-w-sm">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search routes…"
-              className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30" />
+              className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30" />
           </div>
           <div className="flex gap-2">
             {[{ value: '', label: 'All' }, { value: 'pick', label: '🚐 Pick Up' }, { value: 'drop', label: '🏠 Drop Off' }].map(f => (
               <button key={f.value} onClick={() => setTypeFilter(f.value)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-full transition ${typeFilter === f.value ? 'bg-[#1B2B6B] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                className={`px-3 py-1.5 text-xs font-medium rounded-full transition ${typeFilter === f.value ? 'bg-[#1B3B69] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
                 {f.label}
               </button>
             ))}
@@ -829,7 +829,7 @@ export default function RoutesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {filtered.map(route => (
-              <div key={route._id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#1B2B6B]/20 transition-all group">
+              <div key={route._id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#1B3B69]/20 transition-all group">
                 <div className="p-4 border-b border-gray-50">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
@@ -865,7 +865,7 @@ export default function RoutesPage() {
                     <span className="text-xs text-gray-600">{route.van?.carNumber ?? (route.vanId ? route.vanId?.slice(-8) : 'No van assigned')}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <MapPin size={14} className="text-[#1B2B6B] shrink-0" />
+                    <MapPin size={14} className="text-[#1B3B69] shrink-0" />
                     <span className="text-xs text-gray-600">{route.kidLocations?.length ?? 0} student stop{(route.kidLocations?.length ?? 0) !== 1 ? 's' : ''}</span>
                   </div>
                   <div className="flex items-start gap-2">
@@ -875,7 +875,7 @@ export default function RoutesPage() {
                 </div>
                 <div className="px-4 py-3 border-t border-gray-50 flex items-center justify-between cursor-pointer hover:bg-gray-50/50 transition rounded-b-2xl" onClick={() => setDetailRoute(route)}>
                   <span className="text-xs text-gray-400">Created {new Date(route.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                  <ChevronRight size={14} className="text-gray-300 group-hover:text-[#1B2B6B] transition" />
+                  <ChevronRight size={14} className="text-gray-300 group-hover:text-[#1B3B69] transition" />
                 </div>
               </div>
             ))}

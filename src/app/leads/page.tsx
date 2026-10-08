@@ -110,7 +110,7 @@ export default function LeadsPage() {
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#1B2B6B]">School Leads</h1>
+        <h1 className="text-2xl font-bold text-[#1B3B69]">School Leads</h1>
         <p className="text-gray-500 text-sm mt-1">
           Schools that registered via smartvan.pk — manage and track their onboarding status.
         </p>
@@ -119,7 +119,7 @@ export default function LeadsPage() {
       {/* Stats */}
       <div className="grid grid-cols-5 gap-4 mb-6">
         {[
-          { key: 'all',       label: 'Total',     color: 'bg-[#1B2B6B] text-white' },
+          { key: 'all',       label: 'Total',     color: 'bg-[#1B3B69] text-white' },
           { key: 'new',       label: 'New',        color: 'bg-blue-500 text-white' },
           { key: 'contacted', label: 'Contacted',  color: 'bg-yellow-500 text-white' },
           { key: 'activated', label: 'Activated',  color: 'bg-green-500 text-white' },
@@ -195,7 +195,7 @@ export default function LeadsPage() {
                   >
                     <td className="px-4 py-3 text-gray-400 font-mono">{i + 1}</td>
                     <td className="px-4 py-3">
-                      <div className="font-semibold text-[#1B2B6B]">{lead.schoolName}</div>
+                      <div className="font-semibold text-[#1B3B69]">{lead.schoolName}</div>
                       <div className="text-xs text-gray-400">{lead.schoolType}</div>
                     </td>
                     <td className="px-4 py-3">
@@ -203,7 +203,7 @@ export default function LeadsPage() {
                       <div className="text-xs text-gray-400">{lead.designation}</div>
                       <a
                         href={`mailto:${lead.email}`}
-                        className="text-xs text-[#1B2B6B] hover:underline"
+                        className="text-xs text-[#1B3B69] hover:underline"
                       >
                         {lead.email}
                       </a>
@@ -242,7 +242,7 @@ export default function LeadsPage() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => setSelectedLead(lead)}
-                          className="px-3 py-1 text-xs bg-[#1B2B6B] text-white rounded-lg hover:bg-[#111d4a] transition-colors"
+                          className="px-3 py-1 text-xs bg-[#1B3B69] text-white rounded-lg hover:bg-[#111d4a] transition-colors"
                         >
                           View
                         </button>
@@ -275,7 +275,7 @@ export default function LeadsPage() {
         >
           <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="bg-[#1B2B6B] p-6 rounded-t-2xl flex justify-between items-start">
+            <div className="bg-[#1B3B69] p-6 rounded-t-2xl flex justify-between items-start">
               <div>
                 <h2 className="text-white font-bold text-xl">{selectedLead.schoolName}</h2>
                 <p className="text-white/60 text-sm mt-1">{selectedLead.schoolType} • {selectedLead.city}, {selectedLead.country}</p>
@@ -359,7 +359,7 @@ export default function LeadsPage() {
               <div className="mt-6 flex gap-3">
                 <a
                   href={`mailto:${selectedLead.email}?subject=SmartVan Registration – ${selectedLead.schoolName}&body=Dear ${selectedLead.adminName},%0A%0AThank you for registering ${selectedLead.schoolName} on SmartVan.`}
-                  className="flex-1 text-center py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-semibold hover:bg-[#111d4a] transition-colors"
+                  className="flex-1 text-center py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-semibold hover:bg-[#111d4a] transition-colors"
                 >
                   📧 Send Email
                 </a>
@@ -395,7 +395,7 @@ function Row({
     <div className="flex justify-between items-start gap-2">
       <span className="text-xs text-gray-400 flex-shrink-0">{label}</span>
       {isEmail ? (
-        <a href={`mailto:${value}`} className="text-xs font-medium text-[#1B2B6B] hover:underline text-right">
+        <a href={`mailto:${value}`} className="text-xs font-medium text-[#1B3B69] hover:underline text-right">
           {value}
         </a>
       ) : isPhone ? (

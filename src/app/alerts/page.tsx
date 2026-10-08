@@ -67,7 +67,7 @@ function linkify(text: string) {
   const parts = text.split(/(https:\/\/maps\.google\.com\/\?q=[-0-9.,]+)/g);
   return parts.map((part, i) =>
     part.startsWith('https://maps.google.com/') ? (
-      <a key={i} href={part} target="_blank" rel="noreferrer" className="text-[#1B2B6B] font-medium underline">
+      <a key={i} href={part} target="_blank" rel="noreferrer" className="text-[#1B3B69] font-medium underline">
         Open location
       </a>
     ) : (
@@ -114,8 +114,8 @@ function SendAlertModal({ onClose, onSuccess }: { onClose: () => void; onSuccess
       <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 mx-4">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#1B2B6B]/10 rounded-xl flex items-center justify-center">
-              <Megaphone size={18} className="text-[#1B2B6B]" />
+            <div className="w-9 h-9 bg-[#1B3B69]/10 rounded-xl flex items-center justify-center">
+              <Megaphone size={18} className="text-[#1B3B69]" />
             </div>
             <h2 className="text-lg font-bold text-gray-900">Send Alert</h2>
           </div>
@@ -153,7 +153,7 @@ function SendAlertModal({ onClose, onSuccess }: { onClose: () => void; onSuccess
               <select
                 value={form.vanId}
                 onChange={e => setForm(f => ({ ...f, vanId: e.target.value }))}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               >
                 <option value="">Choose a van…</option>
                 {(vansData ?? []).map((v: any) => (
@@ -171,7 +171,7 @@ function SendAlertModal({ onClose, onSuccess }: { onClose: () => void; onSuccess
             <select
               value={form.alertType}
               onChange={e => setForm(f => ({ ...f, alertType: e.target.value }))}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
             >
               <option value="">Select type…</option>
               {ALERT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
@@ -186,15 +186,15 @@ function SendAlertModal({ onClose, onSuccess }: { onClose: () => void; onSuccess
               onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
               rows={4}
               placeholder="Type your alert message here…"
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30 resize-none"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 resize-none"
             />
             <p className="text-xs text-gray-400 mt-1">{form.message.length} characters</p>
           </div>
 
           {/* Preview */}
           {form.message && (
-            <div className="p-3 bg-[#1B2B6B]/5 rounded-xl border border-[#1B2B6B]/10">
-              <p className="text-xs font-semibold text-[#1B2B6B] mb-1">Preview</p>
+            <div className="p-3 bg-[#1B3B69]/5 rounded-xl border border-[#1B3B69]/10">
+              <p className="text-xs font-semibold text-[#1B3B69] mb-1">Preview</p>
               <p className="text-xs text-gray-700 leading-relaxed">{form.message}</p>
               <div className="flex items-center gap-2 mt-2">
                 <Bell size={10} className="text-gray-400" />
@@ -219,7 +219,7 @@ function SendAlertModal({ onClose, onSuccess }: { onClose: () => void; onSuccess
           <button
             onClick={handleSend}
             disabled={sendMutation.isPending}
-            className="flex-1 py-2.5 bg-[#1B2B6B] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 py-2.5 bg-[#1B3B69] text-white rounded-xl text-sm font-medium hover:bg-[#162356] transition disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {sendMutation.isPending ? 'Sending…' : <><Send size={14} /> Send Alert</>}
           </button>
@@ -275,7 +275,7 @@ function AlertCard({ alert, onDelete, onWhatsApp }: { alert: Alert; onDelete: (i
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-1">
               {alert.alertType && (
-                <span className="px-2 py-0.5 bg-[#1B2B6B]/10 text-[#1B2B6B] text-xs font-medium rounded-full">
+                <span className="px-2 py-0.5 bg-[#1B3B69]/10 text-[#1B3B69] text-xs font-medium rounded-full">
                   {alert.alertType}
                 </span>
               )}
@@ -361,7 +361,7 @@ export default function AlertsPage() {
 *Type:* ${alert.alertType || 'General'}
 *Message:* ${alert.message}
 
-_Safe Ride, Every Side_`;
+_Track the Van. Stay Informed._`;
 
       if (phoneNumbers.size === 0) {
         setWaMsg('✗ No parent phone numbers found');
@@ -428,7 +428,7 @@ _Safe Ride, Every Side_`;
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#1B3B69] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition"
           >
             <Plus size={16} /> Send Alert
           </button>
@@ -475,8 +475,8 @@ _Safe Ride, Every Side_`;
             ) : (
               driverAlertsList.map((a: any) => (
                 <div key={a._id} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                  <div className="w-9 h-9 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center shrink-0">
-                    <User size={16} className="text-[#1B2B6B]" />
+                  <div className="w-9 h-9 rounded-full bg-[#1B3B69]/10 flex items-center justify-center shrink-0">
+                    <User size={16} className="text-[#1B3B69]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">

@@ -54,7 +54,7 @@ export default function StaffLoginPage() {
 
   return (
     <div className="min-h-screen flex bg-gray-50">
-      <div className="hidden lg:flex lg:w-1/2 bg-[#1B2B6B] flex-col items-center justify-center p-12 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-[#1B3B69] flex-col items-center justify-center p-12 relative overflow-hidden">
         <div className="relative z-10 text-center">
           <div className="w-80 h-80 bg-white rounded-full flex items-center justify-center shadow-xl">
             <img src="/smartvan-logo-stacked.png" alt="SmartVan" className="w-64 object-contain" />
@@ -77,7 +77,7 @@ export default function StaffLoginPage() {
                 onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
                 placeholder="you@yourschool.com"
                 autoComplete="off"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
               />
             </div>
             <div>
@@ -90,7 +90,7 @@ export default function StaffLoginPage() {
                   onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
                   placeholder="••••••••"
                   autoComplete="new-password"
-                  className="w-full px-4 py-3 pr-11 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+                  className="w-full px-4 py-3 pr-11 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
                 />
                 <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -106,7 +106,7 @@ export default function StaffLoginPage() {
             <button
               onClick={handleLogin}
               disabled={loading}
-              className="w-full py-3 bg-[#1B2B6B] text-white font-semibold rounded-xl hover:bg-[#162356] transition disabled:opacity-60 flex items-center justify-center gap-2"
+              className="w-full py-3 bg-[#1B3B69] text-white font-semibold rounded-xl hover:bg-[#162356] transition disabled:opacity-60 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -120,7 +120,7 @@ export default function StaffLoginPage() {
           </div>
           <p className="text-center text-xs text-gray-400 mt-8">SmartVan Staff Portal · {new Date().getFullYear()}</p>
           <p className="text-center text-xs text-gray-400 mt-2">
-            School admin? <a href="/auth/login" className="text-[#1B2B6B] font-medium hover:underline">Log in here</a> instead
+            School admin? <a href="/auth/login" className="text-[#1B3B69] font-medium hover:underline">Log in here</a> instead
           </p>
         </div>
       </div>
