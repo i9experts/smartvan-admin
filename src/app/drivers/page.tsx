@@ -221,8 +221,8 @@ function DriverDetailDrawer({ driver, onClose, onEdit }: { driver: Driver; onClo
         {driver.van && (
           <div className="p-5 border-b border-gray-100">
             <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Assigned Van</h4>
-            <div className="flex items-center gap-3 p-3 bg-[#FFB800]/10 rounded-xl">
-              <Bus size={20} className="text-[#FFB800]" />
+            <div className="flex items-center gap-3 p-3 bg-[#FEC610]/10 rounded-xl">
+              <Bus size={20} className="text-[#FEC610]" />
               <div>
                 <p className="text-sm font-semibold text-gray-800">{driver.van.carNumber ?? '—'}</p>
                 <p className="text-xs text-gray-500">{driver.van.vehicleType ?? ''}</p>
@@ -695,7 +695,7 @@ export default function DriversPage() {
                         <td className="p-4">
                           {(driver as any).van ? (
                             <span className="flex items-center gap-1.5 text-sm text-gray-700">
-                              <Bus size={13} className="text-[#FFB800]" />
+                              <Bus size={13} className="text-[#FEC610]" />
                               {(driver as any).van.carNumber ?? 'Assigned'}
                             </span>
                           ) : (

@@ -850,7 +850,7 @@ export default function VansPage() {
                     <td className="p-4"><input type="checkbox" checked={selected.has(van._id)} onChange={() => toggleSelect(van._id)} className="rounded border-gray-300" /></td>
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-[#FFB800]/20 flex items-center justify-center shrink-0"><Bus size={18} className="text-[#FFB800]" /></div>
+                        <div className="w-9 h-9 rounded-xl bg-[#FEC610]/20 flex items-center justify-center shrink-0"><Bus size={18} className="text-[#FEC610]" /></div>
                         <div><p className="text-sm font-semibold text-gray-900">{van.carNumber || '—'}</p><p className="text-xs text-gray-400">{van.ownVan ? 'School-owned' : 'Private'}</p></div>
                       </div>
                     </td>

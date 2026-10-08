@@ -257,7 +257,7 @@ export default function DashboardPage() {
     { name: 'Inactive', value: stats.totalStudents - stats.activeStudents },
   ];
 
-  const PIE_COLORS = ['#1B3B69', '#FFB800'];
+  const PIE_COLORS = ['#1B3B69', '#FEC610'];
 
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -311,7 +311,7 @@ export default function DashboardPage() {
               value={stats.totalVans}
               sub={`${stats.activeVans} on road`}
               icon={<Bus size={20} />}
-              color="#FFB800"
+              color="#FEC610"
               trend={0}
             />
             <StatCard
@@ -398,7 +398,7 @@ export default function DashboardPage() {
                   strokeWidth={2.5}
                   fill="url(#colorTrips)"
                   dot={{ fill: '#1B3B69', strokeWidth: 0, r: 4 }}
-                  activeDot={{ r: 6, fill: '#FFB800' }}
+                  activeDot={{ r: 6, fill: '#FEC610' }}
                 />
               </AreaChart>
             </ResponsiveContainer>

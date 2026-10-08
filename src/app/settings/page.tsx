@@ -138,7 +138,7 @@ function SaveBanner({ show, loading, onSave, onDiscard }: { show: boolean; loadi
       <span className="text-sm font-medium">You have unsaved changes</span>
       <div className="flex gap-2">
         <button onClick={onDiscard} className="px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition">Discard</button>
-        <button onClick={onSave} disabled={loading} className="flex items-center gap-2 px-4 py-1.5 bg-[#FFB800] text-[#1B3B69] font-semibold rounded-lg text-sm hover:bg-[#e5a600] transition disabled:opacity-60">
+        <button onClick={onSave} disabled={loading} className="flex items-center gap-2 px-4 py-1.5 bg-[#FEC610] text-[#1B3B69] font-semibold rounded-lg text-sm hover:bg-[#e5a600] transition disabled:opacity-60">
           {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
           {loading ? 'Saving…' : 'Save Changes'}
         </button>
@@ -400,7 +400,7 @@ export default function SettingsPage() {
 
         {/* Plan info */}
         {school && (
-          <div className="mx-4 mb-4 p-3 bg-[#FFB800]/10 rounded-xl border border-[#FFB800]/20">
+          <div className="mx-4 mb-4 p-3 bg-[#FEC610]/10 rounded-xl border border-[#FEC610]/20">
             <p className="text-xs font-semibold text-[#1B3B69] mb-1">{school.currentPlan ?? 'Free Plan'}</p>
             <div className="space-y-1 text-xs text-gray-500">
               <p>Vans: {school.allowedVans ?? '—'}</p>
@@ -600,7 +600,7 @@ export default function SettingsPage() {
                       type="button"
                       onClick={() => avatarInputRef.current?.click()}
                       disabled={isUploadingAvatar}
-                      className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#FFB800] rounded-full flex items-center justify-center shadow-md disabled:opacity-60">
+                      className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#FEC610] rounded-full flex items-center justify-center shadow-md disabled:opacity-60">
                       {isUploadingAvatar ? (
                         <Loader2 size={13} className="text-white animate-spin" />
                       ) : (
@@ -1022,10 +1022,10 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-[#FFB800] shadow" />
+                      <div className="w-8 h-8 rounded-lg bg-[#FEC610] shadow" />
                       <div>
                         <p className="text-xs font-medium text-gray-700">Accent</p>
-                        <p className="text-xs text-gray-400">#FFB800</p>
+                        <p className="text-xs text-gray-400">#FEC610</p>
                       </div>
                     </div>
                   </div>

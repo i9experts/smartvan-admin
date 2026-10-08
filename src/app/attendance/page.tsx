@@ -221,7 +221,7 @@ export default function AttendancePage() {
       let y = 50;
 
       const NAVY = '#1B3B69';
-      const YELLOW = '#FFB800';
+      const YELLOW = '#FEC610';
       const GREEN = '#10b981';
       const AMBER = '#f59e0b';
       const RED = '#ef4444';
@@ -379,7 +379,7 @@ export default function AttendancePage() {
           <button
             onClick={exportPDF}
             disabled={!report || loading || isGeneratingPdf}
-            className="flex items-center gap-2 px-4 py-2 bg-[#FFB800] text-[#1B3B69] rounded-xl text-sm font-semibold hover:bg-[#e6a600] transition-colors disabled:opacity-40"
+            className="flex items-center gap-2 px-4 py-2 bg-[#FEC610] text-[#1B3B69] rounded-xl text-sm font-semibold hover:bg-[#e6a600] transition-colors disabled:opacity-40"
           >
             <Download size={15} /> {isGeneratingPdf ? 'Generating…' : 'Follow-Up Report (PDF)'}
           </button>

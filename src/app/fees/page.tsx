@@ -630,7 +630,7 @@ export default function FeesPage() {
                     <div key={s.value} className="flex items-center gap-3">
                       <span className="text-sm text-gray-600 w-24">{s.label}</span>
                       <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#FFB800] rounded-full" style={{ width: `${pct}%` }} />
+                        <div className="h-full bg-[#FEC610] rounded-full" style={{ width: `${pct}%` }} />
                       </div>
                       <span className="text-xs text-gray-400 w-8 text-right">{count}</span>
                     </div>

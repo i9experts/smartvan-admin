@@ -317,7 +317,7 @@ export default function SuperAdminPage() {
             </div>
             <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#FFB800] rounded-full transition-all"
+                className="h-full bg-[#FEC610] rounded-full transition-all"
                 style={{ width: `${data?.appConnections.drivers.rate ?? 0}%` }}
               />
             </div>

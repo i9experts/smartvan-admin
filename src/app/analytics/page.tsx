@@ -70,7 +70,7 @@ interface AnalyticsResponse {
   };
 }
 
-const PIE_COLORS = ['#1B3B69', '#FFB800', '#10B981', '#EF4444'];
+const PIE_COLORS = ['#1B3B69', '#FEC610', '#10B981', '#EF4444'];
 
 // ─── Small building blocks ─────────────────────────────────────────────────────
 
@@ -280,7 +280,7 @@ export default function AnalyticsPage() {
               title="Fleet Size"
               value={fm.driverCoverage.totalVans}
               sub={`${fm.driverCoverage.withDriver} with driver · ${fm.driverCoverage.withoutDriver} without`}
-              icon={<Bus size={20} />} color="#FFB800"
+              icon={<Bus size={20} />} color="#FEC610"
               trend={fm.trends.vans}
             />
             <StatCard
@@ -369,15 +369,15 @@ export default function AnalyticsPage() {
               <ResponsiveContainer width="100%" height={140}>
                 <PieChart>
                   <Pie data={driverCoverageData} cx="50%" cy="50%" innerRadius={40} outerRadius={65} paddingAngle={4} dataKey="value">
-                    {driverCoverageData.map((_, i) => <Cell key={i} fill={['#FFB800', '#E5E7EB'][i]} />)}
+                    {driverCoverageData.map((_, i) => <Cell key={i} fill={['#FEC610', '#E5E7EB'][i]} />)}
                   </Pie>
                   <Tooltip />
                 </PieChart>
               </ResponsiveContainer>
               <div className="grid grid-cols-2 gap-3 mt-3">
-                <div className="p-3 bg-[#FFB800]/10 rounded-xl text-center">
+                <div className="p-3 bg-[#FEC610]/10 rounded-xl text-center">
                   <p className="text-xs text-gray-500">With Driver</p>
-                  <p className="text-xl font-bold text-[#FFB800]">{fm.driverCoverage.withDriver}</p>
+                  <p className="text-xl font-bold text-[#FEC610]">{fm.driverCoverage.withDriver}</p>
                 </div>
                 <div className="p-3 bg-gray-100 rounded-xl text-center">
                   <p className="text-xs text-gray-500">No Driver</p>

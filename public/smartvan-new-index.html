@@ -27,7 +27,7 @@
   --navy:#1B3B69;
   --navy-dark:#111d4a;
   --navy-light:#243580;
-  --yellow:#FFB800;
+  --yellow:#FEC610;
   --yellow-dark:#e6a600;
   --teal:#00C48C;
   --red:#FF4B4B;
@@ -44,8 +44,8 @@
   --radius:12px;
   --radius-sm:8px;
   --radius-lg:20px;
-  --shadow:0 4px 24px rgba(27,43,107,0.08);
-  --shadow-lg:0 12px 48px rgba(27,43,107,0.16);
+  --shadow:0 4px 24px rgba(27, 59, 105,0.08);
+  --shadow-lg:0 12px 48px rgba(27, 59, 105,0.16);
 }
 html{scroll-behavior:smooth}
 body{font-family:'Inter',sans-serif;color:var(--text);background:var(--white);overflow-x:hidden}
@@ -72,7 +72,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 2rem;height:68px;d
 /* ───── HERO ───── */
 #hero{min-height:100vh;background:linear-gradient(135deg,var(--navy-dark) 0%,var(--navy) 60%,#1e3a8a 100%);display:flex;align-items:center;padding:100px 2rem 60px;position:relative;overflow:hidden}
 .hero-grid{max-width:1200px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,184,0,0.15);border:1px solid rgba(255,184,0,0.3);border-radius:100px;padding:6px 16px;font-size:0.8rem;font-weight:600;color:var(--yellow);margin-bottom:1.5rem}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(254, 198, 16,0.15);border:1px solid rgba(254, 198, 16,0.3);border-radius:100px;padding:6px 16px;font-size:0.8rem;font-weight:600;color:var(--yellow);margin-bottom:1.5rem}
 .hero-badge span{width:6px;height:6px;background:var(--yellow);border-radius:50%;animation:pulse 2s ease-in-out infinite}
 .hero-content h1{font-size:clamp(2.2rem,4vw,3.4rem);font-weight:800;color:var(--white);line-height:1.15;margin-bottom:1.25rem}
 .hero-content h1 em{color:var(--yellow);font-style:normal}
@@ -109,7 +109,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 2rem;height:68px;d
 /* ───── SECTION SHELL ───── */
 section{padding:80px 2rem}
 .section-inner{max-width:1200px;margin:0 auto}
-.section-tag{display:inline-block;background:rgba(27,43,107,0.08);color:var(--navy);font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:1rem}
+.section-tag{display:inline-block;background:rgba(27, 59, 105,0.08);color:var(--navy);font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:1rem}
 .section-title{font-size:clamp(1.7rem,3vw,2.5rem);font-weight:800;color:var(--navy);margin-bottom:0.75rem}
 .section-sub{font-size:1.05rem;color:var(--text-muted);line-height:1.7;max-width:580px}
 .text-center{text-align:center}
@@ -127,8 +127,8 @@ section{padding:80px 2rem}
 .feat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;transition:all .25s;cursor:default}
 .feat-card:hover{border-color:var(--navy);box-shadow:var(--shadow-lg);transform:translateY(-4px)}
 .feat-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;font-size:1.5rem}
-.feat-icon.navy{background:rgba(27,43,107,0.1)}
-.feat-icon.yellow{background:rgba(255,184,0,0.15)}
+.feat-icon.navy{background:rgba(27, 59, 105,0.1)}
+.feat-icon.yellow{background:rgba(254, 198, 16,0.15)}
 .feat-icon.teal{background:rgba(0,196,140,0.12)}
 .feat-icon.red{background:rgba(255,75,75,0.1)}
 .feat-icon.orange{background:rgba(255,140,66,0.1)}
@@ -251,7 +251,7 @@ textarea{resize:vertical;min-height:80px}
 #cta-banner{background:var(--yellow);padding:60px 2rem}
 .cta-inner{max-width:700px;margin:0 auto;text-align:center}
 .cta-inner h2{font-size:clamp(1.8rem,3vw,2.5rem);font-weight:800;color:var(--navy);margin-bottom:0.75rem}
-.cta-inner p{color:rgba(27,43,107,0.7);font-size:1rem;margin-bottom:2rem}
+.cta-inner p{color:rgba(27, 59, 105,0.7);font-size:1rem;margin-bottom:2rem}
 
 /* ───── FOOTER ───── */
 footer{background:var(--navy-dark);color:rgba(255,255,255,0.6);padding:60px 2rem 32px}
@@ -313,7 +313,7 @@ footer{background:var(--navy-dark);color:rgba(255,255,255,0.6);padding:60px 2rem
 }
 
 /* ─── Animated Route Van ─── */
-.route-path{stroke:rgba(255,184,0,0.5);stroke-width:3;fill:none;stroke-dasharray:6 4}
+.route-path{stroke:rgba(254, 198, 16,0.5);stroke-width:3;fill:none;stroke-dasharray:6 4}
 .school-pin,.home-pin{filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))}
 .animated-van{animation:driveAlong 6s ease-in-out infinite}
 @keyframes driveAlong{
@@ -387,9 +387,9 @@ footer{background:var(--navy-dark);color:rgba(255,255,255,0.6);padding:60px 2rem
           <!-- Route path -->
           <path class="route-path" d="M60,230 Q110,180 160,155 Q210,130 270,115 Q320,108 350,130"/>
           <!-- Stop circles -->
-          <circle cx="60" cy="230" r="8" fill="rgba(255,184,0,0.3)" stroke="#FFB800" stroke-width="2"/>
-          <circle cx="160" cy="155" r="6" fill="rgba(255,184,0,0.3)" stroke="#FFB800" stroke-width="1.5"/>
-          <circle cx="270" cy="115" r="6" fill="rgba(255,184,0,0.3)" stroke="#FFB800" stroke-width="1.5"/>
+          <circle cx="60" cy="230" r="8" fill="rgba(254, 198, 16,0.3)" stroke="#FEC610" stroke-width="2"/>
+          <circle cx="160" cy="155" r="6" fill="rgba(254, 198, 16,0.3)" stroke="#FEC610" stroke-width="1.5"/>
+          <circle cx="270" cy="115" r="6" fill="rgba(254, 198, 16,0.3)" stroke="#FEC610" stroke-width="1.5"/>
           <!-- School pin -->
           <g transform="translate(330,115)">
             <circle r="14" fill="#1B3B69" stroke="white" stroke-width="2"/>
@@ -406,8 +406,8 @@ footer{background:var(--navy-dark);color:rgba(255,255,255,0.6);padding:60px 2rem
           </g>
           <!-- Animated Van -->
           <g class="animated-van">
-            <rect x="-14" y="-8" width="28" height="16" rx="4" fill="#FFB800"/>
-            <rect x="-10" y="-6" width="10" height="8" rx="2" fill="rgba(27,43,107,0.6)"/>
+            <rect x="-14" y="-8" width="28" height="16" rx="4" fill="#FEC610"/>
+            <rect x="-10" y="-6" width="10" height="8" rx="2" fill="rgba(27, 59, 105,0.6)"/>
             <circle cx="-8" cy="8" r="4" fill="#1B3B69"/>
             <circle cx="6" cy="8" r="4" fill="#1B3B69"/>
           </g>
@@ -428,7 +428,7 @@ footer{background:var(--navy-dark);color:rgba(255,255,255,0.6);padding:60px 2rem
       </div>
       <!-- Floating alert cards -->
       <div class="float-card fc1"><div class="dot" style="background:#00C48C"></div> Aisha picked up ✓</div>
-      <div class="float-card fc2"><div class="dot" style="background:#FFB800"></div> SOS resolved — Driver OK</div>
+      <div class="float-card fc2"><div class="dot" style="background:#FEC610"></div> SOS resolved — Driver OK</div>
     </div>
   </div>
 </section>
@@ -552,7 +552,7 @@ footer{background:var(--navy-dark);color:rgba(255,255,255,0.6);padding:60px 2rem
     </div>
 
     <!-- How Pricing Works Banner -->
-    <div style="background:rgba(27,43,107,0.05);border:1.5px solid rgba(27,43,107,0.12);border-radius:16px;padding:1.25rem 1.75rem;margin-bottom:2rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+    <div style="background:rgba(27, 59, 105,0.05);border:1.5px solid rgba(27, 59, 105,0.12);border-radius:16px;padding:1.25rem 1.75rem;margin-bottom:2rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
       <div style="font-size:1.5rem">💡</div>
       <div>
         <p style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-bottom:2px">Simple Per-Van Pricing — Pay Only for What You Use</p>
@@ -744,7 +744,7 @@ footer{background:var(--navy-dark);color:rgba(255,255,255,0.6);padding:60px 2rem
 <section id="onboarding">
   <div class="section-inner">
     <div class="text-center">
-      <span class="section-tag" style="background:rgba(255,184,0,0.2);color:#c8900a">Get Started</span>
+      <span class="section-tag" style="background:rgba(254, 198, 16,0.2);color:#c8900a">Get Started</span>
       <h2 class="section-title" style="color:var(--white)">Register Your School</h2>
       <p class="section-sub" style="color:rgba(255,255,255,0.65);margin:0 auto">Takes 3 minutes. We'll have your account ready within 24 hours.</p>
     </div>
@@ -1516,7 +1516,7 @@ function toggleMenu() {
 window.addEventListener('scroll', function() {
   var nav = document.getElementById('navbar');
   if (window.scrollY > 40) {
-    nav.style.boxShadow = '0 4px 24px rgba(27,43,107,0.1)';
+    nav.style.boxShadow = '0 4px 24px rgba(27, 59, 105,0.1)';
   } else {
     nav.style.boxShadow = 'none';
   }

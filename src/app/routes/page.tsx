@@ -183,8 +183,8 @@ function RouteDetailDrawer({ route, onClose, onEdit }: { route: RouteData; onClo
           <div className="p-5 border-b border-gray-100">
             <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Assigned Van</h4>
             {route.van || route.vanId ? (
-              <div className="flex items-center gap-3 p-3 bg-[#FFB800]/10 rounded-xl">
-                <Bus size={20} className="text-[#FFB800]" />
+              <div className="flex items-center gap-3 p-3 bg-[#FEC610]/10 rounded-xl">
+                <Bus size={20} className="text-[#FEC610]" />
                 <div>
                   <p className="text-sm font-semibold text-gray-800">{route.van?.carNumber ?? route.vanId?.slice(-8)}</p>
                   <p className="text-xs text-gray-500">{route.van?.vehicleType ?? ''}</p>
@@ -861,7 +861,7 @@ export default function RoutesPage() {
                 </div>
                 <div className="p-4 space-y-3">
                   <div className="flex items-center gap-2">
-                    <Bus size={14} className="text-[#FFB800] shrink-0" />
+                    <Bus size={14} className="text-[#FEC610] shrink-0" />
                     <span className="text-xs text-gray-600">{route.van?.carNumber ?? (route.vanId ? route.vanId?.slice(-8) : 'No van assigned')}</span>
                   </div>
                   <div className="flex items-center gap-2">

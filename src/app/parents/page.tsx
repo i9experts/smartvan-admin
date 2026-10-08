@@ -494,7 +494,7 @@ export default function ParentsPage() {
                       <div
                         key={k._id}
                         title={k.fullname}
-                        className="w-6 h-6 rounded-full bg-[#FFB800]/20 border-2 border-white flex items-center justify-center text-[8px] font-bold text-[#FFB800]"
+                        className="w-6 h-6 rounded-full bg-[#FEC610]/20 border-2 border-white flex items-center justify-center text-[8px] font-bold text-[#FEC610]"
                       >
                         {k.fullname?.charAt(0)?.toUpperCase()}
                       </div>

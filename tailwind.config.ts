@@ -12,11 +12,11 @@ const config: Config = {
       colors: {
         // SmartVan brand
         sv: {
-          yellow: "#FFB800",
-          "yellow-light": "#FFF8E6",
-          "yellow-dark": "#CC9200",
+          yellow: "#FEC610",
+          "yellow-light": "#FFF7DB",
+          "yellow-dark": "#CB9D0D",
           navy: "#1B3B69",
-          "navy-light": "#EEF0F8",
+          "navy-light": "#EBF0F7",
           teal: "#00C48C",
           "teal-light": "#E6FAF4",
           red: "#FF4B4B",
@@ -54,7 +54,7 @@ const config: Config = {
           foreground: "#8A94A6",
         },
         accent: {
-          DEFAULT: "#FFB800",
+          DEFAULT: "#FEC610",
           foreground: "#1A1A2E",
         },
         card: {

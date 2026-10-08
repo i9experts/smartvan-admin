@@ -132,8 +132,8 @@ function markerIcon(color: string, selected: boolean): any {
         <rect x="0" y="0" width="21" height="14" rx="3"/>
         <rect x="2.5" y="2.5" width="6" height="4.5" rx="1" fill="${color}"/>
         <rect x="10" y="2.5" width="6" height="4.5" rx="1" fill="${color}"/>
-        <circle cx="5" cy="16.5" r="2.3" fill="${color === '#FFB800' ? '#1B3B69' : '#FFB800'}"/>
-        <circle cx="16" cy="16.5" r="2.3" fill="${color === '#FFB800' ? '#1B3B69' : '#FFB800'}"/>
+        <circle cx="5" cy="16.5" r="2.3" fill="${color === '#FEC610' ? '#1B3B69' : '#FEC610'}"/>
+        <circle cx="16" cy="16.5" r="2.3" fill="${color === '#FEC610' ? '#1B3B69' : '#FEC610'}"/>
       </g>
     </svg>
   `.trim();
@@ -212,7 +212,7 @@ function GoogleTrackingMap({ trips, selectedTripId, onSelectTrip }: GoogleTracki
       seen.add(trip._id);
       const position = { lat: loc.lat, lng: loc.long };
       const isSelected = selectedTripId === trip._id;
-      const color = isSelected ? '#FFB800' : '#1B3B69';
+      const color = isSelected ? '#FEC610' : '#1B3B69';
 
       let marker = markersRef.current.get(trip._id);
       if (!marker) {
