@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import QRCode from 'qrcode';
+import { StudentCard } from '@/components/qr/StudentCard';
 import { Printer, RefreshCw, QrCode, Search } from 'lucide-react';
 import { api, vanApi } from '@/lib/api';
 
@@ -13,26 +13,8 @@ interface QrCard {
   image?: string;
   vanId?: string;
   status?: string;
+  vanNumber?: string;
   qrPayload: string;
-}
-
-function QrImage({ payload }: { payload: string }) {
-  const [src, setSrc] = useState<string>('');
-  useEffect(() => {
-    let alive = true;
-    QRCode.toDataURL(payload, { errorCorrectionLevel: 'M', margin: 1, width: 360 })
-      .then((url) => alive && setSrc(url))
-      .catch(() => alive && setSrc(''));
-    return () => {
-      alive = false;
-    };
-  }, [payload]);
-  return src ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt="Student QR code" className="w-[30mm] h-[30mm]" />
-  ) : (
-    <div className="w-[30mm] h-[30mm] bg-gray-100 animate-pulse rounded" />
-  );
 }
 
 /**
@@ -56,11 +38,16 @@ export default function QrCardsPage() {
       })),
   });
 
-  const { data: cards = [], isLoading, isError } = useQuery({
+  const { data: cardsData, isLoading, isError } = useQuery({
     queryKey: ['qr-cards', vanId],
     queryFn: () => api.get('/kid/qr/cards', { params: vanId ? { vanId } : {} }),
-    select: (r: any) => (r.data?.data ?? []) as QrCard[],
+    select: (r: any) => ({
+      cards: (r.data?.data ?? []) as QrCard[],
+      schoolName: (r.data?.school?.name ?? '') as string,
+    }),
   });
+  const cards = cardsData?.cards ?? [];
+  const schoolName = cardsData?.schoolName ?? '';
 
   const vanNumber = useMemo(() => {
     const m = new Map<string, string>(vans.map((v: any) => [v.id, v.carNumber]));
@@ -93,7 +80,7 @@ export default function QrCardsPage() {
             <QrCode size={22} /> Student QR Cards
           </h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            Drivers scan these cards to mark pickup and drop-off. Print, cut and laminate.
+            Drivers scan these cards to mark pickup and drop-off. Print in colour at 100% scale, cut and laminate. Students without a photo get a box to stick one on.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -137,20 +124,11 @@ export default function QrCardsPage() {
       ) : shown.length === 0 ? (
         <p className="text-sm text-gray-400">No students found.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 print:grid-cols-2 print:gap-[4mm]">
+        <div className="flex flex-wrap gap-5 print:gap-[4mm]">
           {shown.map((c) => (
             <div key={c.kidId} className="break-inside-avoid">
-              {/* Card face — ID-1 size (85.6 × 54 mm) when printed */}
-              <div className="bg-white border border-gray-300 rounded-xl p-3 flex gap-3 items-center print:w-[85.6mm] print:h-[54mm] print:rounded-[3mm] print:p-[3mm]">
-                <QrImage payload={c.qrPayload} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-semibold tracking-wide text-[#1B2B6B] uppercase">SmartVan student card</p>
-                  <p className="text-base font-bold text-gray-900 leading-tight mt-1 break-words">{c.fullname}</p>
-                  {c.grade && <p className="text-xs text-gray-600 mt-0.5">Grade {c.grade}</p>}
-                  {vanNumber(c.vanId) && <p className="text-xs text-gray-600">Van {vanNumber(c.vanId)}</p>}
-                  <p className="text-[9px] text-gray-400 mt-2">If found, please return to the school.</p>
-                </div>
-              </div>
+              {/* Card face — ID-1 size (85.6 × 54 mm), same on screen and paper */}
+              <StudentCard card={{ ...c, vanNumber: c.vanNumber || vanNumber(c.vanId) }} schoolName={schoolName} />
               <div className="flex items-center justify-between mt-1 px-1 print:hidden">
                 <span className="text-[11px] text-gray-400">{c.status === 'active' ? 'Active' : c.status || ''}</span>
                 <button
