@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import Link from 'next/link';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Search, X, Phone, Mail, Users,
-  ChevronLeft, ChevronRight, Eye,
+  ChevronLeft, ChevronRight, Eye, Pencil, Loader2, ClipboardList, Camera,
   GraduationCap, Bus, CheckCircle2, XCircle,
 } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api, uploadApi } from '@/lib/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -24,14 +25,26 @@ interface ParentRow {
   fullname?: string;
   email: string;
   phoneNo?: string;
+  alternatePhoneNo?: string;
   address?: string;
   image?: string;
   kids: LinkedKid[];
 }
 
+interface EditParentForm {
+  fullname: string;
+  email: string;
+  phoneNo: string;
+  alternatePhoneNo: string;
+  address: string;
+  image?: string;
+}
+
 const parentApi = {
   getAll: (params: { page: number; limit: number; search?: string }) =>
     api.get('/Admin/getAllParents', { params }),
+  edit: (parentId: string, data: EditParentForm) =>
+    api.patch(`/Admin/editParentByAdmin/${parentId}`, data),
 };
 
 // ─── Build parent rows from students ─────────────────────────────────────────
@@ -39,7 +52,9 @@ const parentApi = {
 
 // ─── Parent Detail Drawer ─────────────────────────────────────────────────────
 
-function ParentDetailDrawer({ parent, onClose }: { parent: ParentRow; onClose: () => void }) {
+function ParentDetailDrawer({
+  parent, onClose, onEdit,
+}: { parent: ParentRow; onClose: () => void; onEdit: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex">
       <div className="flex-1 bg-black/40 backdrop-blur-sm" onClick={onClose} />
@@ -47,9 +62,17 @@ function ParentDetailDrawer({ parent, onClose }: { parent: ParentRow; onClose: (
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100 sticky top-0 bg-white z-10">
           <h2 className="text-lg font-bold text-gray-900">Parent Profile</h2>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
-            <X size={16} />
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={onEdit}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#1B2B6B] border border-[#1B2B6B]/20 rounded-lg hover:bg-[#1B2B6B]/5 transition"
+            >
+              <Pencil size={12} /> Edit
+            </button>
+            <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
+              <X size={16} />
+            </button>
+          </div>
         </div>
 
         {/* Avatar + name */}
@@ -82,6 +105,15 @@ function ParentDetailDrawer({ parent, onClose }: { parent: ParentRow; onClose: (
               <div>
                 <p className="text-xs text-gray-400">Phone</p>
                 <p className="text-sm text-gray-800">{parent.phoneNo}</p>
+              </div>
+            </div>
+          )}
+          {parent.alternatePhoneNo && (
+            <div className="flex items-center gap-3">
+              <Phone size={14} className="text-gray-300 shrink-0" />
+              <div>
+                <p className="text-xs text-gray-400">Alternate Phone</p>
+                <p className="text-sm text-gray-800">{parent.alternatePhoneNo}</p>
               </div>
             </div>
           )}
@@ -143,6 +175,170 @@ function ParentDetailDrawer({ parent, onClose }: { parent: ParentRow; onClose: (
   );
 }
 
+// ─── Edit Parent Modal ──────────────────────────────────────────────────────
+
+function EditParentModal({
+  parent, onClose, onSuccess,
+}: { parent: ParentRow; onClose: () => void; onSuccess: () => void }) {
+  const [form, setForm] = useState<EditParentForm>({
+    fullname: parent.fullname ?? '',
+    email: parent.email ?? '',
+    phoneNo: parent.phoneNo ?? '',
+    alternatePhoneNo: parent.alternatePhoneNo ?? '',
+    address: parent.address ?? '',
+    image: parent.image,
+  });
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [error, setError] = useState('');
+
+  const mutation = useMutation({
+    mutationFn: () => parentApi.edit(parent._id, form),
+    onSuccess: () => onSuccess(),
+    onError: (e: any) => setError(e?.response?.data?.message || 'Failed to save. Please try again.'),
+  });
+
+  async function handlePhotoSelected(file: File) {
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Photo must be under 2MB.');
+      return;
+    }
+    setIsUploadingPhoto(true);
+    try {
+      const res = await uploadApi.image(file);
+      const url = res.data?.url ?? res.data?.data?.url ?? '';
+      setForm((f) => ({ ...f, image: url }));
+    } catch {
+      setError('Photo upload failed. Please try again.');
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.fullname.trim()) {
+      setError('Name cannot be empty.');
+      return;
+    }
+    setError('');
+    mutation.mutate();
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 mx-4">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-bold text-gray-900">Edit Parent</h2>
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
+            <X size={16} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="flex justify-center mb-1">
+            <div className="relative">
+              <div className="w-20 h-20 rounded-full bg-[#1B2B6B]/10 flex items-center justify-center overflow-hidden">
+                {form.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={form.image} alt="Parent" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-2xl font-semibold text-[#1B2B6B]">
+                    {(form.fullname || form.email).charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                id="parent-photo-input"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handlePhotoSelected(file);
+                }}
+              />
+              <label
+                htmlFor="parent-photo-input"
+                className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#1B2B6B] rounded-full flex items-center justify-center shadow-md cursor-pointer"
+              >
+                {isUploadingPhoto ? (
+                  <Loader2 size={12} className="text-white animate-spin" />
+                ) : (
+                  <Camera size={12} className="text-white" />
+                )}
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium text-gray-500">Full Name</label>
+            <input
+              value={form.fullname}
+              onChange={(e) => setForm((f) => ({ ...f, fullname: e.target.value }))}
+              className="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-gray-500">Email</label>
+            <input
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+              className="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-medium text-gray-500">Phone</label>
+              <input
+                value={form.phoneNo}
+                onChange={(e) => setForm((f) => ({ ...f, phoneNo: e.target.value }))}
+                className="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-500">Alternate Phone</label>
+              <input
+                value={form.alternatePhoneNo}
+                onChange={(e) => setForm((f) => ({ ...f, alternatePhoneNo: e.target.value }))}
+                className="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-medium text-gray-500">Address</label>
+            <input
+              value={form.address}
+              onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
+              className="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
+            />
+          </div>
+
+          {error && <p className="text-xs text-red-500">{error}</p>}
+
+          <div className="flex gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={mutation.isPending || isUploadingPhoto}
+              className="flex-1 px-4 py-2.5 bg-[#1B2B6B] text-white text-sm font-medium rounded-xl hover:bg-[#162356] transition disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {mutation.isPending && <Loader2 size={14} className="animate-spin" />}
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 12;
@@ -152,6 +348,8 @@ export default function ParentsPage() {
   const [searchInput, setSearchInput] = useState('');
   const [page, setPage] = useState(1);
   const [detailParent, setDetailParent] = useState<ParentRow | null>(null);
+  const [editParent, setEditParent] = useState<ParentRow | null>(null);
+  const queryClient = useQueryClient();
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ['parents', page, search],
@@ -170,10 +368,27 @@ export default function ParentsPage() {
     setPage(1);
   }
 
+  function handleEditSuccess() {
+    queryClient.invalidateQueries({ queryKey: ['parents'] });
+    setEditParent(null);
+    setDetailParent(null);
+  }
+
   return (
     <>
       {detailParent && (
-        <ParentDetailDrawer parent={detailParent} onClose={() => setDetailParent(null)} />
+        <ParentDetailDrawer
+          parent={detailParent}
+          onClose={() => setDetailParent(null)}
+          onEdit={() => setEditParent(detailParent)}
+        />
+      )}
+      {editParent && (
+        <EditParentModal
+          parent={editParent}
+          onClose={() => setEditParent(null)}
+          onSuccess={handleEditSuccess}
+        />
       )}
 
       <div className="p-6 space-y-5">
@@ -185,6 +400,13 @@ export default function ParentsPage() {
               {total} parent{total !== 1 ? 's' : ''} registered
             </p>
           </div>
+          <Link
+            href="/parents/register"
+            className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition"
+          >
+            <ClipboardList size={16} />
+            Register Report
+          </Link>
         </div>
 
         {/* Search */}
