@@ -1136,6 +1136,12 @@ export default function StudentsPage() {
   const qc = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  // Wait until the admin stops typing before hitting the API.
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search.trim()), 350);
+    return () => clearTimeout(t);
+  }, [search]);
   const [statusFilter, setStatusFilter] = useState('');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [modal, setModal] = useState<'add' | 'edit' | null>(null);
@@ -1145,8 +1151,9 @@ export default function StudentsPage() {
   const [showDelete, setShowDelete] = useState(false);
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['students', page, search, statusFilter],
-    queryFn: () => fetchStudents(page, search, statusFilter),
+    queryKey: ['students', page, debouncedSearch, statusFilter],
+    queryFn: () => fetchStudents(page, debouncedSearch, statusFilter),
+    placeholderData: (prev) => prev,
     staleTime: 30_000,
   });
 
@@ -1283,7 +1290,7 @@ export default function StudentsPage() {
             <input
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              placeholder="Search by name…"
+              placeholder="Search student, parent, driver or van…"
               className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2B6B]/30"
             />
           </div>
