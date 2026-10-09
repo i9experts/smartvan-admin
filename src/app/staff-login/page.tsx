@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import AuthShell from '@/components/AuthShell';
 import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { staffApi } from '@/lib/api';
 
@@ -53,20 +54,15 @@ export default function StaffLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      <div className="hidden lg:flex lg:w-1/2 bg-[#1B3B69] flex-col items-center justify-center p-12 relative overflow-hidden">
-        <div className="relative z-10 text-center">
-          <div className="w-80 h-80 bg-white rounded-full flex items-center justify-center shadow-xl">
-            <img src="/smartvan-logo-stacked.png" alt="SmartVan" className="w-64 object-contain" />
-          </div>
-        </div>
-      </div>
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-md">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Staff Login</h2>
-            <p className="text-gray-500 mt-2">Sign in to your SmartVan staff account</p>
-          </div>
+    <AuthShell
+      badge="Staff Portal"
+      title="Staff Login"
+      subtitle="Sign in to your SmartVan staff account"
+      footer={<>
+            <p>SmartVan Staff Portal · {new Date().getFullYear()}</p>
+            <p>School admin? <a href="/auth/login" className="text-[#1B3B69] font-medium hover:underline">Sign in here</a></p>
+      </>}
+    >
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Email address</label>
@@ -77,7 +73,7 @@ export default function StaffLoginPage() {
                 onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
                 placeholder="you@yourschool.com"
                 autoComplete="off"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white text-gray-900"
               />
             </div>
             <div>
@@ -90,7 +86,7 @@ export default function StaffLoginPage() {
                   onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
                   placeholder="••••••••"
                   autoComplete="new-password"
-                  className="w-full px-4 py-3 pr-11 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30"
+                  className="w-full px-4 py-3 pr-11 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B69]/30 bg-white text-gray-900"
                 />
                 <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -118,12 +114,6 @@ export default function StaffLoginPage() {
               )}
             </button>
           </div>
-          <p className="text-center text-xs text-gray-400 mt-8">SmartVan Staff Portal · {new Date().getFullYear()}</p>
-          <p className="text-center text-xs text-gray-400 mt-2">
-            School admin? <a href="/auth/login" className="text-[#1B3B69] font-medium hover:underline">Log in here</a> instead
-          </p>
-        </div>
-      </div>
-    </div>
+    </AuthShell>
   );
 }
