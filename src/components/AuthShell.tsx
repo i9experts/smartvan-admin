@@ -22,7 +22,7 @@ export default function AuthShell({ badge, title, subtitle, footer, children }: 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#0B1B3F]">
       <div
-        className="absolute inset-0 bg-cover bg-[center_right] opacity-90"
+        className="absolute inset-y-0 inset-x-0 bg-cover bg-[center_85%] bg-no-repeat lg:bg-[position:center_bottom] lg:inset-x-[22%] lg:[mask-image:linear-gradient(to_right,transparent,#000_30%,#000_70%,transparent)] lg:[-webkit-mask-image:linear-gradient(to_right,transparent,#000_30%,#000_70%,transparent)]"
         style={{ backgroundImage: "url('/login-bg.jpg')" }}
       />
       <div className="absolute inset-0 bg-gradient-to-r from-[#0B1B3F] via-[#0B1B3F]/70 to-[#0B1B3F]/20" />
