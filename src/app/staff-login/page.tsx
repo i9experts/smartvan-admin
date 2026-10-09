@@ -60,8 +60,8 @@ export default function StaffLoginPage() {
       subtitle="Sign in to your SmartVan staff account"
       footer={<>
             <p>SmartVan Staff Portal · {new Date().getFullYear()}</p>
-            <p>School admin? <a href="/auth/login" className="text-[#1B3B69] font-medium hover:underline">Sign in here</a></p>
       </>}
+      alt={{ prefix: 'School admin?', label: 'Sign in here', href: '/auth/login' }}
     >
           <div className="space-y-4">
             <div>

@@ -43,8 +43,8 @@ export default function LoginPage() {
       subtitle="Sign in to your admin dashboard"
       footer={<>
             <p>SmartVan Admin · {new Date().getFullYear()}</p>
-            <p>Staff member? <a href="/staff-login" className="text-[#1B3B69] font-medium hover:underline">Sign in here</a></p>
       </>}
+      alt={{ prefix: 'Staff member?', label: 'Sign in here', href: '/staff-login' }}
     >
           <div className="space-y-4">
             <div>
