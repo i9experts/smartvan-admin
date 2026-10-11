@@ -6,7 +6,7 @@ import {
   TrendingUp, TrendingDown, Users, Bus, MapPin, AlertTriangle,
   Route as RouteIcon, UserX, Smartphone, PhoneOff,
   FileWarning, Satellite, Layers, Link2, CalendarClock, ShieldAlert,
-  ChevronDown,
+  ChevronDown, Sparkles, Gauge, Clock,
 } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis,
@@ -41,8 +41,17 @@ interface AnalyticsResponse {
     complaintSummary: { total: number; pending: number; resolved: number; other: number };
     trends: { students: Trend; trips: Trend; vans: Trend; complaints: Trend };
     gradeDistribution: { grade: string; count: number }[];
+    routeOptimization: {
+      optimizedTripCount: number; totalTripCount: number; adoptionPercent: number | null;
+      totalDistanceSavedKm: number; totalDurationSavedMinutes: number;
+      avgDistanceSavedKm: number | null; avgDurationSavedMinutes: number | null;
+    };
   };
   insights: {
+    routeOptimizationByDriver: {
+      count: number;
+      list: { driverId: string; driverName: string; optimizedTripCount: number; distanceSavedKm: number; durationSavedMinutes: number }[];
+    };
     studentsAwaitingVan: { count: number; list: any[] };
     incompleteRouteAssignments: { count: number; list: any[] };
     vansWithoutRoutes: { count: number; list: any[] };
@@ -421,6 +430,100 @@ export default function AnalyticsPage() {
           )}
         </div>
       </div>
+
+      {/* AI Route Optimization */}
+      <SectionHeading title="AI Route Optimization" sub="How much drivers save by following the suggested stop order" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+          <h2 className="text-sm font-semibold text-gray-700 mb-1">Adoption</h2>
+          <p className="text-xs text-gray-400 mb-4">Trips where a driver requested optimization</p>
+          {isLoading || !fm ? (
+            <div className="h-24 bg-gray-50 rounded-xl animate-pulse" />
+          ) : fm.routeOptimization.totalTripCount === 0 ? (
+            <div className="h-24 flex items-center justify-center text-center text-sm text-gray-400">No trips yet</div>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-end justify-between">
+                <p className="text-3xl font-bold text-gray-900">{fm.routeOptimization.adoptionPercent ?? 0}%</p>
+                <p className="text-xs text-gray-400 text-right">
+                  {fm.routeOptimization.optimizedTripCount} of {fm.routeOptimization.totalTripCount} trips
+                </p>
+              </div>
+              <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#FEC610] rounded-full"
+                  style={{ width: `${Math.min(fm.routeOptimization.adoptionPercent ?? 0, 100)}%` }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-medium text-gray-500">Distance Saved</span>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#1B3B6915' }}>
+              <Gauge size={20} style={{ color: '#1B3B69' }} />
+            </div>
+          </div>
+          {isLoading || !fm ? (
+            <div className="h-10 bg-gray-100 rounded animate-pulse" />
+          ) : (
+            <>
+              <p className="text-3xl font-bold text-gray-900">{fm.routeOptimization.totalDistanceSavedKm} km</p>
+              <p className="text-xs text-gray-400 mt-0.5">
+                {fm.routeOptimization.avgDistanceSavedKm != null
+                  ? `${fm.routeOptimization.avgDistanceSavedKm} km avg per optimized trip`
+                  : 'No optimized trips yet'}
+              </p>
+            </>
+          )}
+        </div>
+
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-medium text-gray-500">Time Saved</span>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#10B98115' }}>
+              <Clock size={20} style={{ color: '#10B981' }} />
+            </div>
+          </div>
+          {isLoading || !fm ? (
+            <div className="h-10 bg-gray-100 rounded animate-pulse" />
+          ) : (
+            <>
+              <p className="text-3xl font-bold text-gray-900">{fm.routeOptimization.totalDurationSavedMinutes} min</p>
+              <p className="text-xs text-gray-400 mt-0.5">
+                {fm.routeOptimization.avgDurationSavedMinutes != null
+                  ? `${fm.routeOptimization.avgDurationSavedMinutes} min avg per optimized trip`
+                  : 'No optimized trips yet'}
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+
+      {!isLoading && ins && (
+        <InsightCard
+          title="Route Optimization by Driver"
+          icon={Sparkles} color="#FEC610"
+          actionHint="Drivers who use the Optimize button most, and what it's saving them"
+          sections={[{
+            label: 'Drivers with at least one optimized trip', count: ins.routeOptimizationByDriver.count,
+            columns: [
+              { key: 'driverName', label: 'Driver' },
+              { key: 'optimizedTripCount', label: 'Optimized trips' },
+              { key: 'distanceSavedKmLabel', label: 'Distance saved' },
+              { key: 'durationSavedMinutesLabel', label: 'Time saved' },
+            ],
+            rows: ins.routeOptimizationByDriver.list.map((d) => ({
+              ...d,
+              distanceSavedKmLabel: `${d.distanceSavedKm} km`,
+              durationSavedMinutesLabel: `${d.durationSavedMinutes} min`,
+            })),
+            emptyText: 'No driver has requested route optimization yet.',
+          }]}
+        />
+      )}
 
       {/* High priority insights */}
       <SectionHeading title="Needs Attention" sub="High-priority gaps — act on these first" />
