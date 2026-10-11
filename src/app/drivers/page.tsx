@@ -7,9 +7,9 @@ import {
   Search, X, AlertCircle, Filter,
   ChevronLeft, ChevronRight, CheckCircle2, XCircle,
   Phone, Mail, MapPin, FileText, Eye, UserMinus, Bus,
-  Smartphone, RefreshCw, Pencil, ClipboardList,
+  Smartphone, RefreshCw, Pencil, ClipboardList, Star, MessageSquare,
 } from 'lucide-react';
-import { vanApi, api, uploadApi } from '@/lib/api';
+import { vanApi, api, uploadApi, ratingApi } from '@/lib/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -34,6 +34,17 @@ interface Driver {
   createdAt: string;
   lastLoginAt?: string | null;
   van?: { carNumber?: string; vehicleType?: string; _id: string };
+  avgRating?: number;
+  ratingCount?: number;
+  completedTripCount?: number;
+}
+
+interface Review {
+  stars: number;
+  comment?: string;
+  raterRole: string;
+  tripId: string;
+  createdAt: string;
 }
 
 function timeAgo(dateStr?: string | null): string {
@@ -71,6 +82,19 @@ function AppConnectionBadge({ lastLoginAt }: { lastLoginAt?: string | null }) {
   );
 }
 
+function RatingBadge({ avgRating, ratingCount }: { avgRating?: number; ratingCount?: number }) {
+  if (!ratingCount) {
+    return <span className="text-xs text-gray-400">No ratings yet</span>;
+  }
+  return (
+    <span className="flex items-center gap-1 text-sm">
+      <Star size={13} className="fill-[#FFB800] text-[#FFB800]" />
+      <span className="font-medium text-gray-800">{(avgRating ?? 0).toFixed(1)}</span>
+      <span className="text-xs text-gray-400">({ratingCount})</span>
+    </span>
+  );
+}
+
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 
 function DriverStatusBadge({ status, verified }: { status: string; verified: boolean }) {
@@ -100,6 +124,14 @@ function DriverStatusBadge({ status, verified }: { status: string; verified: boo
 function DriverDetailDrawer({ driver, onClose, onEdit }: { driver: Driver; onClose: () => void; onEdit: () => void }) {
   const [resetResult, setResetResult] = useState<string | null>(null);
   const [resetError, setResetError] = useState('');
+
+  const { data: reviewsData, isLoading: reviewsLoading } = useQuery({
+    queryKey: ['driverReviews', driver._id],
+    queryFn: () => ratingApi.getRatingsForUser(driver._id),
+    select: (r: any) => r.data?.data ?? [],
+    staleTime: 30_000,
+  });
+  const reviews: Review[] = reviewsData ?? [];
 
   const resetMutation = useMutation({
     mutationFn: () => api.post('/van/resetDriverPassword', { driverId: driver._id }),
@@ -154,6 +186,10 @@ function DriverDetailDrawer({ driver, onClose, onEdit }: { driver: Driver; onClo
           <h3 className="text-xl font-bold text-gray-900">{driver.fullname ?? '—'}</h3>
           <div className="mt-2">
             <DriverStatusBadge status={driver.status} verified={driver.isVerified} />
+          </div>
+          <div className="mt-3 flex items-center gap-4">
+            <RatingBadge avgRating={driver.avgRating} ratingCount={driver.ratingCount} />
+            <span className="text-xs text-gray-400">{driver.completedTripCount ?? 0} trips completed</span>
           </div>
         </div>
 
@@ -215,6 +251,49 @@ function DriverDetailDrawer({ driver, onClose, onEdit }: { driver: Driver; onClo
               <p className="text-xs text-red-600 bg-red-50 rounded-lg p-2.5">{resetError}</p>
             )}
           </div>
+        </div>
+
+        {/* Reviews */}
+        <div className="p-5 border-b border-gray-100">
+          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+            Reviews from Parents
+          </h4>
+          {reviewsLoading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <div key={i} className="h-12 bg-gray-50 rounded-xl animate-pulse" />
+              ))}
+            </div>
+          ) : reviews.length === 0 ? (
+            <p className="text-xs text-gray-400">No reviews yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {reviews.map((r, i) => (
+                <div key={i} className="p-3 bg-gray-50 rounded-xl">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-0.5">
+                      {Array.from({ length: 5 }).map((_, s) => (
+                        <Star
+                          key={s}
+                          size={12}
+                          className={s < r.stars ? 'fill-[#FFB800] text-[#FFB800]' : 'text-gray-200'}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-xs text-gray-400">
+                      {new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </span>
+                  </div>
+                  {r.comment && (
+                    <p className="text-xs text-gray-600 mt-1.5 flex items-start gap-1.5">
+                      <MessageSquare size={11} className="text-gray-400 mt-0.5 shrink-0" />
+                      {r.comment}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Van */}
@@ -639,6 +718,7 @@ export default function DriversPage() {
                   <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Driver</th>
                   <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Contact</th>
                   <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">App Status</th>
+                  <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Rating</th>
                   <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Van</th>
                   <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Documents</th>
                   <th className="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
@@ -650,14 +730,14 @@ export default function DriversPage() {
                 {isLoading ? (
                   Array.from({ length: 6 }).map((_, i) => (
                     <tr key={i} className="border-b border-gray-50 animate-pulse">
-                      {Array.from({ length: 9 }).map((_, j) => (
+                      {Array.from({ length: 10 }).map((_, j) => (
                         <td key={j} className="p-4"><div className="h-4 bg-gray-100 rounded" /></td>
                       ))}
                     </tr>
                   ))
                 ) : drivers.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="p-12 text-center">
+                    <td colSpan={10} className="p-12 text-center">
                       <p className="text-sm text-gray-400">{search ? 'No drivers match your search.' : 'No drivers registered yet.'}</p>
                     </td>
                   </tr>
@@ -691,6 +771,9 @@ export default function DriversPage() {
                         </td>
                         <td className="p-4">
                           <AppConnectionBadge lastLoginAt={driver.lastLoginAt} />
+                        </td>
+                        <td className="p-4">
+                          <RatingBadge avgRating={driver.avgRating} ratingCount={driver.ratingCount} />
                         </td>
                         <td className="p-4">
                           {(driver as any).van ? (

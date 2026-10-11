@@ -33,6 +33,8 @@ interface RegisterParent {
   createdAt: string;
   lastLoginAt: string | null;
   kids: RegisterKid[];
+  avgRating: number;
+  ratingCount: number;
 }
 
 interface RegisterReportResponse {
@@ -57,8 +59,12 @@ function appStatusLabel(p: RegisterParent) {
   return p.lastLoginAt ? `Linked · ${formatDate(p.lastLoginAt)}` : 'Not linked yet';
 }
 
+function ratingLabel(p: RegisterParent) {
+  return p.ratingCount > 0 ? `${p.avgRating.toFixed(1)} (${p.ratingCount})` : 'No ratings yet';
+}
+
 const CSV_HEADERS = [
-  'Name', 'Phone', 'Alt Phone', 'Email', 'Address', 'Linked Kids', 'Kids Count', 'App Status', 'Joined Date',
+  'Name', 'Phone', 'Alt Phone', 'Email', 'Address', 'Linked Kids', 'Kids Count', 'App Status', 'Rating', 'Joined Date',
 ];
 
 function toCsvRow(p: RegisterParent): string[] {
@@ -71,6 +77,7 @@ function toCsvRow(p: RegisterParent): string[] {
     kidsLabel(p.kids),
     String(p.kids?.length ?? 0),
     appStatusLabel(p),
+    ratingLabel(p),
     formatDate(p.createdAt),
   ];
 }
@@ -137,7 +144,7 @@ async function downloadPdf(schoolName: string, parents: RegisterParent[]) {
   autoTable(doc, {
     startY: 86,
     margin: { left: margin, right: margin },
-    head: [['Photo', 'Name', 'Phone', 'Alt Phone', 'Email', 'Address', 'Linked Kids', 'App Status', 'Joined']],
+    head: [['Photo', 'Name', 'Phone', 'Alt Phone', 'Email', 'Address', 'Linked Kids', 'App Status', 'Rating', 'Joined']],
     body: parents.map((p) => [
       '',
       p.fullname || '—',
@@ -147,6 +154,7 @@ async function downloadPdf(schoolName: string, parents: RegisterParent[]) {
       p.address || '—',
       kidsLabel(p.kids),
       appStatusLabel(p),
+      ratingLabel(p),
       formatDate(p.createdAt),
     ]),
     theme: 'grid',
@@ -274,6 +282,7 @@ export default function ParentRegisterPage() {
                 <th className="px-4 py-3 print:px-1.5 print:py-1.5">Address</th>
                 <th className="px-4 py-3 print:px-1.5 print:py-1.5">Linked Kids</th>
                 <th className="px-4 py-3 print:px-1.5 print:py-1.5">App Status</th>
+                <th className="px-4 py-3 print:px-1.5 print:py-1.5">Rating</th>
                 <th className="px-4 py-3 print:px-1.5 print:py-1.5">Joined</th>
               </tr>
             </thead>
@@ -305,6 +314,7 @@ export default function ParentRegisterPage() {
                     {kidsLabel(p.kids)}
                   </td>
                   <td className="px-4 py-2.5 print:px-1.5 print:py-1 text-gray-600">{appStatusLabel(p)}</td>
+                  <td className="px-4 py-2.5 print:px-1.5 print:py-1 text-gray-600">{ratingLabel(p)}</td>
                   <td className="px-4 py-2.5 print:px-1.5 print:py-1 text-gray-600">{formatDate(p.createdAt)}</td>
                 </tr>
               ))}
