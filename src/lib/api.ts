@@ -190,3 +190,6 @@ export const auditLogApi = {
 export const searchApi = {
   universal: (q: string) => api.get('/search/universal', { params: { q } }),
 };
+export const ratingApi = {
+  getRatingsForUser: (userId: string) => api.get(`/rating/getRatingsForUser/${userId}`),
+};

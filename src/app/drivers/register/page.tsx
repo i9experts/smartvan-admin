@@ -32,6 +32,9 @@ interface RegisterDriver {
   expiryDateLicense: string;
   expiryDateVehicleCard: string;
   van: { carNumber: string; vehicleType: string } | null;
+  avgRating: number;
+  ratingCount: number;
+  completedTripCount: number;
 }
 
 interface RegisterReportResponse {
@@ -66,9 +69,13 @@ function vehicleCardLabel(d: RegisterDriver) {
   return d.expiryDateVehicleCard ? `Complete · exp ${d.expiryDateVehicleCard}` : 'Complete';
 }
 
+function ratingLabel(d: RegisterDriver) {
+  return d.ratingCount > 0 ? `${d.avgRating.toFixed(1)} (${d.ratingCount})` : 'No ratings yet';
+}
+
 const CSV_HEADERS = [
   'Name', 'Phone', 'Alt Phone', 'NIC', 'Status', 'Van', 'App Status',
-  'Licence', 'Vehicle Card', 'Address', 'Joined Date',
+  'Rating', 'Trips Completed', 'Licence', 'Vehicle Card', 'Address', 'Joined Date',
 ];
 
 function toCsvRow(d: RegisterDriver): string[] {
@@ -80,6 +87,8 @@ function toCsvRow(d: RegisterDriver): string[] {
     d.status,
     vanLabel(d.van),
     appStatusLabel(d),
+    ratingLabel(d),
+    String(d.completedTripCount),
     licenceLabel(d),
     vehicleCardLabel(d),
     d.address,
@@ -150,7 +159,7 @@ async function downloadPdf(schoolName: string, drivers: RegisterDriver[]) {
   autoTable(doc, {
     startY: 86,
     margin: { left: margin, right: margin },
-    head: [['Photo', 'Name', 'Phone', 'NIC', 'Status', 'Van', 'App Status', 'Licence', 'Vehicle Card', 'Address', 'Joined']],
+    head: [['Photo', 'Name', 'Phone', 'NIC', 'Status', 'Van', 'App Status', 'Rating', 'Trips', 'Licence', 'Vehicle Card', 'Address', 'Joined']],
     body: drivers.map((d) => [
       '',
       d.fullname || '—',
@@ -159,6 +168,8 @@ async function downloadPdf(schoolName: string, drivers: RegisterDriver[]) {
       d.status || '—',
       vanLabel(d.van),
       appStatusLabel(d),
+      ratingLabel(d),
+      String(d.completedTripCount),
       licenceLabel(d),
       vehicleCardLabel(d),
       d.address || '—',
@@ -288,6 +299,8 @@ export default function DriverRegisterPage() {
                 <th className="px-4 py-3 print:px-1.5 print:py-1.5">Status</th>
                 <th className="px-4 py-3 print:px-1.5 print:py-1.5">Van</th>
                 <th className="px-4 py-3 print:px-1.5 print:py-1.5">App Status</th>
+                <th className="px-4 py-3 print:px-1.5 print:py-1.5">Rating</th>
+                <th className="px-4 py-3 print:px-1.5 print:py-1.5">Trips</th>
                 <th className="px-4 py-3 print:px-1.5 print:py-1.5">Licence</th>
                 <th className="px-4 py-3 print:px-1.5 print:py-1.5">Vehicle Card</th>
                 <th className="px-4 py-3 print:px-1.5 print:py-1.5">Address</th>
@@ -317,6 +330,8 @@ export default function DriverRegisterPage() {
                   <td className="px-4 py-2.5 print:px-1.5 print:py-1 text-gray-600 capitalize">{d.status || '—'}</td>
                   <td className="px-4 py-2.5 print:px-1.5 print:py-1 text-gray-600">{vanLabel(d.van)}</td>
                   <td className="px-4 py-2.5 print:px-1.5 print:py-1 text-gray-600">{appStatusLabel(d)}</td>
+                  <td className="px-4 py-2.5 print:px-1.5 print:py-1 text-gray-600">{ratingLabel(d)}</td>
+                  <td className="px-4 py-2.5 print:px-1.5 print:py-1 text-gray-600">{d.completedTripCount}</td>
                   <td className="px-4 py-2.5 print:px-1.5 print:py-1 text-gray-600">{licenceLabel(d)}</td>
                   <td className="px-4 py-2.5 print:px-1.5 print:py-1 text-gray-600">{vehicleCardLabel(d)}</td>
                   <td className="px-4 py-2.5 print:px-1.5 print:py-1 text-gray-600 max-w-[220px] truncate" title={d.address}>

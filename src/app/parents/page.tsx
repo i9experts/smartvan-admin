@@ -6,9 +6,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Search, X, Phone, Mail, Users,
   ChevronLeft, ChevronRight, Eye, Pencil, Loader2, ClipboardList, Camera,
-  GraduationCap, Bus, CheckCircle2, XCircle,
+  GraduationCap, Bus, CheckCircle2, XCircle, Star, MessageSquare,
 } from 'lucide-react';
-import { api, uploadApi } from '@/lib/api';
+import { api, uploadApi, ratingApi } from '@/lib/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -29,6 +29,29 @@ interface ParentRow {
   address?: string;
   image?: string;
   kids: LinkedKid[];
+  avgRating?: number;
+  ratingCount?: number;
+}
+
+interface Review {
+  stars: number;
+  comment?: string;
+  raterRole: string;
+  tripId: string;
+  createdAt: string;
+}
+
+function RatingBadge({ avgRating, ratingCount }: { avgRating?: number; ratingCount?: number }) {
+  if (!ratingCount) {
+    return <span className="text-xs text-gray-400">No ratings yet</span>;
+  }
+  return (
+    <span className="flex items-center gap-1 text-sm">
+      <Star size={13} className="fill-[#FFB800] text-[#FFB800]" />
+      <span className="font-medium text-gray-800">{(avgRating ?? 0).toFixed(1)}</span>
+      <span className="text-xs text-gray-400">({ratingCount})</span>
+    </span>
+  );
 }
 
 interface EditParentForm {
@@ -55,6 +78,14 @@ const parentApi = {
 function ParentDetailDrawer({
   parent, onClose, onEdit,
 }: { parent: ParentRow; onClose: () => void; onEdit: () => void }) {
+  const { data: reviewsData, isLoading: reviewsLoading } = useQuery({
+    queryKey: ['parentReviews', parent._id],
+    queryFn: () => ratingApi.getRatingsForUser(parent._id),
+    select: (r: any) => r.data?.data ?? [],
+    staleTime: 30_000,
+  });
+  const reviews: Review[] = reviewsData ?? [];
+
   return (
     <div className="fixed inset-0 z-50 flex">
       <div className="flex-1 bg-black/40 backdrop-blur-sm" onClick={onClose} />
@@ -94,6 +125,9 @@ function ParentDetailDrawer({
               {parent.kids.filter(k => k.status === 'active').length} active
             </span>
           </div>
+          <div className="mt-3">
+            <RatingBadge avgRating={parent.avgRating} ratingCount={parent.ratingCount} />
+          </div>
         </div>
 
         {/* Contact info */}
@@ -131,6 +165,49 @@ function ParentDetailDrawer({
                 <p className="text-xs text-gray-400">Address</p>
                 <p className="text-sm text-gray-800">{parent.address}</p>
               </div>
+            </div>
+          )}
+        </div>
+
+        {/* Reviews */}
+        <div className="p-5 border-b border-gray-100">
+          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+            Reviews from Drivers
+          </h4>
+          {reviewsLoading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <div key={i} className="h-12 bg-gray-50 rounded-xl animate-pulse" />
+              ))}
+            </div>
+          ) : reviews.length === 0 ? (
+            <p className="text-xs text-gray-400">No reviews yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {reviews.map((r, i) => (
+                <div key={i} className="p-3 bg-gray-50 rounded-xl">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-0.5">
+                      {Array.from({ length: 5 }).map((_, s) => (
+                        <Star
+                          key={s}
+                          size={12}
+                          className={s < r.stars ? 'fill-[#FFB800] text-[#FFB800]' : 'text-gray-200'}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-xs text-gray-400">
+                      {new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </span>
+                  </div>
+                  {r.comment && (
+                    <p className="text-xs text-gray-600 mt-1.5 flex items-start gap-1.5">
+                      <MessageSquare size={11} className="text-gray-400 mt-0.5 shrink-0" />
+                      {r.comment}
+                    </p>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -479,6 +556,11 @@ export default function ParentsPage() {
                     <Mail size={11} className="text-gray-400 shrink-0" />
                     <span className="truncate">{parent.email}</span>
                   </div>
+                </div>
+
+                {/* Rating */}
+                <div className="mb-3">
+                  <RatingBadge avgRating={parent.avgRating} ratingCount={parent.ratingCount} />
                 </div>
 
                 {/* Kids summary */}
