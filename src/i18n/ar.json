@@ -22,7 +22,10 @@
     "tickets": "التذاكر",
     "auditLog": "سجل النشاط",
     "settings": "الإعدادات",
-    "qrCards": "بطاقات QR للطلاب"
+    "qrCards": "بطاقات QR للطلاب",
+    "safetyChecklists": "قوائم السلامة",
+    "ratings": "التقييمات",
+    "routeOptimization": "تحسين المسار"
   },
   "common": {
     "save": "حفظ",
