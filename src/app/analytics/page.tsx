@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import {
   TrendingUp, TrendingDown, Users, Bus, MapPin, AlertTriangle,
@@ -432,7 +433,12 @@ export default function AnalyticsPage() {
       </div>
 
       {/* AI Route Optimization */}
-      <SectionHeading title="AI Route Optimization" sub="How much drivers save by following the suggested stop order" />
+      <div className="flex items-center justify-between">
+        <SectionHeading title="AI Route Optimization" sub="How much drivers save by following the suggested stop order" />
+        <Link href="/route-optimization" className="text-xs font-semibold text-[#1B3B69] hover:underline mb-1">
+          View full log →
+        </Link>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <h2 className="text-sm font-semibold text-gray-700 mb-1">Adoption</h2>

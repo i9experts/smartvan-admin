@@ -6,7 +6,7 @@ import Image from "next/image";
 import {
   LayoutDashboard, MapPin, School, Bus, Users, Route,
   Bell, BarChart3, Receipt, Wrench, Settings, LogOut, MessageSquare, History,
-  Image as ImageIcon, AlertTriangle, HelpCircle, QrCode,
+  Image as ImageIcon, AlertTriangle, HelpCircle, QrCode, ClipboardCheck, Star, Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -25,8 +25,11 @@ const navItems: { labelKey: string; href: string; icon: any; roles: ("admin" | "
   { labelKey: "nav.alertsOverview", href: "/alerts", icon: Bell, roles: ["admin"], permission: "view_alerts" },
   { labelKey: "nav.complaints", href: "/complaints", icon: AlertTriangle, roles: ["admin"], permission: "manage_complaints" },
   { labelKey: "nav.analytics", href: "/analytics", icon: BarChart3, roles: ["admin"], permission: "view_analytics" },
+  { labelKey: "nav.ratings", href: "/ratings", icon: Star, roles: ["admin"], permission: "view_analytics" },
+  { labelKey: "nav.routeOptimization", href: "/route-optimization", icon: Sparkles, roles: ["admin"], permission: "manage_fleet" },
   { labelKey: "nav.billing", href: "/billing", icon: Receipt, roles: ["admin"] },
   { labelKey: "nav.fleetManagement", href: "/fleet", icon: Wrench, roles: ["admin"], permission: "view_fleet_health" },
+  { labelKey: "nav.safetyChecklists", href: "/safety-checklists", icon: ClipboardCheck, roles: ["admin"], permission: "manage_fleet" },
   { labelKey: "nav.attendance", href: "/attendance", icon: Users, roles: ["admin"], permission: "view_attendance" },
   { labelKey: "nav.feeManagement", href: "/fees", icon: Users, roles: ["admin"], permission: "manage_fees" },
   { labelKey: "nav.team", href: "/team", icon: Users, roles: ["admin"] },

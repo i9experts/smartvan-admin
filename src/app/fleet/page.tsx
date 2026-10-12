@@ -1,5 +1,6 @@
 'use client';
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import {
   Bus, AlertTriangle, CheckCircle2, XCircle,
@@ -215,6 +216,10 @@ function VanDetailDrawer({ van, onClose }: { van: VanItem; onClose: () => void }
                 </div>
               ))}
             </div>
+            <p className="text-[11px] text-gray-400 mt-2">
+              Document readiness only. For the driver's actual pre-trip vehicle check, see{' '}
+              <Link href="/safety-checklists" className="text-[#1B3B69] font-medium hover:underline">Safety Checklists</Link>.
+            </p>
           </div>
           <div>
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3 mt-5">Document Expiry</p>

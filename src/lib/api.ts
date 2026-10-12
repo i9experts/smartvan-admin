@@ -106,6 +106,14 @@ export const vanApi = {
 export const tripApi = {
   getByAdmin: (params?: { page?: number; limit?: number; status?: string; driverId?: string; date?: string }) =>
     api.get('/trips/Get-Trips-By-Admin', { params }),
+  getRouteOptimizationLog: (params?: { page?: number; limit?: number; driverId?: string; startDate?: string; endDate?: string }) =>
+    api.get('/trips/routeOptimization/forAdmin', { params }),
+};
+
+export const checklistApi = {
+  getLog: (params?: { page?: number; limit?: number; startDate?: string; endDate?: string; vanId?: string; driverId?: string; status?: 'ok' | 'issues' }) =>
+    api.get('/trips/checklist/forAdmin', { params }),
+  getComplianceSummary: () => api.get('/trips/checklist/complianceSummary'),
 };
 
 export const reportApi = {
@@ -192,4 +200,6 @@ export const searchApi = {
 };
 export const ratingApi = {
   getRatingsForUser: (userId: string) => api.get(`/rating/getRatingsForUser/${userId}`),
+  getAllForSchool: (params?: { page?: number; limit?: number; rateeRole?: 'driver' | 'parent'; minStars?: number; startDate?: string; endDate?: string }) =>
+    api.get('/rating/getAllRatingsForSchool', { params }),
 };
