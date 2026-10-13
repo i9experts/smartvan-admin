@@ -61,6 +61,7 @@ const SAFETY_BADGES: Record<string, { label: string; color: string }> = {
   pretrip_issue: { label: 'Van check', color: '#D97706' },
   document_expiry: { label: 'Document expiry', color: '#7C3AED' },
   traffic_delay: { label: 'Traffic', color: '#7C3AED' },
+  tracking_lost: { label: 'Tracking lost', color: '#DC2626' },
 };
 
 /** Makes the Google Maps links in safety alert messages clickable. */

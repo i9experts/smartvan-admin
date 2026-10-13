@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { BASE_URL } from '@/lib/api';
 
-export type SafetyAlertKind = 'sos' | 'childLeftBehind' | 'overspeed' | 'checklist' | 'traffic';
+export type SafetyAlertKind = 'sos' | 'childLeftBehind' | 'overspeed' | 'checklist' | 'traffic' | 'trackingLost';
 
 export interface SafetyAlert {
   id: string;
@@ -43,6 +43,11 @@ function toAlert(kind: SafetyAlertKind, p: any): SafetyAlert {
         ...base,
         message: `Driving at ${p?.speedKmh} km/h (limit ${p?.limitKmh}).`,
         location: p?.location ?? null,
+      };
+    case 'trackingLost':
+      return {
+        ...base,
+        message: `No location for ${p?.minutes ?? 4} min during a trip.${p?.driverPhone ? ` Call ${p.driverPhone}.` : ''}`,
       };
     case 'traffic':
       return {
@@ -102,6 +107,11 @@ export function useSchoolAlerts(
     socket.on('overspeedAlert', push('overspeed'));
     socket.on('pretripChecklistAlert', push('checklist'));
     socket.on('trafficDelayAlert', push('traffic'));
+    socket.on('trackingLostAlert', push('trackingLost'));
+    // Tracking came back — drop the matching 'lost' toast.
+    socket.on('trackingRestored', (p: any) => {
+      setAlerts((prev) => prev.filter((a) => !(a.kind === 'trackingLost' && a.tripId === p?.tripId)));
+    });
 
     return () => {
       socket.disconnect();

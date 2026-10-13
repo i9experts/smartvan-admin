@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
-import { AlertOctagon, Gauge, ClipboardX, Baby, MapPin, X, TrafficCone } from 'lucide-react';
+import { AlertOctagon, Gauge, ClipboardX, Baby, MapPin, X, TrafficCone, WifiOff } from 'lucide-react';
 import { SafetyAlert, useSchoolAlerts } from '@/hooks/useSchoolAlerts';
 
 const STYLES: Record<SafetyAlert['kind'], { title: string; color: string; Icon: any }> = {
@@ -12,6 +12,7 @@ const STYLES: Record<SafetyAlert['kind'], { title: string; color: string; Icon: 
   overspeed: { title: 'Overspeeding', color: '#EA580C', Icon: Gauge },
   checklist: { title: 'Van check issues', color: '#D97706', Icon: ClipboardX },
   traffic: { title: 'Van delayed in traffic', color: '#7C3AED', Icon: TrafficCone },
+  trackingLost: { title: 'Live tracking lost', color: '#DC2626', Icon: WifiOff },
 };
 
 /** Repeating beep while an SOS is unacknowledged (Web Audio, no asset). */
