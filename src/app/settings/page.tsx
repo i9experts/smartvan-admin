@@ -1,7 +1,11 @@
 'use client';
 import { useTheme } from '@/theme/ThemeContext';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import type { PickedLocation } from '@/components/MapPicker';
+
+// Google Maps loads only when the picker opens.
+const MapPicker = lazy(() => import('@/components/MapPicker'));
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Building2, User, Clock, Bell, Shield, Palette,
@@ -165,6 +169,7 @@ export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const [activeSection, setActiveSection] = useState('school');
   const [isDirty, setIsDirty] = useState(false);
+  const [showSchoolPicker, setShowSchoolPicker] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [showCurrentPw, setShowCurrentPw] = useState(false);
@@ -304,6 +309,8 @@ export default function SettingsPage() {
         branchName: school.branchName ?? '',
         currency: school.currency ?? 'PKR',
         country: school.country ?? 'PK',
+        lat: school.lat || undefined,
+        long: school.long || undefined,
       });
       setTripForm({
         startTime: school.startTime ?? '',
@@ -376,6 +383,26 @@ export default function SettingsPage() {
 
   return (
     <div className="flex h-full min-h-screen">
+      {showSchoolPicker && (
+        <Suspense fallback={<div className="fixed inset-0 z-[100] bg-black/40" />}>
+          <MapPicker
+            title="Pin the school location"
+            initial={schoolForm.lat && schoolForm.long ? { lat: schoolForm.lat, lng: schoolForm.long } : undefined}
+            onConfirm={(loc: PickedLocation) => {
+              setSchoolForm((f) => ({
+                ...f,
+                lat: loc.lat,
+                long: loc.lng,
+                // Fill the address from the map only if it was empty.
+                address: f.address && f.address.trim() ? f.address : loc.address,
+              }));
+              markDirty();
+              setShowSchoolPicker(false);
+            }}
+            onClose={() => setShowSchoolPicker(false)}
+          />
+        </Suspense>
+      )}
       {/* Sidebar */}
       <aside className="w-56 shrink-0 border-r border-gray-100 bg-white sticky top-0 h-screen overflow-y-auto">
         <div className="p-5">
@@ -545,6 +572,31 @@ export default function SettingsPage() {
                       <textarea value={schoolForm.address ?? ''} onChange={e => { setSchoolForm(f => ({ ...f, address: e.target.value })); markDirty(); }}
                         rows={2} className={`${inputClass} pl-9 resize-none`} placeholder="Full school address" />
                     </div>
+                  </Field>
+                  <Field label="School location on map" hint="Used for the live map, ETA to school, arrival alerts and traffic alerts">
+                    <button
+                      type="button"
+                      onClick={() => setShowSchoolPicker(true)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 border rounded-xl text-left transition ${
+                        schoolForm.lat && schoolForm.long
+                          ? 'border-[#1B3B69]/40 bg-[#1B3B69]/5'
+                          : 'border-amber-300 bg-amber-50 hover:bg-amber-100'
+                      }`}
+                    >
+                      <MapPin size={18} className={schoolForm.lat && schoolForm.long ? 'text-[#1B3B69] shrink-0' : 'text-amber-600 shrink-0'} />
+                      <div className="flex-1 min-w-0">
+                        {schoolForm.lat && schoolForm.long ? (
+                          <p className="text-xs font-mono text-gray-600">
+                            {schoolForm.lat.toFixed(6)}, {schoolForm.long.toFixed(6)}
+                          </p>
+                        ) : (
+                          <p className="text-sm text-amber-700">Not set — tap to pin the school on the map</p>
+                        )}
+                      </div>
+                      <span className="text-xs text-[#1B3B69] font-medium shrink-0">
+                        {schoolForm.lat && schoolForm.long ? 'Change' : 'Set location'}
+                      </span>
+                    </button>
                   </Field>
 
                   {/* Plan info (read-only) */}
