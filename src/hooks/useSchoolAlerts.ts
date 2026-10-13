@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { BASE_URL } from '@/lib/api';
 
-export type SafetyAlertKind = 'sos' | 'childLeftBehind' | 'overspeed' | 'checklist';
+export type SafetyAlertKind = 'sos' | 'childLeftBehind' | 'overspeed' | 'checklist' | 'traffic';
 
 export interface SafetyAlert {
   id: string;
@@ -42,6 +42,12 @@ function toAlert(kind: SafetyAlertKind, p: any): SafetyAlert {
       return {
         ...base,
         message: `Driving at ${p?.speedKmh} km/h (limit ${p?.limitKmh}).`,
+        location: p?.location ?? null,
+      };
+    case 'traffic':
+      return {
+        ...base,
+        message: `Stopped for ${p?.stoppedMinutes ?? 2} min away from any stop (traffic).`,
         location: p?.location ?? null,
       };
     case 'checklist': {
@@ -95,6 +101,7 @@ export function useSchoolAlerts(
     socket.on('childLeftBehindAlert', push('childLeftBehind'));
     socket.on('overspeedAlert', push('overspeed'));
     socket.on('pretripChecklistAlert', push('checklist'));
+    socket.on('trafficDelayAlert', push('traffic'));
 
     return () => {
       socket.disconnect();

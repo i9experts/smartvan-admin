@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
-import { AlertOctagon, Gauge, ClipboardX, Baby, MapPin, X } from 'lucide-react';
+import { AlertOctagon, Gauge, ClipboardX, Baby, MapPin, X, TrafficCone } from 'lucide-react';
 import { SafetyAlert, useSchoolAlerts } from '@/hooks/useSchoolAlerts';
 
 const STYLES: Record<SafetyAlert['kind'], { title: string; color: string; Icon: any }> = {
@@ -11,6 +11,7 @@ const STYLES: Record<SafetyAlert['kind'], { title: string; color: string; Icon: 
   childLeftBehind: { title: 'Students not dropped', color: '#DC2626', Icon: Baby },
   overspeed: { title: 'Overspeeding', color: '#EA580C', Icon: Gauge },
   checklist: { title: 'Van check issues', color: '#D97706', Icon: ClipboardX },
+  traffic: { title: 'Van delayed in traffic', color: '#7C3AED', Icon: TrafficCone },
 };
 
 /** Repeating beep while an SOS is unacknowledged (Web Audio, no asset). */
@@ -91,7 +92,7 @@ export function SafetyAlertCenter() {
   // Auto-dismiss the less critical toasts.
   useEffect(() => {
     const timers = alerts
-      .filter((a) => a.kind === 'overspeed' || a.kind === 'checklist')
+      .filter((a) => a.kind === 'overspeed' || a.kind === 'checklist' || a.kind === 'traffic')
       .map((a) => setTimeout(() => dismiss(a.id), 20_000 - (Date.now() - a.receivedAt)));
     return () => timers.forEach(clearTimeout);
   }, [alerts, dismiss]);
