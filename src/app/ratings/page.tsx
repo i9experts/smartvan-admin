@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { Star, Calendar, ChevronLeft, ChevronRight, MessageSquare } from 'lucide-react';
 import { ratingApi } from '@/lib/api';
+import { useFeatures } from '@/hooks/useFeatures';
+import { PremiumLocked } from '@/components/billing/PremiumLocked';
 
 interface RatingEntry {
   id: string;
@@ -28,6 +30,7 @@ function Stars({ count }: { count: number }) {
 }
 
 export default function RatingsPage() {
+  const { hasFeature, loading: featuresLoading } = useFeatures();
   const [rateeRole, setRateeRole] = useState<'all' | 'driver' | 'parent'>('all');
   const [minStars, setMinStars] = useState<number | ''>('');
   const [startDate, setStartDate] = useState('');
@@ -38,6 +41,7 @@ export default function RatingsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (featuresLoading || !hasFeature('ratings')) return;
     setLoading(true);
     ratingApi.getAllForSchool({
       page, limit: 10,
@@ -51,7 +55,17 @@ export default function RatingsPage() {
         setPagination(res.data?.pagination ?? { page: 1, limit: 10, total: 0, totalPages: 1 });
       })
       .finally(() => setLoading(false));
-  }, [page, rateeRole, minStars, startDate, endDate]);
+  }, [page, rateeRole, minStars, startDate, endDate, featuresLoading, hasFeature]);
+
+  if (featuresLoading) return null;
+  if (!hasFeature('ratings')) {
+    return (
+      <PremiumLocked
+        featureLabel="Ratings & Reviews Log"
+        description="A browsable, filterable school-wide log of every driver and parent rating — unlock Premium to see it."
+      />
+    );
+  }
 
   const avg = ratings.length
     ? (ratings.reduce((s, r) => s + r.stars, 0) / ratings.length).toFixed(1)

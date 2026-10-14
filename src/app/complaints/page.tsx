@@ -9,6 +9,8 @@ import {
   MessageSquare, User, Calendar, Tag, Image, ClipboardList,
 } from 'lucide-react';
 import { reportApi } from '@/lib/api';
+import { useFeatures } from '@/hooks/useFeatures';
+import { PremiumLocked } from '@/components/billing/PremiumLocked';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -260,6 +262,7 @@ function DetailDrawer({ complaint, onClose, onStatusChange }: DetailDrawerProps)
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function ComplaintsPage() {
+  const { hasFeature, loading: featuresLoading } = useFeatures();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -271,6 +274,7 @@ export default function ComplaintsPage() {
     queryFn: () => reportApi.getByAdmin({ page, limit: 10, status: statusFilter || undefined, type: typeFilter || undefined }),
     select: r => r.data,
     staleTime: 30_000,
+    enabled: !featuresLoading && hasFeature('complaints'),
   });
 
   const complaints: Complaint[] = data?.data ?? [];
@@ -285,6 +289,16 @@ export default function ComplaintsPage() {
         c._id.includes(search)
       )
     : complaints;
+
+  if (featuresLoading) return null;
+  if (!hasFeature('complaints')) {
+    return (
+      <PremiumLocked
+        featureLabel="Complaints & Reports"
+        description="Manage and respond to driver and parent complaints — unlock Premium to see them."
+      />
+    );
+  }
 
   return (
     <>

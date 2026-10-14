@@ -6,6 +6,8 @@ import {
   Calendar, ChevronLeft, ChevronRight, ShieldAlert,
 } from 'lucide-react';
 import { checklistApi } from '@/lib/api';
+import { useFeatures } from '@/hooks/useFeatures';
+import { PremiumLocked } from '@/components/billing/PremiumLocked';
 
 interface ComplianceSummary {
   date: string;
@@ -35,6 +37,7 @@ function getToday() {
 }
 
 export default function SafetyChecklistsPage() {
+  const { hasFeature, loading: featuresLoading } = useFeatures();
   const [summary, setSummary] = useState<ComplianceSummary | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(true);
 
@@ -48,12 +51,14 @@ export default function SafetyChecklistsPage() {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   useEffect(() => {
+    if (featuresLoading || !hasFeature('safety_checklists')) return;
     checklistApi.getComplianceSummary()
       .then(res => setSummary(res.data?.data ?? null))
       .finally(() => setSummaryLoading(false));
-  }, []);
+  }, [featuresLoading, hasFeature]);
 
   useEffect(() => {
+    if (featuresLoading || !hasFeature('safety_checklists')) return;
     setLogLoading(true);
     checklistApi.getLog({
       page, limit: 10, startDate, endDate,
@@ -64,7 +69,17 @@ export default function SafetyChecklistsPage() {
         setPagination(res.data?.pagination ?? { page: 1, limit: 10, total: 0, totalPages: 1 });
       })
       .finally(() => setLogLoading(false));
-  }, [page, startDate, endDate, status]);
+  }, [page, startDate, endDate, status, featuresLoading, hasFeature]);
+
+  if (featuresLoading) return null;
+  if (!hasFeature('safety_checklists')) {
+    return (
+      <PremiumLocked
+        featureLabel="Safety Checklist Compliance"
+        description="School-wide visibility into drivers' daily pre-trip vehicle checks — unlock Premium to see it."
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

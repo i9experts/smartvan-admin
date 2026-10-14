@@ -203,3 +203,28 @@ export const ratingApi = {
   getAllForSchool: (params?: { page?: number; limit?: number; rateeRole?: 'driver' | 'parent'; minStars?: number; startDate?: string; endDate?: string }) =>
     api.get('/rating/getAllRatingsForSchool', { params }),
 };
+
+export interface FeatureDef {
+  key: string;
+  label: string;
+  description: string;
+  tier: 'basic' | 'premium';
+  backendEnforced: boolean;
+}
+
+export const featureApi = {
+  getRegistry: () => api.get<{ message: string; data: FeatureDef[] }>('/school/feature-registry'),
+  getMyFeatures: () => api.get<{
+    message: string;
+    data: {
+      featureTier: 'basic' | 'premium';
+      enabledFeatures: string[];
+      disabledFeatures: string[];
+      effectiveFeatures: string[];
+      premiumSubscriptionStatus: 'active' | 'inactive' | 'payment_failed';
+    };
+  }>('/school/my-features'),
+  getSchoolFeatures: (schoolId: string) => api.get(`/school/${schoolId}/features`),
+  updateSchoolFeatureTier: (schoolId: string, body: { featureTier?: 'basic' | 'premium'; enabledFeatures?: string[]; disabledFeatures?: string[] }) =>
+    api.patch(`/school/${schoolId}/feature-tier`, body),
+};

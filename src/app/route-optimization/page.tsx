@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { Sparkles, Calendar, ChevronLeft, ChevronRight, Gauge, Clock, Download } from 'lucide-react';
 import { tripApi } from '@/lib/api';
+import { useFeatures } from '@/hooks/useFeatures';
+import { PremiumLocked } from '@/components/billing/PremiumLocked';
 
 interface OptimizationEntry {
   tripId: string;
@@ -28,6 +30,7 @@ function minutes(seconds: number) {
 }
 
 export default function RouteOptimizationPage() {
+  const { hasFeature, loading: featuresLoading } = useFeatures();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [page, setPage] = useState(1);
@@ -36,6 +39,7 @@ export default function RouteOptimizationPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (featuresLoading || !hasFeature('route_optimization')) return;
     setLoading(true);
     tripApi.getRouteOptimizationLog({
       page, limit: 10,
@@ -47,7 +51,17 @@ export default function RouteOptimizationPage() {
         setPagination(res.data?.pagination ?? { page: 1, limit: 10, total: 0, totalPages: 1 });
       })
       .finally(() => setLoading(false));
-  }, [page, startDate, endDate]);
+  }, [page, startDate, endDate, featuresLoading, hasFeature]);
+
+  if (featuresLoading) return null;
+  if (!hasFeature('route_optimization')) {
+    return (
+      <PremiumLocked
+        featureLabel="AI Route Optimization"
+        description="Drivers can request an AI-optimized stop order, with a school-wide savings log — unlock Premium to see it."
+      />
+    );
+  }
 
   const totalDistanceSaved = entries.reduce((s, e) => s + (e.distanceSavedMeters || 0), 0);
   const totalDurationSaved = entries.reduce((s, e) => s + (e.durationSavedSeconds || 0), 0);
