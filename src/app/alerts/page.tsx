@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useMarkAlertsSeen } from '@/hooks/useUnreadAlertsCount';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Bell, Plus, Trash2, X, AlertCircle, Users,
@@ -341,6 +342,14 @@ export default function AlertsPage() {
     select: (r: any) => r.data,
     staleTime: 30_000,
   });
+
+  // Opening Alerts marks everything as seen (clears the sidebar/bell badge),
+  // and so does every refresh while the page is open (new live alerts).
+  const markSeen = useMarkAlertsSeen();
+  useEffect(() => {
+    markSeen.mutate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [driverAlertsData]);
   const driverAlertsList: any[] = driverAlertsData?.data ?? [];
 
   const [waMsg, setWaMsg] = useState('');

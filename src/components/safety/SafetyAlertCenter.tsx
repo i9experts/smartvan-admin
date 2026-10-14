@@ -80,6 +80,7 @@ export function SafetyAlertCenter() {
   const onAlert = useCallback(
     (a: SafetyAlert) => {
       queryClient.invalidateQueries({ queryKey: ['driver-alerts'] });
+      queryClient.invalidateQueries({ queryKey: ['alerts-unread'] });
       if (a.kind === 'sos') alarm.start();
       if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted' && document.hidden) {
         new Notification(`SmartVan — ${STYLES[a.kind].title}`, { body: `${a.driverName}: ${a.message}` });

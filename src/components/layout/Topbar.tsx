@@ -6,7 +6,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { searchApi } from "@/lib/api";
-import { usePendingAlertsCount } from "@/hooks/usePendingAlertsCount";
+import { useUnreadAlertsCount } from "@/hooks/useUnreadAlertsCount";
 
 interface TopbarProps {
   title?: string;
@@ -36,7 +36,7 @@ export function Topbar({ title }: TopbarProps) {
   const { user: admin } = useAuth();
   const { language, setLanguage } = useLanguage();
   const router = useRouter();
-  const pendingAlertsCount = usePendingAlertsCount();
+  const pendingAlertsCount = useUnreadAlertsCount();
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResults | null>(null);

@@ -20,7 +20,24 @@ interface KidStop {
   kidId: string;
   lat: number;
   long: number;
-  kidName?: string;
+  kidName?: string | null;
+  kidImage?: string | null;
+  grade?: string | null;
+  /** Place name (map picker, child's home address or reverse-geocoded). */
+  address?: string | null;
+}
+
+/** Student photo or initial, used in stop rows. */
+function StopAvatar({ stop }: { stop: KidStop }) {
+  const name = stop.kidName || '';
+  return stop.kidImage ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={stop.kidImage} alt={name} className="w-8 h-8 rounded-full object-cover shrink-0 border border-gray-200" />
+  ) : (
+    <div className="w-8 h-8 rounded-full bg-[#1B3B69]/10 text-[#1B3B69] flex items-center justify-center text-xs font-semibold shrink-0">
+      {name ? name.charAt(0).toUpperCase() : '?'}
+    </div>
+  );
 }
 
 interface RouteData {
@@ -244,9 +261,17 @@ function RouteDetailDrawer({ route, onClose, onEdit }: { route: RouteData; onClo
                 {stops.map((stop, i) => (
                   <div key={String(stop.kidId)} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
                     <div className="w-7 h-7 bg-[#1B3B69] rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">{i + 1}</div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-800">{stop.kidName ?? `Stop ${i + 1}`}</p>
-                      <p className="text-xs font-mono text-gray-400">{stop.lat.toFixed(5)}, {stop.long.toFixed(5)}</p>
+                    <StopAvatar stop={stop} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-800 truncate">
+                        {stop.kidName || 'Student'}
+                        {stop.grade ? <span className="text-xs text-gray-400 font-normal"> · Grade {stop.grade}</span> : null}
+                      </p>
+                      {stop.address ? (
+                        <p className="text-xs text-gray-500 truncate" title={`${stop.lat.toFixed(5)}, ${stop.long.toFixed(5)}`}>{stop.address}</p>
+                      ) : (
+                        <p className="text-xs font-mono text-gray-400">{stop.lat.toFixed(5)}, {stop.long.toFixed(5)}</p>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -309,7 +334,7 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
       tripDays: form.tripDays,
       startPoint: form.startPoint ? { lat: form.startPoint.lat, long: form.startPoint.long, address: form.startPoint.address } : undefined,
       endPoint: form.endPoint ? { lat: form.endPoint.lat, long: form.endPoint.long, address: form.endPoint.address } : undefined,
-      kidLocations: form.kidLocations.map(k => ({ kidId: k.kidId, lat: k.lat, long: k.long })),
+      kidLocations: form.kidLocations.map(k => ({ kidId: k.kidId, lat: k.lat, long: k.long, ...(k.address ? { address: k.address } : {}) })),
     }),
     onSuccess: () => { onSuccess(); onClose(); },
     onError: (e: any) => {
@@ -335,7 +360,7 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
       tripDays: form.tripDays,
       startPoint: form.startPoint ? { lat: form.startPoint.lat, long: form.startPoint.long, address: form.startPoint.address } : undefined,
       endPoint: form.endPoint ? { lat: form.endPoint.lat, long: form.endPoint.long, address: form.endPoint.address } : undefined,
-      kidLocations: form.kidLocations.map(k => ({ kidId: k.kidId, lat: k.lat, long: k.long })),
+      kidLocations: form.kidLocations.map(k => ({ kidId: k.kidId, lat: k.lat, long: k.long, ...(k.address ? { address: k.address } : {}) })),
     }),
     onSuccess: () => { onSuccess(); onClose(); },
     onError: (e: any) => {
@@ -363,7 +388,7 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
       setForm(f => ({
         ...f,
         kidLocations: f.kidLocations.map(k =>
-          k.kidId === kidId ? { ...k, lat: loc.lat, long: loc.lng } : k
+          k.kidId === kidId ? { ...k, lat: loc.lat, long: loc.lng, address: loc.address || null } : k
         ),
       }));
     }
@@ -386,6 +411,9 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
         lat: student.homeLat ?? 0,
         long: student.homeLng ?? 0,
         kidName: student.fullname,
+        kidImage: student.image ?? null,
+        grade: student.grade ?? null,
+        address: student.homeAddress ?? null,
       }],
     }));
   }
@@ -590,7 +618,11 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
                       <div key={stop.kidId} className="bg-gray-50 rounded-xl p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <span className="w-6 h-6 bg-[#1B3B69] rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">{i + 1}</span>
-                          <p className="text-sm font-medium text-gray-800 flex-1">{stop.kidName ?? stop.kidId?.slice(-6)}</p>
+                          <StopAvatar stop={stop} />
+                          <p className="text-sm font-medium text-gray-800 flex-1 truncate">
+                            {stop.kidName || 'Student'}
+                            {stop.grade ? <span className="text-xs text-gray-400 font-normal"> · Grade {stop.grade}</span> : null}
+                          </p>
                           <div className="flex gap-1">
                             <button onClick={() => moveStop(i, 'up')} disabled={i === 0} className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-200 disabled:opacity-30">
                               <ArrowUp size={12} />
@@ -611,7 +643,11 @@ function RouteModal({ mode, route, vans, students, onClose, onSuccess }: {
                         >
                           <MapPin size={14} className={stop.lat ? 'text-[#1B3B69]' : 'text-gray-400'} />
                           {stop.lat ? (
-                            <span className="text-xs font-mono text-gray-600">{stop.lat.toFixed(5)}, {stop.long.toFixed(5)}</span>
+                            stop.address ? (
+                              <span className="text-xs text-gray-700 truncate flex-1" title={`${stop.lat.toFixed(5)}, ${stop.long.toFixed(5)}`}>{stop.address}</span>
+                            ) : (
+                              <span className="text-xs font-mono text-gray-600">{stop.lat.toFixed(5)}, {stop.long.toFixed(5)}</span>
+                            )
                           ) : (
                             <span className="text-xs text-gray-400">Tap to pick location on map</span>
                           )}

@@ -10,7 +10,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { usePendingAlertsCount } from "@/hooks/usePendingAlertsCount";
+import { useUnreadAlertsCount } from "@/hooks/useUnreadAlertsCount";
+import { usePendingAlertsCount as usePendingComplaintsCount } from "@/hooks/usePendingAlertsCount";
 
 const navItems: { labelKey: string; href: string; icon: any; roles: ("admin" | "superadmin")[]; permission?: string }[] = [
   { labelKey: "nav.overview", href: "/super-admin", icon: LayoutDashboard, roles: ["superadmin"] },
@@ -45,7 +46,8 @@ export function Sidebar() {
   const pathname = usePathname();
   const { user: admin, logout } = useAuth();
   const { t, isRTL } = useLanguage();
-  const pendingAlertsCount = usePendingAlertsCount();
+  const pendingAlertsCount = useUnreadAlertsCount();
+  const pendingComplaintsCount = usePendingComplaintsCount();
 
   return (
     <aside className="print:hidden w-[190px] bg-white dark:bg-[var(--sv-card-bg)] border-r border-sv-border dark:border-[var(--sv-border)] flex flex-col flex-shrink-0 h-screen sticky top-0">
@@ -82,7 +84,13 @@ export function Sidebar() {
               <span className="flex-1 truncate">{t(item.labelKey)}</span>
               {item.href === '/alerts' && pendingAlertsCount > 0 && !active && (
                 <span className="bg-sv-red text-white text-[9px] font-medium px-1.5 py-0.5 rounded-full">
-                  {pendingAlertsCount}
+                  {pendingAlertsCount > 99 ? '99+' : pendingAlertsCount}
+                </span>
+              )}
+              {/* Complaints waiting for review (not part of the alerts badge). */}
+              {item.href === '/complaints' && pendingComplaintsCount > 0 && !active && (
+                <span className="bg-amber-500 text-white text-[9px] font-medium px-1.5 py-0.5 rounded-full">
+                  {pendingComplaintsCount > 99 ? '99+' : pendingComplaintsCount}
                 </span>
               )}
             </Link>

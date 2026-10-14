@@ -1,6 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 
+// Pending complaints count — shown on the sidebar's "Complaints & Reports"
+// item. (The Alerts badge uses useUnreadAlertsCount.)
+//
 // The sidebar's "Alerts Overview" badge and the topbar bell icon both used
 // to show a hardcoded literal "3", regardless of what was actually
 // happening — this hook gives both a single, real, live count instead.
