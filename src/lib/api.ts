@@ -240,7 +240,7 @@ export const billingApi = {
       data: {
         subscriptionStatus: string;
         premiumSubscriptionStatus: string;
-        diagnostic?: { stripeCustomerId: string | null; subscriptionsFound: { id: string; status: string; type: string; created: string }[] };
+        diagnostic?: { stripeCustomerId: string | null; recoveredByEmail?: boolean; subscriptionsFound: { id: string; status: string; type: string; created: string }[] };
       };
     }>(`/billing/schools/${schoolId}/sync-from-stripe`, {}),
   syncMyStatus: () =>

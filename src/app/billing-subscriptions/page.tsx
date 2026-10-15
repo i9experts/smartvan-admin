@@ -89,7 +89,8 @@ export default function BillingSubscriptionsPage() {
         } else if (diagnostic.subscriptionsFound.length === 0) {
           detail = `Stripe customer ${diagnostic.stripeCustomerId} has 0 subscriptions — nothing to sync.`;
         } else {
-          detail = `${diagnostic.stripeCustomerId}: ${diagnostic.subscriptionsFound.map((s) => `${s.type}=${s.status}`).join(', ')}`;
+          const prefix = diagnostic.recoveredByEmail ? 'Recovered a lost Stripe link by email — ' : '';
+          detail = `${prefix}${diagnostic.stripeCustomerId}: ${diagnostic.subscriptionsFound.map((s) => `${s.type}=${s.status}`).join(', ')}`;
         }
       }
       setActionResult({ schoolId, status: 'ok', detail });
