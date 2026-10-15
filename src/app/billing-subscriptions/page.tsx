@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
-  CreditCard, Search, Sparkles, ShieldCheck, ChevronLeft, ChevronRight, TrendingUp, AlertTriangle,
+  CreditCard, Search, Sparkles, ShieldCheck, ChevronLeft, ChevronRight, TrendingUp, AlertTriangle, Send, Check,
 } from 'lucide-react';
 import { schoolApi, billingApi } from '@/lib/api';
 import { SchoolFeaturesModal } from '@/components/super-admin/SchoolFeaturesModal';
@@ -65,6 +65,17 @@ export default function BillingSubscriptionsPage() {
   const [status, setStatus] = useState('all');
   const [page, setPage] = useState(1);
   const [managingFeatures, setManagingFeatures] = useState<{ id: string; name: string } | null>(null);
+  const [reminderResult, setReminderResult] = useState<{ schoolId: string; status: 'sent' | 'error'; detail: string } | null>(null);
+
+  const sendReminder = useMutation({
+    mutationFn: (schoolId: string) => billingApi.sendReminder(schoolId),
+    onSuccess: (res, schoolId) => {
+      setReminderResult({ schoolId, status: 'sent', detail: `Sent to ${res.data.data.schoolEmail}` });
+    },
+    onError: (err: any, schoolId) => {
+      setReminderResult({ schoolId, status: 'error', detail: err?.response?.data?.message || 'Could not send reminder' });
+    },
+  });
 
   const { data: breakdown } = useQuery({
     queryKey: ['billing-plan-breakdown'],
@@ -234,13 +245,31 @@ export default function BillingSubscriptionsPage() {
                       </td>
                       <td className="px-5 py-3.5">{billingStatusBadge(inst.premiumSubscriptionStatus)}</td>
                       <td className="px-5 py-3.5">
-                        <button
-                          onClick={() => setManagingFeatures({ id: inst.schoolId, name: inst.schoolName })}
-                          title="Manage features"
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-[#1B3B69] hover:bg-gray-100"
-                        >
-                          <ShieldCheck size={15} />
-                        </button>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => setManagingFeatures({ id: inst.schoolId, name: inst.schoolName })}
+                            title="Manage features"
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-[#1B3B69] hover:bg-gray-100"
+                          >
+                            <ShieldCheck size={15} />
+                          </button>
+                          {inst.activeVans > 0 && inst.subscriptionStatus !== 'active' && (
+                            <button
+                              onClick={() => { setReminderResult(null); sendReminder.mutate(inst.schoolId); }}
+                              disabled={sendReminder.isPending && sendReminder.variables === inst.schoolId}
+                              title="Email a payment link to this school"
+                              className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 disabled:opacity-40"
+                            >
+                              <Send size={15} />
+                            </button>
+                          )}
+                        </div>
+                        {reminderResult?.schoolId === inst.schoolId && (
+                          <p className={`text-[11px] mt-1 flex items-center gap-1 ${reminderResult.status === 'sent' ? 'text-emerald-600' : 'text-red-600'}`}>
+                            {reminderResult.status === 'sent' && <Check size={10} />}
+                            {reminderResult.detail}
+                          </p>
+                        )}
                       </td>
                     </tr>
                   ))}

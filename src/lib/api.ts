@@ -229,6 +229,11 @@ export const billingApi = {
       unbilledSchoolsWithVans: number;
     };
   }>('/billing/plan-breakdown'),
+  sendReminder: (schoolId: string) =>
+    api.post<{ message: string; data: { schoolEmail: string; totalAmount: number; currency: string; totalVans: number } }>(
+      `/billing/schools/${schoolId}/send-reminder`,
+      {},
+    ),
 };
 
 export const featureApi = {
