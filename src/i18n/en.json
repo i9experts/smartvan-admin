@@ -25,7 +25,10 @@
     "qrCards": "Student QR Cards",
     "safetyChecklists": "Safety Checklists",
     "ratings": "Ratings",
-    "routeOptimization": "Route Optimization"
+    "routeOptimization": "Route Optimization",
+    "institutions": "Institutions",
+    "billingSubscriptions": "Billing & Subscriptions",
+    "appsModules": "Apps & Modules"
   },
   "common": {
     "save": "Save",

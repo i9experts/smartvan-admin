@@ -7,6 +7,7 @@ import {
   LayoutDashboard, MapPin, School, Bus, Users, Route,
   Bell, BarChart3, Receipt, Wrench, Settings, LogOut, MessageSquare, History,
   Image as ImageIcon, AlertTriangle, HelpCircle, QrCode, ClipboardCheck, Star, Sparkles, Lock,
+  Building2, CreditCard, LayoutGrid,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -16,6 +17,9 @@ import { useFeatures } from "@/hooks/useFeatures";
 
 const navItems: { labelKey: string; href: string; icon: any; roles: ("admin" | "superadmin")[]; permission?: string; featureKey?: string }[] = [
   { labelKey: "nav.overview", href: "/super-admin", icon: LayoutDashboard, roles: ["superadmin"] },
+  { labelKey: "nav.institutions", href: "/institutions", icon: Building2, roles: ["superadmin"] },
+  { labelKey: "nav.billingSubscriptions", href: "/billing-subscriptions", icon: CreditCard, roles: ["superadmin"] },
+  { labelKey: "nav.appsModules", href: "/apps-modules", icon: LayoutGrid, roles: ["superadmin"] },
   { labelKey: "nav.overview", href: "/dashboard", icon: LayoutDashboard, roles: ["admin"], permission: "view_dashboard" },
   { labelKey: "nav.liveTracking", href: "/tracking", icon: MapPin, roles: ["admin"] },
   { labelKey: "nav.studentManagement", href: "/students", icon: School, roles: ["admin"], permission: "manage_students" },
