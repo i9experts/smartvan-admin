@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { useFeatures } from '@/hooks/useFeatures';
 
 // Pending complaints count — shown on the sidebar's "Complaints & Reports"
 // item. (The Alerts badge uses useUnreadAlertsCount.)
@@ -14,12 +15,16 @@ import { api } from '@/lib/api';
 // state. limit=1 keeps this cheap: we only need the total count from the
 // pagination metadata, not the actual records.
 export function usePendingAlertsCount() {
+  const { hasFeature, loading: featuresLoading } = useFeatures();
+  const unlocked = !featuresLoading && hasFeature('complaints');
+
   const { data } = useQuery({
     queryKey: ['pending-complaints-count'],
     queryFn: () => api.get('/report/getComplainsByAdmin', { params: { status: 'pending', limit: 1 } }),
     select: (res) => res.data?.pagination?.total ?? 0,
     staleTime: 30_000,
     refetchInterval: 60_000,
+    enabled: unlocked,
   });
-  return data ?? 0;
+  return unlocked ? (data ?? 0) : 0;
 }

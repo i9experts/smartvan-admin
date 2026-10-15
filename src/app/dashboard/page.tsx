@@ -26,6 +26,7 @@ import {
   Legend,
 } from 'recharts';
 import { api } from '@/lib/api';
+import { useFeatures } from '@/hooks/useFeatures';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -185,6 +186,9 @@ function SkeletonCard() {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
+  const { hasFeature, loading: featuresLoading } = useFeatures();
+  const complaintsUnlocked = !featuresLoading && hasFeature('complaints');
+
   const {
     data: students = [],
     isLoading: loadingStudents,
@@ -233,20 +237,22 @@ export default function DashboardPage() {
     queryKey: ['dashboard-complaints'],
     queryFn: fetchComplaints,
     staleTime: 60_000,
+    enabled: complaintsUnlocked,
   });
 
   const isLoading =
-    loadingStudents || loadingVans || loadingDrivers || loadingTrips || loadingComplaints;
+    loadingStudents || loadingVans || loadingDrivers || loadingTrips || (complaintsUnlocked && loadingComplaints);
 
   // A failed fetch otherwise falls back to [] and every KPI computed from it
   // reads as a legitimate "0" — indistinguishable from a genuinely empty
   // new school. Surface which counts, if any, are actually unreliable.
+  // Complaints being on a different plan isn't a failure, so it's excluded.
   const failedMetrics = [
     errorStudents && 'students',
     errorVans && 'fleet',
     errorDrivers && 'drivers',
     errorTrips && "today's trips",
-    errorComplaints && 'complaints',
+    complaintsUnlocked && errorComplaints && 'complaints',
   ].filter(Boolean) as string[];
 
   const stats = buildStats(students, vans, drivers, trips, complaints);
