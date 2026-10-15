@@ -87,7 +87,8 @@ export default function BillingSubscriptionsPage() {
         if (!diagnostic.stripeCustomerId) {
           detail = 'No Stripe customer on file for this school — it has never gone through checkout.';
         } else if (diagnostic.subscriptionsFound.length === 0) {
-          detail = `Stripe customer ${diagnostic.stripeCustomerId} has 0 subscriptions — nothing to sync.`;
+          const emailNote = diagnostic.searchedEmail ? ` (searched by ${diagnostic.searchedEmail})` : '';
+          detail = `Stripe customer ${diagnostic.stripeCustomerId} has 0 subscriptions${emailNote} — nothing to sync.`;
         } else {
           const prefix = diagnostic.recoveredByEmail ? 'Recovered a lost Stripe link by email — ' : '';
           detail = `${prefix}${diagnostic.stripeCustomerId}: ${diagnostic.subscriptionsFound.map((s) => `${s.type}=${s.status}`).join(', ')}`;
