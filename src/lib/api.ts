@@ -235,10 +235,14 @@ export const billingApi = {
       {},
     ),
   syncFromStripe: (schoolId: string) =>
-    api.post<{ message: string; data: { subscriptionStatus: string; premiumSubscriptionStatus: string } }>(
-      `/billing/schools/${schoolId}/sync-from-stripe`,
-      {},
-    ),
+    api.post<{
+      message: string;
+      data: {
+        subscriptionStatus: string;
+        premiumSubscriptionStatus: string;
+        diagnostic?: { stripeCustomerId: string | null; subscriptionsFound: { id: string; status: string; type: string; created: string }[] };
+      };
+    }>(`/billing/schools/${schoolId}/sync-from-stripe`, {}),
   syncMyStatus: () =>
     api.post<{ message: string; data: { subscriptionStatus: string; premiumSubscriptionStatus: string } }>(
       '/billing/sync-my-status',

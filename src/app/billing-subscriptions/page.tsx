@@ -81,8 +81,18 @@ export default function BillingSubscriptionsPage() {
   const syncFromStripe = useMutation({
     mutationFn: (schoolId: string) => billingApi.syncFromStripe(schoolId),
     onSuccess: (res, schoolId) => {
-      const { subscriptionStatus } = res.data.data;
-      setActionResult({ schoolId, status: 'ok', detail: `Synced — now "${subscriptionStatus}"` });
+      const { subscriptionStatus, diagnostic } = res.data.data;
+      let detail = `Synced — now "${subscriptionStatus}"`;
+      if (diagnostic) {
+        if (!diagnostic.stripeCustomerId) {
+          detail = 'No Stripe customer on file for this school — it has never gone through checkout.';
+        } else if (diagnostic.subscriptionsFound.length === 0) {
+          detail = `Stripe customer ${diagnostic.stripeCustomerId} has 0 subscriptions — nothing to sync.`;
+        } else {
+          detail = `${diagnostic.stripeCustomerId}: ${diagnostic.subscriptionsFound.map((s) => `${s.type}=${s.status}`).join(', ')}`;
+        }
+      }
+      setActionResult({ schoolId, status: 'ok', detail });
       qc.invalidateQueries({ queryKey: ['billing-institutions'] });
       qc.invalidateQueries({ queryKey: ['billing-plan-breakdown'] });
     },
