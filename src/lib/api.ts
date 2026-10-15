@@ -234,6 +234,16 @@ export const billingApi = {
       `/billing/schools/${schoolId}/send-reminder`,
       {},
     ),
+  syncFromStripe: (schoolId: string) =>
+    api.post<{ message: string; data: { subscriptionStatus: string; premiumSubscriptionStatus: string } }>(
+      `/billing/schools/${schoolId}/sync-from-stripe`,
+      {},
+    ),
+  syncMyStatus: () =>
+    api.post<{ message: string; data: { subscriptionStatus: string; premiumSubscriptionStatus: string } }>(
+      '/billing/sync-my-status',
+      {},
+    ),
 };
 
 export const featureApi = {
