@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  CreditCard, Search, Sparkles, ShieldCheck, ChevronLeft, ChevronRight, TrendingUp, AlertTriangle, Send, Check,
+  CreditCard, Search, Sparkles, ShieldCheck, ChevronLeft, ChevronRight, TrendingUp, AlertTriangle, Send, Check, RefreshCw,
 } from 'lucide-react';
 import { schoolApi, billingApi } from '@/lib/api';
 import { SchoolFeaturesModal } from '@/components/super-admin/SchoolFeaturesModal';
@@ -61,19 +61,33 @@ function StatCard({ label, value, sub, accent }: { label: string; value: string;
 }
 
 export default function BillingSubscriptionsPage() {
+  const qc = useQueryClient();
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('all');
   const [page, setPage] = useState(1);
   const [managingFeatures, setManagingFeatures] = useState<{ id: string; name: string } | null>(null);
-  const [reminderResult, setReminderResult] = useState<{ schoolId: string; status: 'sent' | 'error'; detail: string } | null>(null);
+  const [actionResult, setActionResult] = useState<{ schoolId: string; status: 'ok' | 'error'; detail: string } | null>(null);
 
   const sendReminder = useMutation({
     mutationFn: (schoolId: string) => billingApi.sendReminder(schoolId),
     onSuccess: (res, schoolId) => {
-      setReminderResult({ schoolId, status: 'sent', detail: `Sent to ${res.data.data.schoolEmail}` });
+      setActionResult({ schoolId, status: 'ok', detail: `Sent to ${res.data.data.schoolEmail}` });
     },
     onError: (err: any, schoolId) => {
-      setReminderResult({ schoolId, status: 'error', detail: err?.response?.data?.message || 'Could not send reminder' });
+      setActionResult({ schoolId, status: 'error', detail: err?.response?.data?.message || 'Could not send reminder' });
+    },
+  });
+
+  const syncFromStripe = useMutation({
+    mutationFn: (schoolId: string) => billingApi.syncFromStripe(schoolId),
+    onSuccess: (res, schoolId) => {
+      const { subscriptionStatus } = res.data.data;
+      setActionResult({ schoolId, status: 'ok', detail: `Synced — now "${subscriptionStatus}"` });
+      qc.invalidateQueries({ queryKey: ['billing-institutions'] });
+      qc.invalidateQueries({ queryKey: ['billing-plan-breakdown'] });
+    },
+    onError: (err: any, schoolId) => {
+      setActionResult({ schoolId, status: 'error', detail: err?.response?.data?.message || 'Could not sync from Stripe' });
     },
   });
 
@@ -255,7 +269,7 @@ export default function BillingSubscriptionsPage() {
                           </button>
                           {inst.activeVans > 0 && inst.subscriptionStatus !== 'active' && (
                             <button
-                              onClick={() => { setReminderResult(null); sendReminder.mutate(inst.schoolId); }}
+                              onClick={() => { setActionResult(null); sendReminder.mutate(inst.schoolId); }}
                               disabled={sendReminder.isPending && sendReminder.variables === inst.schoolId}
                               title="Email a payment link to this school"
                               className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 disabled:opacity-40"
@@ -263,11 +277,19 @@ export default function BillingSubscriptionsPage() {
                               <Send size={15} />
                             </button>
                           )}
+                          <button
+                            onClick={() => { setActionResult(null); syncFromStripe.mutate(inst.schoolId); }}
+                            disabled={syncFromStripe.isPending && syncFromStripe.variables === inst.schoolId}
+                            title="Re-check this school's real status directly from Stripe"
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-[#1B3B69] hover:bg-gray-100 disabled:opacity-40"
+                          >
+                            <RefreshCw size={15} className={syncFromStripe.isPending && syncFromStripe.variables === inst.schoolId ? 'animate-spin' : ''} />
+                          </button>
                         </div>
-                        {reminderResult?.schoolId === inst.schoolId && (
-                          <p className={`text-[11px] mt-1 flex items-center gap-1 ${reminderResult.status === 'sent' ? 'text-emerald-600' : 'text-red-600'}`}>
-                            {reminderResult.status === 'sent' && <Check size={10} />}
-                            {reminderResult.detail}
+                        {actionResult?.schoolId === inst.schoolId && (
+                          <p className={`text-[11px] mt-1 flex items-center gap-1 ${actionResult.status === 'ok' ? 'text-emerald-600' : 'text-red-600'}`}>
+                            {actionResult.status === 'ok' && <Check size={10} />}
+                            {actionResult.detail}
                           </p>
                         )}
                       </td>

@@ -1,13 +1,13 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   CreditCard, CheckCircle2, Clock, AlertCircle,
   DollarSign, Bus, FileText, ExternalLink,
   Zap, Shield, TrendingUp, Building2, Users,
   XCircle, RefreshCw,
 } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api, billingApi } from '@/lib/api';
 
 function formatCurrency(amount: number, currency: string) {
   if (currency === 'PKR') return `PKR ${amount.toLocaleString()}`;
@@ -33,6 +33,7 @@ function useRole() {
 
 // ─── School Admin Billing View ────────────────────────────────────────────────
 function SchoolBillingView() {
+  const qc = useQueryClient();
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -47,6 +48,22 @@ function SchoolBillingView() {
     queryFn: () => api.get('/billing/history').then(r => r.data),
     staleTime: 60_000,
   });
+
+  // Reconciles this school's status directly from Stripe on every visit,
+  // independent of webhook delivery — so returning from Stripe Checkout (or
+  // any payment that happened while the admin wasn't watching) reflects
+  // here and unlocks Premium immediately rather than waiting on a webhook.
+  useEffect(() => {
+    billingApi.syncMyStatus().then(() => {
+      qc.invalidateQueries({ queryKey: ['billing-status'] });
+      qc.invalidateQueries({ queryKey: ['billing-history'] });
+      qc.invalidateQueries({ queryKey: ['my-features'] });
+    }).catch(() => {
+      // Best-effort — the page still works off its own live /billing/status
+      // and /billing/history reads even if this sync call fails.
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleSubscribe() {
     setCheckoutLoading(true);

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Lock, Sparkles } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api, billingApi } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 
 interface PremiumLockedProps {
@@ -16,12 +17,25 @@ interface PremiumLockedProps {
  * even if this component were somehow bypassed). */
 export function PremiumLocked({ featureLabel, description }: PremiumLockedProps) {
   const { user } = useAuth();
+  const qc = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   // Billing is deliberately never delegable to school_staff — only the
   // school's own admin account can start a Premium checkout.
   const canUpgrade = user?.role === 'admin';
+
+  // Hitting a paywall is the exact moment a stale "still locked" DB status
+  // is most visible to a school that already paid — reconcile with Stripe
+  // right here rather than waiting for a webhook, and if it turns out
+  // they're actually Premium, re-render unlocked automatically.
+  useEffect(() => {
+    if (user?.role !== 'admin') return;
+    billingApi.syncMyStatus().then(() => {
+      qc.invalidateQueries({ queryKey: ['my-features'] });
+    }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleUpgrade = async () => {
     setLoading(true);
