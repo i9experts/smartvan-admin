@@ -9,6 +9,8 @@ import {
   BadgeCheck, BarChart3, RefreshCw,
 } from 'lucide-react';
 import { vanApi } from '@/lib/api';
+import { useFeatures } from '@/hooks/useFeatures';
+import { PremiumLocked } from '@/components/billing/PremiumLocked';
 
 interface VanItem {
   _id: string; carNumber: string; vehicleType: string; venCapacity?: number;
@@ -313,6 +315,7 @@ function VanCard({ van, onClick }: { van: VanItem; onClick: () => void }) {
 }
 
 export default function FleetPage() {
+  const { hasFeature, loading: featuresLoading } = useFeatures();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all'|'active'|'inactive'|'critical'|'overdue'>('all');
   const [selectedVan, setSelectedVan] = useState<VanItem|null>(null);
@@ -323,6 +326,7 @@ export default function FleetPage() {
     queryFn: () => vanApi.getByAdmin({ page: 1, limit: 100 }),
     select: (r: any) => mapVans(r.data),
     staleTime: 30_000,
+    enabled: !featuresLoading && hasFeature('fleet_health'),
   });
 
   const vans: VanItem[] = data?.data ?? [];
@@ -348,6 +352,16 @@ export default function FleetPage() {
     else if (filter === 'overdue') list = list.filter(v => { const e = getEarliestExpiry(v); return e && new Date(e) < new Date(); });
     return list;
   }, [vans, search, filter]);
+
+  if (featuresLoading) return null;
+  if (!hasFeature('fleet_health')) {
+    return (
+      <PremiumLocked
+        featureLabel="Fleet Health"
+        description="Document compliance scoring and a fleet readiness dashboard — unlock Premium to see it."
+      />
+    );
+  }
 
   return (
     <>

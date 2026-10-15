@@ -9,6 +9,8 @@ import {
   Calendar, Phone, Wallet, TrendingUp, ChevronDown,
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { useFeatures } from '@/hooks/useFeatures';
+import { PremiumLocked } from '@/components/billing/PremiumLocked';
 
 const CURRENCIES = ['PKR', 'SAR', 'AED', 'QAR', 'USD'];
 const BILLING_CYCLES = ['monthly', 'quarterly', 'yearly', 'one_time'];
@@ -335,6 +337,8 @@ function FeeConfigModal({ existing, schoolId, defaultCurrency = 'PKR', onClose }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function FeesPage() {
+  const { hasFeature, loading: featuresLoading } = useFeatures();
+  const feesUnlocked = !featuresLoading && hasFeature('fee_management');
   const qc = useQueryClient();
   const [tab, setTab] = useState<'overview' | 'payments' | 'unpaid' | 'settings'>('overview');
   const [month, setMonth] = useState(getCurrentMonth());
@@ -360,24 +364,28 @@ export default function FeesPage() {
     queryKey: ['fees', 'summary', month],
     queryFn: () => api.get(`/fees/summary?month=${month}`).then(r => r.data?.data),
     staleTime: 30_000,
+    enabled: feesUnlocked,
   });
 
   const { data: paymentsData, isLoading: loadingPayments } = useQuery({
     queryKey: ['fees', 'payments', month, statusFilter],
     queryFn: () => api.get(`/fees/payments?month=${month}${statusFilter ? `&status=${statusFilter}` : ''}`).then(r => r.data),
     staleTime: 30_000,
+    enabled: feesUnlocked,
   });
 
   const { data: unpaidData, isLoading: loadingUnpaid } = useQuery({
     queryKey: ['fees', 'unpaid', month],
     queryFn: () => api.get(`/fees/unpaid?month=${month}`).then(r => r.data),
     staleTime: 30_000,
+    enabled: feesUnlocked,
   });
 
   const { data: feeConfigs, isLoading: loadingConfigs } = useQuery({
     queryKey: ['fees', 'configs'],
     queryFn: () => api.get('/fees/school').then(r => r.data?.data ?? []),
     staleTime: 60_000,
+    enabled: feesUnlocked,
   });
 
   const payments: any[] = paymentsData?.data ?? [];
@@ -465,6 +473,16 @@ export default function FeesPage() {
     { id: 'unpaid', label: `Unpaid ${summary.pending + summary.overdue > 0 ? `(${summary.pending + summary.overdue})` : ''}`, icon: AlertCircle },
     { id: 'settings', label: 'Fee Structure', icon: Settings },
   ] as const;
+
+  if (featuresLoading) return null;
+  if (!hasFeature('fee_management')) {
+    return (
+      <PremiumLocked
+        featureLabel="Fee Management"
+        description="Set transport fees, generate monthly invoices, and track payments and reminders — unlock Premium to see them."
+      />
+    );
+  }
 
   return (
     <>

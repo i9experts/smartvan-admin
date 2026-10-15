@@ -15,6 +15,8 @@ import {
   PieChart, Pie, Cell, Legend,
 } from 'recharts';
 import { api } from '@/lib/api';
+import { useFeatures } from '@/hooks/useFeatures';
+import { PremiumLocked } from '@/components/billing/PremiumLocked';
 
 // ─── Types (mirrors GET /Admin/getAnalytics) ──────────────────────────────────
 
@@ -226,11 +228,23 @@ function getDayLabel(dateStr: string) {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function AnalyticsPage() {
+  const { hasFeature, loading: featuresLoading } = useFeatures();
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['analytics'],
     queryFn: async () => (await api.get<AnalyticsResponse>('/Admin/getAnalytics')).data,
     staleTime: 60_000,
+    enabled: !featuresLoading && hasFeature('analytics'),
   });
+
+  if (featuresLoading) return null;
+  if (!hasFeature('analytics')) {
+    return (
+      <PremiumLocked
+        featureLabel="Analytics Dashboard"
+        description="School-wide trends, insights, and the AI route-optimization savings report — unlock Premium to see them."
+      />
+    );
+  }
 
   if (isError) {
     return (

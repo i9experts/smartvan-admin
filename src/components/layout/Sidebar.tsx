@@ -6,14 +6,15 @@ import Image from "next/image";
 import {
   LayoutDashboard, MapPin, School, Bus, Users, Route,
   Bell, BarChart3, Receipt, Wrench, Settings, LogOut, MessageSquare, History,
-  Image as ImageIcon, AlertTriangle, HelpCircle, QrCode, ClipboardCheck, Star, Sparkles,
+  Image as ImageIcon, AlertTriangle, HelpCircle, QrCode, ClipboardCheck, Star, Sparkles, Lock,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useUnreadAlertsCount } from "@/hooks/useUnreadAlertsCount";
 import { usePendingAlertsCount as usePendingComplaintsCount } from "@/hooks/usePendingAlertsCount";
+import { useFeatures } from "@/hooks/useFeatures";
 
-const navItems: { labelKey: string; href: string; icon: any; roles: ("admin" | "superadmin")[]; permission?: string }[] = [
+const navItems: { labelKey: string; href: string; icon: any; roles: ("admin" | "superadmin")[]; permission?: string; featureKey?: string }[] = [
   { labelKey: "nav.overview", href: "/super-admin", icon: LayoutDashboard, roles: ["superadmin"] },
   { labelKey: "nav.overview", href: "/dashboard", icon: LayoutDashboard, roles: ["admin"], permission: "view_dashboard" },
   { labelKey: "nav.liveTracking", href: "/tracking", icon: MapPin, roles: ["admin"] },
@@ -24,15 +25,15 @@ const navItems: { labelKey: string; href: string; icon: any; roles: ("admin" | "
   { labelKey: "nav.parentManagement", href: "/parents", icon: Users, roles: ["admin"], permission: "manage_parents" },
   { labelKey: "nav.routePlanner", href: "/routes", icon: Route, roles: ["admin"], permission: "manage_routes" },
   { labelKey: "nav.alertsOverview", href: "/alerts", icon: Bell, roles: ["admin"], permission: "view_alerts" },
-  { labelKey: "nav.complaints", href: "/complaints", icon: AlertTriangle, roles: ["admin"], permission: "manage_complaints" },
-  { labelKey: "nav.analytics", href: "/analytics", icon: BarChart3, roles: ["admin"], permission: "view_analytics" },
-  { labelKey: "nav.ratings", href: "/ratings", icon: Star, roles: ["admin"], permission: "view_analytics" },
-  { labelKey: "nav.routeOptimization", href: "/route-optimization", icon: Sparkles, roles: ["admin"], permission: "manage_fleet" },
+  { labelKey: "nav.complaints", href: "/complaints", icon: AlertTriangle, roles: ["admin"], permission: "manage_complaints", featureKey: "complaints" },
+  { labelKey: "nav.analytics", href: "/analytics", icon: BarChart3, roles: ["admin"], permission: "view_analytics", featureKey: "analytics" },
+  { labelKey: "nav.ratings", href: "/ratings", icon: Star, roles: ["admin"], permission: "view_analytics", featureKey: "ratings" },
+  { labelKey: "nav.routeOptimization", href: "/route-optimization", icon: Sparkles, roles: ["admin"], permission: "manage_fleet", featureKey: "route_optimization" },
   { labelKey: "nav.billing", href: "/billing", icon: Receipt, roles: ["admin"] },
-  { labelKey: "nav.fleetManagement", href: "/fleet", icon: Wrench, roles: ["admin"], permission: "view_fleet_health" },
-  { labelKey: "nav.safetyChecklists", href: "/safety-checklists", icon: ClipboardCheck, roles: ["admin"], permission: "manage_fleet" },
+  { labelKey: "nav.fleetManagement", href: "/fleet", icon: Wrench, roles: ["admin"], permission: "view_fleet_health", featureKey: "fleet_health" },
+  { labelKey: "nav.safetyChecklists", href: "/safety-checklists", icon: ClipboardCheck, roles: ["admin"], permission: "manage_fleet", featureKey: "safety_checklists" },
   { labelKey: "nav.attendance", href: "/attendance", icon: Users, roles: ["admin"], permission: "view_attendance" },
-  { labelKey: "nav.feeManagement", href: "/fees", icon: Users, roles: ["admin"], permission: "manage_fees" },
+  { labelKey: "nav.feeManagement", href: "/fees", icon: Users, roles: ["admin"], permission: "manage_fees", featureKey: "fee_management" },
   { labelKey: "nav.team", href: "/team", icon: Users, roles: ["admin"] },
   { labelKey: "nav.support", href: "/support", icon: HelpCircle, roles: ["admin"] },
   { labelKey: "nav.schoolLeads", href: "/leads", icon: Users, roles: ["superadmin"] },
@@ -48,6 +49,7 @@ export function Sidebar() {
   const { t, isRTL } = useLanguage();
   const pendingAlertsCount = useUnreadAlertsCount();
   const pendingComplaintsCount = usePendingComplaintsCount();
+  const { hasFeature } = useFeatures();
 
   return (
     <aside className="print:hidden w-[190px] bg-white dark:bg-[var(--sv-card-bg)] border-r border-sv-border dark:border-[var(--sv-border)] flex flex-col flex-shrink-0 h-screen sticky top-0">
@@ -69,6 +71,10 @@ export function Sidebar() {
           return item.roles.includes((admin?.role as "admin" | "superadmin") ?? "admin");
         }).map((item) => {
           const active = pathname === item.href || pathname.startsWith(item.href + "/");
+          // Locked items still navigate — the page itself shows the
+          // "Unlock Premium" paywall rather than hiding the module outright,
+          // so schools can see what they're missing and upgrade in place.
+          const locked = !!item.featureKey && !hasFeature(item.featureKey);
           return (
             <Link
               key={item.href}
@@ -77,18 +83,23 @@ export function Sidebar() {
                 "flex items-center gap-2.5 px-4 py-[9px] text-[12.5px] transition-all",
                 active
                   ? "bg-sv-navy text-white rounded-lg mx-2 px-3"
+                  : locked
+                  ? "text-sv-muted/60 hover:text-sv-text hover:bg-sv-bg dark:hover:bg-white/5"
                   : "text-sv-muted hover:text-sv-text hover:bg-sv-bg dark:hover:bg-white/5"
               )}
             >
               <item.icon size={16} className="flex-shrink-0" />
               <span className="flex-1 truncate">{t(item.labelKey)}</span>
+              {locked && (
+                <Lock size={11} className={active ? "text-white/70" : "text-sv-muted/60"} />
+              )}
               {item.href === '/alerts' && pendingAlertsCount > 0 && !active && (
                 <span className="bg-sv-red text-white text-[9px] font-medium px-1.5 py-0.5 rounded-full">
                   {pendingAlertsCount > 99 ? '99+' : pendingAlertsCount}
                 </span>
               )}
               {/* Complaints waiting for review (not part of the alerts badge). */}
-              {item.href === '/complaints' && pendingComplaintsCount > 0 && !active && (
+              {item.href === '/complaints' && pendingComplaintsCount > 0 && !active && !locked && (
                 <span className="bg-amber-500 text-white text-[9px] font-medium px-1.5 py-0.5 rounded-full">
                   {pendingComplaintsCount > 99 ? '99+' : pendingComplaintsCount}
                 </span>

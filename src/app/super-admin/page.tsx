@@ -13,6 +13,8 @@ import {
   Smartphone,
 } from 'lucide-react';
 import { api, schoolApi } from '@/lib/api';
+import { useState } from 'react';
+import { SchoolFeaturesModal } from '@/components/super-admin/SchoolFeaturesModal';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -117,7 +119,15 @@ function SkeletonCard() {
   );
 }
 
-function InstitutionRow({ school, onChanged }: { school: { schoolId: string; schoolName: string; status: string; totalVans: number; avgHealth: number | null }; onChanged: () => void }) {
+function InstitutionRow({
+  school,
+  onChanged,
+  onManageFeatures,
+}: {
+  school: { schoolId: string; schoolName: string; status: string; totalVans: number; avgHealth: number | null };
+  onChanged: () => void;
+  onManageFeatures: () => void;
+}) {
   const toggleMutation = useMutation({
     mutationFn: () => schoolApi.changeStatus(school.schoolId, school.status === 'active' ? 'inActive' : 'active'),
     onSuccess: () => onChanged(),
@@ -133,7 +143,13 @@ function InstitutionRow({ school, onChanged }: { school: { schoolId: string; sch
       </td>
       <td className="py-2 text-gray-600">{school.totalVans}</td>
       <td className="py-2 text-gray-900">{school.avgHealth !== null ? `${school.avgHealth}%` : '—'}</td>
-      <td className="py-2 text-right">
+      <td className="py-2 text-right space-x-2">
+        <button
+          onClick={onManageFeatures}
+          className="text-xs px-2.5 py-1 rounded-lg font-medium text-[#1B3B69] hover:bg-[#1B3B69]/5 transition"
+        >
+          Features
+        </button>
         <button
           onClick={() => toggleMutation.mutate()}
           disabled={toggleMutation.isPending}
@@ -158,9 +174,17 @@ export default function SuperAdminPage() {
     queryFn: fetchOverview,
     staleTime: 60_000,
   });
+  const [featuresSchool, setFeaturesSchool] = useState<{ id: string; name: string } | null>(null);
 
   return (
     <div className="p-6 space-y-6">
+      {featuresSchool && (
+        <SchoolFeaturesModal
+          schoolId={featuresSchool.id}
+          schoolName={featuresSchool.name}
+          onClose={() => setFeaturesSchool(null)}
+        />
+      )}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Super Admin Overview</h1>
@@ -379,7 +403,12 @@ export default function SuperAdminPage() {
             </thead>
             <tbody>
               {data?.institutions.snapshot.map((s) => (
-                <InstitutionRow key={s.schoolId} school={s} onChanged={refetch} />
+                <InstitutionRow
+                  key={s.schoolId}
+                  school={s}
+                  onChanged={refetch}
+                  onManageFeatures={() => setFeaturesSchool({ id: s.schoolId, name: s.schoolName })}
+                />
               ))}
             </tbody>
           </table>
