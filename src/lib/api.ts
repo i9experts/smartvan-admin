@@ -148,11 +148,14 @@ export const routeApi = {
 };
 
 export const schoolApi = {
-  getAll: (params?: { page?: number; limit?: number; search?: string }) =>
+  getAll: (params?: { page?: number; limit?: number; search?: string; plan?: 'basic' | 'premium'; billingStatus?: string }) =>
     api.get('/Admin/getAllSchoolsBySuperAdmin', { params }),
   getById: (id: string) => api.get(`/Admin/getSchoolById/${id}`),
   changeStatus: (schoolId: string, status: string) =>
     api.post('/school/changeSchoolStatus', { schoolId, status }),
+  createInstitution: (body: { schoolName: string; adminName: string; email: string; phone: string; address?: string; featureTier?: 'basic' | 'premium' }) =>
+    api.post('/school/create-institution', body),
+  getAppsModulesOverview: () => api.get('/school/apps-modules-overview'),
 };
 export const employeeApi = {
   getPermissions: () => api.get('/employee/permissions'),
@@ -211,6 +214,20 @@ export interface FeatureDef {
   tier: 'basic' | 'premium';
   backendEnforced: boolean;
 }
+
+export const billingApi = {
+  getPlanBreakdown: () => api.get<{
+    message: string;
+    data: {
+      totalSchools: number;
+      byTier: { basic: number; premium: number };
+      premiumActiveCount: number;
+      estimatedPremiumMrrPkr: number;
+      premiumPricePkr: number;
+      byVanBillingStatus: Record<string, number>;
+    };
+  }>('/billing/plan-breakdown'),
+};
 
 export const featureApi = {
   getRegistry: () => api.get<{ message: string; data: FeatureDef[] }>('/school/feature-registry'),

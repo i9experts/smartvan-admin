@@ -25,7 +25,10 @@
     "qrCards": "بطاقات QR للطلاب",
     "safetyChecklists": "قوائم السلامة",
     "ratings": "التقييمات",
-    "routeOptimization": "تحسين المسار"
+    "routeOptimization": "تحسين المسار",
+    "institutions": "المؤسسات",
+    "billingSubscriptions": "الفواتير والاشتراكات",
+    "appsModules": "التطبيقات والوحدات"
   },
   "common": {
     "save": "حفظ",

@@ -11,6 +11,9 @@ import {
   WifiOff,
   Activity,
   Smartphone,
+  Megaphone,
+  Plus,
+  X,
 } from 'lucide-react';
 import { api, schoolApi } from '@/lib/api';
 import { useState } from 'react';
@@ -23,7 +26,19 @@ interface SuperAdminOverview {
     total: number;
     active: number;
     inactive: number;
+    suspended: number;
+    newToday: number;
+    newThisWeek: number;
+    churnRatePercent: number;
     snapshot: { schoolId: string; schoolName: string; status: string; totalVans: number; avgHealth: number | null }[];
+  };
+  revenue: {
+    vanBillingMrr: number;
+    premiumMrr: number;
+    totalMrr: number;
+    totalArr: number;
+    currency: string;
+    planBreakdown: { totalSchools: number; byTier: { basic: number; premium: number }; premiumActiveCount: number } | null;
   };
   fleet: {
     total: number;
@@ -168,6 +183,127 @@ function InstitutionRow({
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
+function BroadcastModal({ onClose }: { onClose: () => void }) {
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const mutation = useMutation({
+    mutationFn: () => api.post('/Admin/broadcast', { subject, message }),
+    onSuccess: () => onClose(),
+  });
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl max-w-lg w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <Megaphone size={18} className="text-[#FEC610]" /> Broadcast to All Admins
+          </h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+        </div>
+        <div className="p-6 space-y-4">
+          <div>
+            <label className="text-xs font-medium text-gray-500 mb-1 block">Subject</label>
+            <input
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="e.g. Scheduled maintenance this weekend"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#1B3B69]"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-gray-500 mb-1 block">Message</label>
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              rows={5}
+              placeholder="Emailed to every active school's admin."
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#1B3B69] resize-none"
+            />
+          </div>
+          {mutation.isError && <p className="text-sm text-red-600">Could not send. Please try again.</p>}
+          {mutation.isSuccess && (
+            <p className="text-sm text-emerald-600">
+              Sent to {(mutation.data as any)?.data?.data?.recipientCount ?? 0} admin(s).
+            </p>
+          )}
+          <div className="flex gap-2 pt-1">
+            <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50">
+              Cancel
+            </button>
+            <button
+              onClick={() => mutation.mutate()}
+              disabled={!subject.trim() || !message.trim() || mutation.isPending}
+              className="flex-1 px-4 py-2.5 rounded-xl bg-[#1B3B69] text-white text-sm font-semibold hover:bg-[#111d4a] disabled:opacity-50"
+            >
+              {mutation.isPending ? 'Sending…' : 'Send Broadcast'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AddInstitutionModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const [form, setForm] = useState({ schoolName: '', adminName: '', email: '', phone: '', address: '', featureTier: 'basic' as 'basic' | 'premium' });
+  const mutation = useMutation({
+    mutationFn: () => schoolApi.createInstitution(form),
+    onSuccess: () => { onCreated(); onClose(); },
+  });
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl max-w-lg w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <Plus size={18} className="text-[#1B3B69]" /> Add Institution
+          </h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+        </div>
+        <div className="p-6 space-y-3">
+          <p className="text-xs text-gray-400 -mt-1">
+            Creates the school and admin account immediately — credentials are emailed. For reviewing an inbound lead first, use School Leads instead.
+          </p>
+          <input placeholder="School name" value={form.schoolName} onChange={set('schoolName')}
+            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#1B3B69]" />
+          <input placeholder="Admin full name" value={form.adminName} onChange={set('adminName')}
+            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#1B3B69]" />
+          <input placeholder="Admin email" type="email" value={form.email} onChange={set('email')}
+            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#1B3B69]" />
+          <input placeholder="Phone" value={form.phone} onChange={set('phone')}
+            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#1B3B69]" />
+          <input placeholder="Address (optional)" value={form.address} onChange={set('address')}
+            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#1B3B69]" />
+          <select
+            value={form.featureTier}
+            onChange={(e) => setForm((f) => ({ ...f, featureTier: e.target.value as 'basic' | 'premium' }))}
+            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#1B3B69] bg-white"
+          >
+            <option value="basic">Basic tier</option>
+            <option value="premium">Premium tier</option>
+          </select>
+          {mutation.isError && (
+            <p className="text-sm text-red-600">{(mutation.error as any)?.response?.data?.message || 'Could not create. Please try again.'}</p>
+          )}
+          <div className="flex gap-2 pt-1">
+            <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50">
+              Cancel
+            </button>
+            <button
+              onClick={() => mutation.mutate()}
+              disabled={!form.schoolName || !form.adminName || !form.email || !form.phone || mutation.isPending}
+              className="flex-1 px-4 py-2.5 rounded-xl bg-[#1B3B69] text-white text-sm font-semibold hover:bg-[#111d4a] disabled:opacity-50"
+            >
+              {mutation.isPending ? 'Creating…' : 'Create Institution'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function SuperAdminPage() {
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['super-admin-overview'],
@@ -175,6 +311,8 @@ export default function SuperAdminPage() {
     staleTime: 60_000,
   });
   const [featuresSchool, setFeaturesSchool] = useState<{ id: string; name: string } | null>(null);
+  const [showBroadcast, setShowBroadcast] = useState(false);
+  const [showAddInstitution, setShowAddInstitution] = useState(false);
 
   return (
     <div className="p-6 space-y-6">
@@ -185,19 +323,83 @@ export default function SuperAdminPage() {
           onClose={() => setFeaturesSchool(null)}
         />
       )}
+      {showBroadcast && <BroadcastModal onClose={() => setShowBroadcast(false)} />}
+      {showAddInstitution && <AddInstitutionModal onClose={() => setShowAddInstitution(false)} onCreated={() => refetch()} />}
+
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Super Admin Overview</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Command Center</h1>
           <p className="text-sm text-gray-400 mt-0.5">Platform-wide intelligence across all institutions</p>
         </div>
-        <button
-          onClick={() => refetch()}
-          disabled={isFetching}
-          className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-50"
-        >
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowBroadcast(true)}
+            className="flex items-center gap-2 px-3 py-2 bg-[#FEC610] text-[#1B3B69] rounded-xl text-sm font-semibold hover:bg-[#e6b40d] transition"
+          >
+            <Megaphone size={15} /> Broadcast
+          </button>
+          <button
+            onClick={() => setShowAddInstitution(true)}
+            className="flex items-center gap-2 px-3 py-2 bg-[#1B3B69] text-white rounded-xl text-sm font-semibold hover:bg-[#111d4a] transition"
+          >
+            <Plus size={15} /> Add Institution
+          </button>
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-50"
+          >
+            Refresh
+          </button>
+        </div>
       </div>
+
+      {/* Revenue Intelligence */}
+      {!isLoading && data && (
+        <div className="bg-gradient-to-br from-[#1B3B69] to-[#2D4099] rounded-2xl p-6 text-white">
+          <p className="text-xs uppercase tracking-wide text-white/60 mb-1">Monthly Recurring Revenue</p>
+          <div className="flex items-end justify-between flex-wrap gap-4">
+            <div>
+              <p className="text-4xl font-bold">{data.revenue.currency} {data.revenue.totalMrr.toLocaleString()}</p>
+              <p className="text-xs text-white/60 mt-1">ARR: {data.revenue.currency} {(data.revenue.totalArr / 1_000_000).toFixed(1)}M</p>
+            </div>
+            <div className="flex gap-6">
+              <div className="text-right">
+                <p className="text-lg font-bold">{data.institutions.total}</p>
+                <p className="text-xs text-white/60">Institutions</p>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-bold">{data.revenue.planBreakdown?.premiumActiveCount ?? 0}</p>
+                <p className="text-xs text-white/60">Premium (Paid)</p>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-bold">{data.institutions.newThisWeek}</p>
+                <p className="text-xs text-white/60">New This Week</p>
+              </div>
+              <div className="text-right">
+                <p className={`text-lg font-bold ${data.institutions.churnRatePercent > 10 ? 'text-red-300' : 'text-white'}`}>
+                  {data.institutions.churnRatePercent}%
+                </p>
+                <p className="text-xs text-white/60">Suspended Rate</p>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-5 pt-5 border-t border-white/10">
+            <div className="bg-white/10 rounded-xl p-3">
+              <p className="text-xs text-white/60">Van Billing MRR</p>
+              <p className="text-lg font-bold">{data.revenue.currency} {data.revenue.vanBillingMrr.toLocaleString()}</p>
+            </div>
+            <div className="bg-white/10 rounded-xl p-3">
+              <p className="text-xs text-white/60">Premium MRR</p>
+              <p className="text-lg font-bold">{data.revenue.currency} {data.revenue.premiumMrr.toLocaleString()}</p>
+            </div>
+            <div className="bg-white/10 rounded-xl p-3">
+              <p className="text-xs text-white/60">New Today</p>
+              <p className="text-lg font-bold">{data.institutions.newToday}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Executive KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
