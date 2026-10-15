@@ -351,13 +351,19 @@ function SchoolBillingView() {
                     {inv.status === 'paid' ? <CheckCircle2 size={16} className="text-emerald-600" /> : <AlertCircle size={16} className="text-red-500" />}
                   </div>
                   <div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       <p className="text-sm font-medium text-gray-900">{formatCurrency(inv.amount, inv.currency)}</p>
                       <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${inv.type === 'premium_feature_tier' ? 'bg-[#FEC610]/20 text-[#8a6500]' : 'bg-blue-50 text-[#1B3B69]'}`}>
                         {inv.type === 'premium_feature_tier' ? 'Premium' : 'Van Billing'}
                       </span>
+                      {inv.manual && (
+                        <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500" title={inv.note || ''}>
+                          Manually recorded
+                        </span>
+                      )}
                     </div>
                     <p className="text-xs text-gray-400">{formatDate(inv.date)}</p>
+                    {inv.manual && inv.note && <p className="text-[11px] text-gray-400 mt-0.5">{inv.note}</p>}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
