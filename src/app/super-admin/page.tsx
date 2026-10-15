@@ -39,6 +39,8 @@ interface SuperAdminOverview {
     totalArr: number;
     currency: string;
     planBreakdown: { totalSchools: number; byTier: { basic: number; premium: number }; premiumActiveCount: number } | null;
+    potentialVanBillingByCurrency: Record<string, number>;
+    unbilledSchoolsWithVans: number;
   };
   fleet: {
     total: number;
@@ -384,9 +386,9 @@ export default function SuperAdminPage() {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-5 pt-5 border-t border-white/10">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-5 border-t border-white/10">
             <div className="bg-white/10 rounded-xl p-3">
-              <p className="text-xs text-white/60">Van Billing MRR</p>
+              <p className="text-xs text-white/60">Van Billing MRR (confirmed)</p>
               <p className="text-lg font-bold">{data.revenue.currency} {data.revenue.vanBillingMrr.toLocaleString()}</p>
             </div>
             <div className="bg-white/10 rounded-xl p-3">
@@ -397,6 +399,15 @@ export default function SuperAdminPage() {
               <p className="text-xs text-white/60">New Today</p>
               <p className="text-lg font-bold">{data.institutions.newToday}</p>
             </div>
+            {data.revenue.unbilledSchoolsWithVans > 0 && (
+              <div className="bg-amber-400/20 rounded-xl p-3 border border-amber-300/40">
+                <p className="text-xs text-white/70">Unbilled Fleet Value</p>
+                <p className="text-lg font-bold text-amber-200">
+                  {data.revenue.currency} {(data.revenue.potentialVanBillingByCurrency?.[data.revenue.currency] ?? 0).toLocaleString()}
+                </p>
+                <p className="text-[11px] text-white/60 mt-0.5">{data.revenue.unbilledSchoolsWithVans} institution{data.revenue.unbilledSchoolsWithVans === 1 ? '' : 's'} with vans, no subscription</p>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
-  CreditCard, Search, Sparkles, ShieldCheck, ChevronLeft, ChevronRight, TrendingUp,
+  CreditCard, Search, Sparkles, ShieldCheck, ChevronLeft, ChevronRight, TrendingUp, AlertTriangle,
 } from 'lucide-react';
 import { schoolApi, billingApi } from '@/lib/api';
 import { SchoolFeaturesModal } from '@/components/super-admin/SchoolFeaturesModal';
@@ -15,6 +15,9 @@ interface Institution {
   premiumSubscriptionStatus: string;
   currentPlan: string;
   subscriptionStatus: string;
+  activeVans: number;
+  estimatedMonthlyVanBilling: number;
+  currency: string;
 }
 
 const STATUS_TABS: { value: string; label: string }[] = [
@@ -85,6 +88,8 @@ export default function BillingSubscriptionsPage() {
   const pagination = data?.pagination ?? { page: 1, limit: 10, total: 0, totalPages: 1 };
 
   const premiumMrr = breakdown ? breakdown.premiumActiveCount * breakdown.premiumPricePkr : 0;
+  const potentialVanBillingPkr = breakdown?.potentialVanBillingByCurrency?.PKR ?? 0;
+  const potentialVanBillingOther = Object.entries(breakdown?.potentialVanBillingByCurrency ?? {}).filter(([c]) => c !== 'PKR');
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -115,6 +120,23 @@ export default function BillingSubscriptionsPage() {
         <StatCard label="Basic Plan" value={`${breakdown?.byTier.basic ?? 0}`} sub="institutions" />
         <StatCard label="Premium Plan" value={`${breakdown?.byTier.premium ?? 0}`} sub="institutions" />
       </div>
+
+      {breakdown && breakdown.unbilledSchoolsWithVans > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 flex flex-wrap items-start gap-3">
+          <AlertTriangle size={18} className="text-amber-500 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-amber-800">
+              {breakdown.unbilledSchoolsWithVans} institution{breakdown.unbilledSchoolsWithVans === 1 ? '' : 's'} running vans without a confirmed subscription
+            </p>
+            <p className="text-xs text-amber-700 mt-0.5">
+              Based on their actual active fleet, they represent an estimated{' '}
+              <strong>Rs {potentialVanBillingPkr.toLocaleString()}/mo</strong>
+              {potentialVanBillingOther.map(([curr, amt]) => <span key={curr}> + {curr} {Number(amt).toLocaleString()}/mo</span>)}
+              {' '}in van billing that isn&apos;t yet collected. Use the &quot;No subscription&quot; filter below to find them.
+            </p>
+          </div>
+        </div>
+      )}
 
       {breakdown && (
         <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-6 flex flex-wrap gap-6 items-center">
@@ -176,6 +198,7 @@ export default function BillingSubscriptionsPage() {
                     <th className="text-left px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide">Institution</th>
                     <th className="text-left px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide">Feature Plan</th>
                     <th className="text-left px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide">Van Billing</th>
+                    <th className="text-left px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide">Fleet Value</th>
                     <th className="text-left px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide">Premium Billing</th>
                     <th className="text-left px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide">Actions</th>
                   </tr>
@@ -194,6 +217,21 @@ export default function BillingSubscriptionsPage() {
                         )}
                       </td>
                       <td className="px-5 py-3.5">{billingStatusBadge(inst.subscriptionStatus)}</td>
+                      <td className="px-5 py-3.5">
+                        {inst.activeVans > 0 ? (
+                          <div>
+                            <span className="font-semibold text-gray-800">{inst.currency} {inst.estimatedMonthlyVanBilling.toLocaleString()}/mo</span>
+                            <p className="text-xs text-gray-400">{inst.activeVans} active van{inst.activeVans === 1 ? '' : 's'}</p>
+                            {inst.subscriptionStatus !== 'active' && (
+                              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-600 mt-0.5">
+                                <AlertTriangle size={10} /> unbilled
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-gray-300">—</span>
+                        )}
+                      </td>
                       <td className="px-5 py-3.5">{billingStatusBadge(inst.premiumSubscriptionStatus)}</td>
                       <td className="px-5 py-3.5">
                         <button
