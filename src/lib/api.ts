@@ -225,6 +225,8 @@ export const billingApi = {
       estimatedPremiumMrrPkr: number;
       premiumPricePkr: number;
       byVanBillingStatus: Record<string, number>;
+      potentialVanBillingByCurrency: Record<string, number>;
+      unbilledSchoolsWithVans: number;
     };
   }>('/billing/plan-breakdown'),
 };

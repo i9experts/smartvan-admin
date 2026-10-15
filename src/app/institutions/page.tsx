@@ -26,6 +26,9 @@ interface Institution {
   totalKids: number;
   totalVans: number;
   totalRoutes: number;
+  activeVans: number;
+  estimatedMonthlyVanBilling: number;
+  currency: string;
 }
 
 function TierBadge({ tier }: { tier: 'basic' | 'premium' }) {
@@ -90,6 +93,15 @@ function DetailDrawer({ inst, onClose }: { inst: Institution; onClose: () => voi
           </div>
           <div className="bg-gray-50 rounded-xl p-4 space-y-2 text-sm">
             <div className="flex justify-between"><span className="text-gray-400">Van billing</span><span className="font-medium text-gray-800">{inst.subscriptionStatus}</span></div>
+            {inst.activeVans > 0 && (
+              <div className="flex justify-between">
+                <span className="text-gray-400">Estimated fleet value</span>
+                <span className="font-medium text-gray-800">
+                  {inst.currency} {inst.estimatedMonthlyVanBilling.toLocaleString()}/mo
+                  {inst.subscriptionStatus !== 'active' && <span className="text-amber-600"> (unbilled)</span>}
+                </span>
+              </div>
+            )}
             <div className="flex justify-between"><span className="text-gray-400">Premium billing</span><span className="font-medium text-gray-800">{inst.premiumSubscriptionStatus}</span></div>
             {inst.createdAt && (
               <div className="flex justify-between"><span className="text-gray-400">Joined</span><span className="font-medium text-gray-800">{new Date(inst.createdAt).toLocaleDateString()}</span></div>
