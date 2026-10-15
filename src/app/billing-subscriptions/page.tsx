@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  CreditCard, Search, Sparkles, ShieldCheck, ChevronLeft, ChevronRight, TrendingUp, AlertTriangle, Send, Check, RefreshCw,
+  CreditCard, Search, Sparkles, ShieldCheck, ChevronLeft, ChevronRight, TrendingUp, AlertTriangle, Send, Check, RefreshCw, BadgeCheck, X,
 } from 'lucide-react';
 import { schoolApi, billingApi } from '@/lib/api';
 import { SchoolFeaturesModal } from '@/components/super-admin/SchoolFeaturesModal';
@@ -60,12 +60,80 @@ function StatCard({ label, value, sub, accent }: { label: string; value: string;
   );
 }
 
+function MarkPaidModal({
+  schoolId, schoolName, onClose, onDone,
+}: { schoolId: string; schoolName: string; onClose: () => void; onDone: (status: { subscriptionStatus: string; premiumSubscriptionStatus: string }) => void }) {
+  const [vanBilling, setVanBilling] = useState(true);
+  const [premium, setPremium] = useState(false);
+  const [note, setNote] = useState('');
+
+  const mutation = useMutation({
+    mutationFn: () => billingApi.markPaid(schoolId, { vanBilling, premium, note }),
+    onSuccess: (res) => onDone(res.data.data),
+  });
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl w-full max-w-md shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <h2 className="text-base font-bold text-gray-900">Mark {schoolName} as paid</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={18} /></button>
+        </div>
+        <div className="p-6 space-y-4">
+          <p className="text-xs text-gray-500 leading-relaxed">
+            For payment collected outside the normal Stripe Checkout flow (a manually-sent invoice/payment link, bank transfer, etc) —
+            sets status directly without touching Stripe. A future &quot;Sync from Stripe&quot; won&apos;t revert this.
+          </p>
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input type="checkbox" checked={vanBilling} onChange={(e) => setVanBilling(e.target.checked)} className="rounded" />
+              Van billing — mark active
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input type="checkbox" checked={premium} onChange={(e) => setPremium(e.target.checked)} className="rounded" />
+              Premium — mark active
+            </label>
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">
+              Note — how was this payment actually collected? <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={3}
+              placeholder="e.g. Manual Stripe invoice sent directly, receipt #2902-5979, Rs10,920 paid Oct 15 2026"
+              className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2 outline-none focus:border-[#1B3B69]"
+            />
+          </div>
+          {mutation.isError && (
+            <p className="text-xs text-red-600">{(mutation.error as any)?.response?.data?.message || 'Could not update billing status'}</p>
+          )}
+          <div className="flex gap-2 pt-1">
+            <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50">
+              Cancel
+            </button>
+            <button
+              onClick={() => mutation.mutate()}
+              disabled={mutation.isPending || !note.trim() || (!vanBilling && !premium)}
+              className="flex-1 py-2.5 rounded-xl bg-[#1B3B69] text-white text-sm font-semibold hover:bg-[#162356] disabled:opacity-50"
+            >
+              {mutation.isPending ? 'Saving…' : 'Mark as Paid'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function BillingSubscriptionsPage() {
   const qc = useQueryClient();
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('all');
   const [page, setPage] = useState(1);
   const [managingFeatures, setManagingFeatures] = useState<{ id: string; name: string } | null>(null);
+  const [markingPaid, setMarkingPaid] = useState<{ id: string; name: string } | null>(null);
   const [actionResult, setActionResult] = useState<{ schoolId: string; status: 'ok' | 'error'; detail: string } | null>(null);
 
   const sendReminder = useMutation({
@@ -135,6 +203,19 @@ export default function BillingSubscriptionsPage() {
           schoolId={managingFeatures.id}
           schoolName={managingFeatures.name}
           onClose={() => setManagingFeatures(null)}
+        />
+      )}
+      {markingPaid && (
+        <MarkPaidModal
+          schoolId={markingPaid.id}
+          schoolName={markingPaid.name}
+          onClose={() => setMarkingPaid(null)}
+          onDone={(result) => {
+            setActionResult({ schoolId: markingPaid.id, status: 'ok', detail: `Marked paid — now "${result.subscriptionStatus}" / "${result.premiumSubscriptionStatus}"` });
+            setMarkingPaid(null);
+            qc.invalidateQueries({ queryKey: ['billing-institutions'] });
+            qc.invalidateQueries({ queryKey: ['billing-plan-breakdown'] });
+          }}
         />
       )}
 
@@ -297,6 +378,15 @@ export default function BillingSubscriptionsPage() {
                           >
                             <RefreshCw size={15} className={syncFromStripe.isPending && syncFromStripe.variables === inst.schoolId ? 'animate-spin' : ''} />
                           </button>
+                          {inst.subscriptionStatus !== 'active' && (
+                            <button
+                              onClick={() => { setActionResult(null); setMarkingPaid({ id: inst.schoolId, name: inst.schoolName }); }}
+                              title="Manually mark as paid (payment collected outside Stripe)"
+                              className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 hover:bg-emerald-50"
+                            >
+                              <BadgeCheck size={15} />
+                            </button>
+                          )}
                         </div>
                         {actionResult?.schoolId === inst.schoolId && (
                           <p className={`text-[11px] mt-1 flex items-center gap-1 ${actionResult.status === 'ok' ? 'text-emerald-600' : 'text-red-600'}`}>

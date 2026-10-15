@@ -243,6 +243,11 @@ export const billingApi = {
         diagnostic?: { stripeCustomerId: string | null; recoveredByEmail?: boolean; searchedEmail?: string | null; subscriptionsFound: { id: string; status: string; type: string; created: string }[] };
       };
     }>(`/billing/schools/${schoolId}/sync-from-stripe`, {}),
+  markPaid: (schoolId: string, body: { vanBilling?: boolean; premium?: boolean; note: string }) =>
+    api.post<{ message: string; data: { subscriptionStatus: string; premiumSubscriptionStatus: string } }>(
+      `/billing/schools/${schoolId}/mark-paid`,
+      body,
+    ),
   syncMyStatus: () =>
     api.post<{ message: string; data: { subscriptionStatus: string; premiumSubscriptionStatus: string } }>(
       '/billing/sync-my-status',
