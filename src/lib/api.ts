@@ -110,6 +110,17 @@ export const tripApi = {
     api.get('/trips/routeOptimization/forAdmin', { params }),
 };
 
+export const adminTripApi = {
+  getActive: () => api.get('/admin/trips/active'),
+  getCompleted: (params: {
+    from?: string; to?: string; driverId?: string; vanId?: string; routeId?: string;
+    tripType?: 'pick' | 'drop'; page?: number; limit?: number;
+  }) => api.get('/admin/trips/completed', { params }),
+  getDetails: (id: string) => api.get(`/admin/trips/${id}/details`),
+  getTrail: (id: string) => api.get(`/trips/${id}/trail`),
+  getRoutePlan: (id: string) => api.get(`/trips/${id}/route-plan`),
+};
+
 export const checklistApi = {
   getLog: (params?: { page?: number; limit?: number; startDate?: string; endDate?: string; vanId?: string; driverId?: string; status?: 'ok' | 'issues' }) =>
     api.get('/trips/checklist/forAdmin', { params }),

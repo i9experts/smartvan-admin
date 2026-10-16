@@ -2,6 +2,7 @@
   "nav": {
     "overview": "Overview",
     "liveTracking": "Live Tracking",
+    "tripHistory": "Trip History",
     "studentManagement": "Student Management",
     "vanDriverMgmt": "Vans",
     "driverAccounts": "Driver Accounts",

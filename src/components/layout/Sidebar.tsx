@@ -17,6 +17,7 @@ const navItems: { labelKey: string; href: string; icon: any; roles: ("admin" | "
   { labelKey: "nav.overview", href: "/super-admin", icon: LayoutDashboard, roles: ["superadmin"] },
   { labelKey: "nav.overview", href: "/dashboard", icon: LayoutDashboard, roles: ["admin"], permission: "view_dashboard" },
   { labelKey: "nav.liveTracking", href: "/tracking", icon: MapPin, roles: ["admin"] },
+  { labelKey: "nav.tripHistory", href: "/trip-history", icon: History, roles: ["admin"] },
   { labelKey: "nav.studentManagement", href: "/students", icon: School, roles: ["admin"], permission: "manage_students" },
   { labelKey: "nav.qrCards", href: "/qr-cards", icon: QrCode, roles: ["admin"], permission: "manage_students" },
   { labelKey: "nav.vanDriverMgmt", href: "/vans", icon: Bus, roles: ["admin"], permission: "manage_fleet" },
