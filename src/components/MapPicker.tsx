@@ -29,14 +29,14 @@ export function loadGoogleMaps(): Promise<void> {
 
   loadingPromise = new Promise((resolve, reject) => {
     const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
-    if (!key) { reject(new Error('No Google Maps key')); return; }
+    if (!key) { loadingPromise = null; reject(new Error('No Google Maps key')); return; }
 
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&language=en`;
     script.async = true;
     script.defer = true;
     script.onload = () => { googleLoaded = true; resolve(); };
-    script.onerror = reject;
+    script.onerror = () => { loadingPromise = null; script.remove(); reject(new Error('Google Maps script failed to load')); };
     document.head.appendChild(script);
   });
 
