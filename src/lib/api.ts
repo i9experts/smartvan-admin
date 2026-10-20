@@ -329,6 +329,8 @@ export const parentIntelligenceApi = {
       '/parent-intelligence/register',
       { params },
     ),
+  backfill: () =>
+    api.post<{ academicLevelUpdated: number; geoUpdated: number; geoRemaining: number }>('/parent-intelligence/backfill', {}),
 };
 
 export const featureApi = {

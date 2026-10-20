@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Users, Baby, Building2, Search, ChevronLeft, ChevronRight,
-  GraduationCap, Flag,
+  GraduationCap, Flag, RefreshCw,
 } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -71,7 +71,9 @@ function RankedList({
 type GeoField = 'city' | 'country' | 'district' | 'town';
 
 export default function ParentIntelligencePage() {
+  const qc = useQueryClient();
   const [geoField, setGeoField] = useState<GeoField>('city');
+  const [backfillMessage, setBackfillMessage] = useState<string | null>(null);
 
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<'all' | 'attached' | 'prospect'>('all');
@@ -108,6 +110,20 @@ export default function ParentIntelligencePage() {
   const rows: ParentIntelligenceRegisterRow[] = register?.rows ?? [];
   const pagination = { page: register?.page ?? 1, totalPages: register?.totalPages ?? 1, total: register?.total ?? 0 };
 
+  const backfill = useMutation({
+    mutationFn: () => parentIntelligenceApi.backfill(),
+    onSuccess: (res) => {
+      const { academicLevelUpdated, geoUpdated, geoRemaining } = res.data;
+      setBackfillMessage(
+        `Updated ${academicLevelUpdated} grade level${academicLevelUpdated === 1 ? '' : 's'} and ${geoUpdated} location${geoUpdated === 1 ? '' : 's'}.` +
+        (geoRemaining > 0 ? ` ${geoRemaining} more still need geocoding — click again to continue.` : ' All caught up.')
+      );
+      qc.invalidateQueries({ queryKey: ['parent-intelligence-overview'] });
+      qc.invalidateQueries({ queryKey: ['parent-intelligence-register'] });
+    },
+    onError: () => setBackfillMessage('Backfill failed — please try again.'),
+  });
+
   const geoRows = (overview ? overview[`by${geoField[0].toUpperCase()}${geoField.slice(1)}` as 'byCity'] : []) || [];
   const levelData = (overview?.byLevel ?? []).map((l) => ({ name: l._id === 'primary' ? 'Primary' : 'Secondary', value: l.count }));
 
@@ -117,13 +133,26 @@ export default function ParentIntelligencePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#1B3B69] flex items-center gap-2">
-          <Users size={24} /> Parent Intelligence
-        </h1>
-        <p className="text-gray-500 text-sm mt-1">
-          Every registered parent and child on the platform — including families whose school hasn&apos;t joined SmartVan yet.
-        </p>
+      <div className="mb-6 flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-[#1B3B69] flex items-center gap-2">
+            <Users size={24} /> Parent Intelligence
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
+            Every registered parent and child on the platform — including families whose school hasn&apos;t joined SmartVan yet.
+          </p>
+        </div>
+        <div className="text-right">
+          <button
+            onClick={() => { setBackfillMessage(null); backfill.mutate(); }}
+            disabled={backfill.isPending}
+            className="flex items-center gap-1.5 text-sm font-medium px-3.5 py-2 rounded-xl border border-gray-200 bg-white text-[#1B3B69] hover:bg-gray-50 disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={backfill.isPending ? 'animate-spin' : ''} />
+            {backfill.isPending ? 'Backfilling…' : 'Backfill locations & levels'}
+          </button>
+          {backfillMessage && <p className="text-xs text-gray-500 mt-1.5 max-w-xs">{backfillMessage}</p>}
+        </div>
       </div>
 
       {/* KPIs */}
