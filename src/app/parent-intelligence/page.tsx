@@ -332,7 +332,9 @@ export default function ParentIntelligencePage() {
                     <tr key={i} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                       <td className="px-5 py-3.5">
                         <div className="font-semibold text-gray-800">{r.parentName || '—'}</div>
-                        <div className="text-xs text-gray-400">{r.parentEmail || r.parentPhone || '—'}</div>
+                        <div className="text-xs text-gray-400">
+                          {[r.parentEmail, r.parentPhone].filter(Boolean).join(' · ') || '—'}
+                        </div>
                       </td>
                       <td className="px-5 py-3.5 text-gray-600">{r.kidName || '—'}</td>
                       <td className="px-5 py-3.5 text-gray-600">{r.schoolName || '—'}</td>
