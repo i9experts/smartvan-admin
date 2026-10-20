@@ -266,6 +266,71 @@ export const billingApi = {
     ),
 };
 
+export interface ParentIntelligenceOverview {
+  totalParents: number;
+  linkedParents: number;
+  unlinkedParents: number;
+  parentsWithKids: number;
+  parentsWithNoKids: number;
+  totalKids: number;
+  attachedKids: number;
+  prospectKids: number;
+  byLevel: { _id: 'primary' | 'secondary'; count: number }[];
+  byGrade: { _id: string; count: number }[];
+  byAgeBucket: { label: string; count: number }[];
+  byCountry: { value: string; count: number }[];
+  byCity: { value: string; count: number }[];
+  byDistrict: { value: string; count: number }[];
+  byTown: { value: string; count: number }[];
+  topUnmetDemandSchools: { schoolName: string; count: number }[];
+  topActiveSchools: { schoolId: string; schoolName: string; count: number }[];
+  registrationsOverTime: { month: string; count: number }[];
+}
+
+export interface ParentIntelligenceRegisterRow {
+  kidName?: string;
+  grade?: string;
+  age?: number;
+  gender?: string;
+  academicLevel?: 'primary' | 'secondary';
+  city?: string;
+  district?: string;
+  town?: string;
+  country?: string;
+  isProspect?: boolean;
+  prospectSchoolName?: string;
+  schoolName?: string;
+  parentName?: string;
+  parentEmail?: string;
+  parentPhone?: string;
+  createdAt?: string;
+}
+
+export interface ParentIntelligenceRegisterFilters {
+  page?: number;
+  limit?: number;
+  search?: string;
+  city?: string;
+  country?: string;
+  district?: string;
+  town?: string;
+  schoolId?: string;
+  level?: string;
+  grade?: string;
+  ageMin?: number;
+  ageMax?: number;
+  status?: 'attached' | 'prospect';
+}
+
+export const parentIntelligenceApi = {
+  getOverview: () => api.get<ParentIntelligenceOverview>('/parent-intelligence/overview'),
+  getRegister: (params: ParentIntelligenceRegisterFilters) =>
+    api.get<{ rows: ParentIntelligenceRegisterRow[]; page: number; limit: number; total: number; totalPages: number }>(
+      '/parent-intelligence/register',
+      { params },
+    ),
+};
+
 export const featureApi = {
   getRegistry: () => api.get<{ message: string; data: FeatureDef[] }>('/school/feature-registry'),
   getMyFeatures: () => api.get<{
