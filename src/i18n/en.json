@@ -29,7 +29,8 @@
     "routeOptimization": "Route Optimization",
     "institutions": "Institutions",
     "billingSubscriptions": "Billing & Subscriptions",
-    "appsModules": "Apps & Modules"
+    "appsModules": "Apps & Modules",
+    "parentIntelligence": "Parent Intelligence"
   },
   "common": {
     "save": "Save",

@@ -29,7 +29,8 @@
     "routeOptimization": "تحسين المسار",
     "institutions": "المؤسسات",
     "billingSubscriptions": "الفواتير والاشتراكات",
-    "appsModules": "التطبيقات والوحدات"
+    "appsModules": "التطبيقات والوحدات",
+    "parentIntelligence": "بيانات أولياء الأمور"
   },
   "common": {
     "save": "حفظ",
