@@ -32,7 +32,8 @@
     "appsModules": "Apps & Modules",
     "parentIntelligence": "Parent Intelligence",
     "appVersions": "App Versions",
-    "campaigns": "Campaigns"
+    "campaigns": "Campaigns",
+    "partners": "Partners"
   },
   "common": {
     "save": "Save",

@@ -32,7 +32,8 @@
     "appsModules": "التطبيقات والوحدات",
     "parentIntelligence": "بيانات أولياء الأمور",
     "appVersions": "إصدارات التطبيق",
-    "campaigns": "الحملات"
+    "campaigns": "الحملات",
+    "partners": "الشركاء"
   },
   "common": {
     "save": "حفظ",

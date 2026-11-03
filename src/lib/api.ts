@@ -285,6 +285,67 @@ export const campaignsApi = {
   remove: (id: string) => api.delete(`/school/campaigns/${id}`),
 };
 
+export type PartnerType = 'individual_agent' | 'channel_partner' | 'reseller';
+
+export interface Partner {
+  _id: string;
+  name: string;
+  contactName?: string;
+  email: string;
+  phone?: string;
+  type: PartnerType;
+  referralCode: string;
+  commissionRate: number;
+  status: 'active' | 'inactive';
+  paymentDetails?: string;
+  notes?: string;
+  createdAt: string;
+  metrics: {
+    signups: number;
+    trials: number;
+    won: number;
+    pendingByCurrency: Record<string, number>;
+    paidByCurrency: Record<string, number>;
+  };
+}
+
+export interface Commission {
+  _id: string;
+  partnerId: string;
+  schoolId: { _id: string; schoolName: string } | string;
+  leadId: string;
+  source: 'stripe_invoice' | 'manual';
+  stripeInvoiceId?: string;
+  grossAmount: number;
+  rate: number;
+  amount: number;
+  currency: string;
+  status: 'pending' | 'paid';
+  paidAt?: string;
+  paidBy?: string;
+  note?: string;
+  createdAt: string;
+}
+
+export interface PartnersOverview {
+  totalPartners: number;
+  activePartners: number;
+  pendingByCurrency: Record<string, number>;
+  paidByCurrency: Record<string, number>;
+}
+
+export const partnersApi = {
+  getAll: () => api.get<{ message: string; data: Partner[] }>('/school/partners'),
+  getOverview: () => api.get<{ message: string; data: PartnersOverview }>('/school/partners/overview'),
+  create: (body: Partial<Partner>) => api.post<{ message: string; data: Partner }>('/school/partners', body),
+  update: (id: string, body: Partial<Partner>) => api.patch<{ message: string; data: Partner }>(`/school/partners/${id}`, body),
+  remove: (id: string) => api.delete(`/school/partners/${id}`),
+  getCommissions: (id: string) =>
+    api.get<{ message: string; data: { partner: Partner; commissions: Commission[] } }>(`/school/partners/${id}/commissions`),
+  markCommissionPaid: (commissionId: string, note?: string) =>
+    api.patch<{ message: string; data: Commission }>(`/school/partners/commissions/${commissionId}/mark-paid`, { note }),
+};
+
 export const employeeApi = {
   getPermissions: () => api.get('/employee/permissions'),
   getAll: () => api.get('/employee/all'),
