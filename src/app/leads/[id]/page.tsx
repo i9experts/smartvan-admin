@@ -133,7 +133,9 @@ export default function LeadDetailPage() {
             <h1 className="text-xl font-bold text-[#1B3B69] flex items-center gap-2">
               <Building2 size={20} /> {lead.schoolName}
             </h1>
-            <p className="text-sm text-gray-400 mt-1">{lead.schoolType} · {lead.city}, {lead.country}</p>
+            <p className="text-sm text-gray-400 mt-1">
+              {[lead.schoolType, [lead.city, lead.country].filter(Boolean).join(', ')].filter(Boolean).join(' · ') || 'No details yet'}
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold px-3 py-1.5 rounded-full text-white" style={{ backgroundColor: stage?.color }}>
@@ -151,9 +153,14 @@ export default function LeadDetailPage() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-5 pt-5 border-t border-gray-100">
-          <InfoRow icon={<User size={14} />} label="Admin" value={`${lead.adminName} (${lead.designation})`} />
+          <InfoRow icon={<User size={14} />} label="Admin" value={lead.designation ? `${lead.adminName} (${lead.designation})` : lead.adminName} />
           <InfoRow icon={<Mail size={14} />} label="Email" value={lead.email} href={`mailto:${lead.email}`} />
-          <InfoRow icon={<Phone size={14} />} label="Phone" value={lead.phone} href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}`} />
+          <InfoRow
+            icon={<Phone size={14} />}
+            label="Phone"
+            value={lead.phone || '—'}
+            href={lead.phone ? `https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}` : undefined}
+          />
           <InfoRow icon={<MapPin size={14} />} label="Fleet" value={`${lead.vanCount || '—'} vans · ${lead.studentCount || '—'} students`} />
         </div>
       </div>

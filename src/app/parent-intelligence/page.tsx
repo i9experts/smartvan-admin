@@ -47,17 +47,35 @@ function ChartCard({ title, sub, children }: { title: string; sub?: string; chil
 }
 
 function RankedList({
-  rows, emptyText, countLabel,
-}: { rows: { label: string; count: number }[]; emptyText: string; countLabel: string }) {
+  rows, emptyText, countLabel, onConvert, converted, converting,
+}: {
+  rows: { label: string; count: number }[]; emptyText: string; countLabel: string;
+  onConvert?: (label: string) => void; converted?: Set<string>; converting?: string | null;
+}) {
   if (rows.length === 0) return <p className="text-xs text-gray-300 py-6 text-center">{emptyText}</p>;
   const max = Math.max(...rows.map((r) => r.count), 1);
   return (
     <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
       {rows.map((r, i) => (
         <div key={i}>
-          <div className="flex items-center justify-between text-xs mb-1">
+          <div className="flex items-center justify-between text-xs mb-1 gap-2">
             <span className="text-gray-700 font-medium truncate pr-2" title={r.label}>{i + 1}. {r.label}</span>
-            <span className="text-gray-400 shrink-0">{r.count} {countLabel}</span>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-gray-400">{r.count} {countLabel}</span>
+              {onConvert && (
+                converted?.has(r.label) ? (
+                  <span className="text-emerald-600 font-medium">Added</span>
+                ) : (
+                  <button
+                    onClick={() => onConvert(r.label)}
+                    disabled={converting === r.label}
+                    className="text-[#1B3B69] font-semibold hover:underline disabled:opacity-40"
+                  >
+                    {converting === r.label ? 'Adding…' : 'Convert to Lead'}
+                  </button>
+                )
+              )}
+            </div>
           </div>
           <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div className="h-full bg-[#1B3B69] rounded-full" style={{ width: `${(r.count / max) * 100}%` }} />
@@ -109,6 +127,20 @@ export default function ParentIntelligencePage() {
 
   const rows: ParentIntelligenceRegisterRow[] = register?.rows ?? [];
   const pagination = { page: register?.page ?? 1, totalPages: register?.totalPages ?? 1, total: register?.total ?? 0 };
+
+  const [convertedSchools, setConvertedSchools] = useState<Set<string>>(new Set());
+  const [convertingSchool, setConvertingSchool] = useState<string | null>(null);
+  const [convertError, setConvertError] = useState<string | null>(null);
+  const convertDemand = useMutation({
+    mutationFn: (schoolName: string) => parentIntelligenceApi.convertDemandToLead(schoolName),
+    onMutate: (schoolName) => { setConvertingSchool(schoolName); setConvertError(null); },
+    onSuccess: (_res, schoolName) => {
+      setConvertedSchools((prev) => new Set(prev).add(schoolName));
+      qc.invalidateQueries({ queryKey: ['leads'] });
+    },
+    onError: (err: any) => setConvertError(err?.response?.data?.message || 'Could not convert — no parent contact on file for this school.'),
+    onSettled: () => setConvertingSchool(null),
+  });
 
   const backfill = useMutation({
     mutationFn: () => parentIntelligenceApi.backfill(),
@@ -241,10 +273,14 @@ export default function ParentIntelligencePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
         <ChartCard title="Top Unmet Demand" sub="Schools parents named that haven't joined SmartVan yet — sales leads">
+          {convertError && <p className="text-xs text-red-500 mb-2">{convertError}</p>}
           <RankedList
             rows={(overview?.topUnmetDemandSchools ?? []).map((s) => ({ label: s.schoolName, count: s.count }))}
             emptyText="No unlinked school names reported yet"
             countLabel="parents"
+            onConvert={(schoolName) => convertDemand.mutate(schoolName)}
+            converted={convertedSchools}
+            converting={convertingSchool}
           />
         </ChartCard>
         <ChartCard title="Top Active Schools" sub="Onboarded schools with the most children on file">

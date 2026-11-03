@@ -187,23 +187,26 @@ export interface LeadTaskEntry {
   completedAt?: string;
 }
 
+export type LeadSource = 'website' | 'contact_us' | 'manual' | 'import' | 'stalled_trial' | 'parent_demand';
+
 export interface Lead {
   _id: string;
   schoolName: string;
-  schoolType: string;
-  country: string;
-  city: string;
+  schoolType?: string;
+  country?: string;
+  city?: string;
   address?: string;
   vanCount?: string;
   studentCount?: string;
   adminName: string;
-  designation: string;
+  designation?: string;
   email: string;
-  phone: string;
+  phone?: string;
   plan?: string;
   currency?: string;
   challenges?: string;
   status: LeadStatus;
+  source?: LeadSource;
   schoolId?: string;
   activity: LeadActivityEntry[];
   tasks: LeadTaskEntry[];
@@ -231,6 +234,13 @@ export const leadsApi = {
   getEmailTemplates: () => api.get<{ message: string; data: LeadEmailTemplate[] }>('/school/leads/email-templates'),
   sendEmail: (id: string, body: { subject: string; body: string }) =>
     api.post<{ message: string; data: Lead }>(`/school/leads/${id}/send-email`, body),
+  create: (body: Partial<Lead>) => api.post<{ message: string; data: Lead }>('/school/leads', body),
+  import: (rows: Record<string, any>[]) =>
+    api.post<{ message: string; data: { created: number; merged: number; failed: { row: number; reason: string }[] } }>(
+      '/school/leads/import',
+      { rows },
+    ),
+  syncStalledSchools: () => api.post<{ message: string; data: { created: number } }>('/school/leads/sync-stalled-schools', {}),
 };
 
 export const employeeApi = {
@@ -400,6 +410,8 @@ export const parentIntelligenceApi = {
     ),
   backfill: () =>
     api.post<{ academicLevelUpdated: number; geoUpdated: number; geoRemaining: number }>('/parent-intelligence/backfill', {}),
+  convertDemandToLead: (schoolName: string) =>
+    api.post<{ message: string; data: Lead }>('/parent-intelligence/convert-demand-to-lead', { schoolName }),
 };
 
 export const featureApi = {
