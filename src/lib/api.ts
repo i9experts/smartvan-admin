@@ -168,6 +168,71 @@ export const schoolApi = {
     api.post('/school/create-institution', body),
   getAppsModulesOverview: () => api.get('/school/apps-modules-overview'),
 };
+
+export type LeadStatus = 'new' | 'contacted' | 'demo' | 'trial' | 'won' | 'lost';
+
+export interface LeadActivityEntry {
+  type: 'note' | 'call' | 'whatsapp' | 'meeting' | 'email' | 'status_change';
+  summary: string;
+  authorEmail?: string;
+  occurredAt: string;
+}
+
+export interface LeadTaskEntry {
+  _id: string;
+  title: string;
+  dueAt?: string;
+  done: boolean;
+  createdAt: string;
+  completedAt?: string;
+}
+
+export interface Lead {
+  _id: string;
+  schoolName: string;
+  schoolType: string;
+  country: string;
+  city: string;
+  address?: string;
+  vanCount?: string;
+  studentCount?: string;
+  adminName: string;
+  designation: string;
+  email: string;
+  phone: string;
+  plan?: string;
+  currency?: string;
+  challenges?: string;
+  status: LeadStatus;
+  schoolId?: string;
+  activity: LeadActivityEntry[];
+  tasks: LeadTaskEntry[];
+  createdAt: string;
+}
+
+export interface LeadEmailTemplate {
+  id: string;
+  name: string;
+  subject: string;
+  body: string;
+}
+
+export const leadsApi = {
+  getAll: () => api.get<{ message: string; data: Lead[] }>('/school/leads'),
+  getById: (id: string) => api.get<{ message: string; data: Lead }>(`/school/leads/${id}`),
+  updateStatus: (id: string, status: LeadStatus) =>
+    api.patch<{ message: string; data: Lead }>(`/school/leads/${id}/status`, { status }),
+  addActivity: (id: string, body: { type: 'note' | 'call' | 'whatsapp' | 'meeting'; summary: string }) =>
+    api.post<{ message: string; data: Lead }>(`/school/leads/${id}/activity`, body),
+  addTask: (id: string, body: { title: string; dueAt?: string }) =>
+    api.post<{ message: string; data: Lead }>(`/school/leads/${id}/tasks`, body),
+  updateTask: (id: string, taskId: string, body: { done?: boolean; title?: string; dueAt?: string }) =>
+    api.patch<{ message: string; data: Lead }>(`/school/leads/${id}/tasks/${taskId}`, body),
+  getEmailTemplates: () => api.get<{ message: string; data: LeadEmailTemplate[] }>('/school/leads/email-templates'),
+  sendEmail: (id: string, body: { subject: string; body: string }) =>
+    api.post<{ message: string; data: Lead }>(`/school/leads/${id}/send-email`, body),
+};
+
 export const employeeApi = {
   getPermissions: () => api.get('/employee/permissions'),
   getAll: () => api.get('/employee/all'),
