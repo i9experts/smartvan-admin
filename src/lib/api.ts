@@ -185,6 +185,7 @@ export interface LeadTaskEntry {
   done: boolean;
   createdAt: string;
   completedAt?: string;
+  source?: 'manual' | 'auto';
 }
 
 export type LeadSource = 'website' | 'contact_us' | 'manual' | 'import' | 'stalled_trial' | 'parent_demand';
@@ -217,6 +218,9 @@ export interface Lead {
   campaignId?: string;
   assignedTo?: string;
   wonAt?: string;
+  score?: number;
+  scoreUpdatedAt?: string;
+  lastEscalatedAt?: string;
 }
 
 export interface LeaderboardRow {
