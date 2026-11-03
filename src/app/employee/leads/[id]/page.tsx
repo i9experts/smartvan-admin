@@ -141,6 +141,16 @@ export default function MyLeadDetailPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            {lead.score != null && (
+              <span
+                title="Lead score"
+                className={`text-xs font-bold px-2.5 py-1.5 rounded-full ${
+                  lead.score >= 70 ? 'bg-emerald-50 text-emerald-600' : lead.score >= 40 ? 'bg-amber-50 text-amber-600' : 'bg-gray-100 text-gray-500'
+                }`}
+              >
+                {lead.score}
+              </span>
+            )}
             <span className="text-xs font-semibold px-3 py-1.5 rounded-full text-white" style={{ backgroundColor: stage?.color }}>
               {stage?.label}
             </span>
@@ -260,7 +270,10 @@ export default function MyLeadDetailPage() {
                         {t.done && <CheckCircle2 size={12} className="text-white" />}
                       </button>
                       <div className="min-w-0">
-                        <p className={`truncate ${t.done ? 'line-through text-gray-400' : 'text-gray-700'}`}>{t.title}</p>
+                        <p className={`truncate ${t.done ? 'line-through text-gray-400' : 'text-gray-700'}`}>
+                          {t.title}
+                          {t.source === 'auto' && <span className="ml-1.5 text-[10px] font-semibold text-[#F2994A] align-middle">AUTO</span>}
+                        </p>
                         {t.dueAt && (
                           <p className={`text-xs ${overdue ? 'text-red-500 font-medium' : 'text-gray-400'}`}>
                             {overdue ? 'Overdue — ' : 'Due '}{new Date(t.dueAt).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' })}

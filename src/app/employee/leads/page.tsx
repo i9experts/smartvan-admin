@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, Search, ChevronRight, Plus, X, Trophy } from 'lucide-react';
+import { Users, Search, ChevronRight, Plus, X, Trophy, Flame } from 'lucide-react';
 import { leadsApi, Lead, LeadStatus } from '@/lib/api';
 
 const STAGES: { key: LeadStatus; label: string; color: string }[] = [
@@ -15,6 +15,12 @@ const STAGES: { key: LeadStatus; label: string; color: string }[] = [
   { key: 'lost', label: 'Lost', color: '#EB5757' },
 ];
 
+function ScoreBadge({ score }: { score?: number }) {
+  if (score == null) return null;
+  const tier = score >= 70 ? 'bg-emerald-50 text-emerald-600' : score >= 40 ? 'bg-amber-50 text-amber-600' : 'bg-gray-100 text-gray-500';
+  return <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ${tier}`}>{score}</span>;
+}
+
 function LeadCard({ lead }: { lead: Lead }) {
   const qc = useQueryClient();
   const moveStage = useMutation({
@@ -25,7 +31,13 @@ function LeadCard({ lead }: { lead: Lead }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-3.5 shadow-sm hover:shadow-md transition-shadow">
       <Link href={`/employee/leads/${lead._id}`} className="block">
-        <p className="font-semibold text-gray-800 text-sm truncate">{lead.schoolName}</p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="font-semibold text-gray-800 text-sm truncate flex items-center gap-1">
+            {lead.lastEscalatedAt && <Flame size={12} className="text-red-400 shrink-0" />}
+            {lead.schoolName}
+          </p>
+          <ScoreBadge score={lead.score} />
+        </div>
         <p className="text-xs text-gray-400 truncate">{lead.adminName}{lead.city ? ` · ${lead.city}` : ''}</p>
       </Link>
       <div className="flex items-center justify-between mt-2.5 gap-2">
@@ -126,7 +138,8 @@ export default function MyLeadsPage() {
     return l.schoolName.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.adminName.toLowerCase().includes(q);
   });
 
-  const byStage = (stage: LeadStatus) => filtered.filter((l) => l.status === stage);
+  const byStage = (stage: LeadStatus) =>
+    filtered.filter((l) => l.status === stage).sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

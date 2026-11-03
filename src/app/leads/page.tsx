@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, Search, Building2, ChevronRight, Plus, Upload, RefreshCw, X, Trophy, UserCircle2 } from 'lucide-react';
+import { Users, Search, Building2, ChevronRight, Plus, Upload, RefreshCw, X, Trophy, UserCircle2, Flame } from 'lucide-react';
 import { leadsApi, employeeApi, Lead, LeadStatus, LeaderboardRow } from '@/lib/api';
 
 const STAGES: { key: LeadStatus; label: string; color: string }[] = [
@@ -52,6 +52,12 @@ function normalizeImportRow(row: Record<string, any>): Record<string, any> {
   return out;
 }
 
+function ScoreBadge({ score }: { score?: number }) {
+  if (score == null) return null;
+  const tier = score >= 70 ? 'bg-emerald-50 text-emerald-600' : score >= 40 ? 'bg-amber-50 text-amber-600' : 'bg-gray-100 text-gray-500';
+  return <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ${tier}`}>{score}</span>;
+}
+
 function LeadCard({ lead, salesReps }: { lead: Lead; salesReps: { _id: string; name: string }[] }) {
   const qc = useQueryClient();
   const moveStage = useMutation({
@@ -67,12 +73,18 @@ function LeadCard({ lead, salesReps }: { lead: Lead; salesReps: { _id: string; n
     <div className="bg-white rounded-xl border border-gray-200 p-3.5 shadow-sm hover:shadow-md transition-shadow">
       <Link href={`/leads/${lead._id}`} className="block">
         <div className="flex items-center justify-between gap-2">
-          <p className="font-semibold text-gray-800 text-sm truncate">{lead.schoolName}</p>
-          {lead.source && (
-            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 shrink-0">
-              {SOURCE_LABELS[lead.source] || lead.source}
-            </span>
-          )}
+          <p className="font-semibold text-gray-800 text-sm truncate flex items-center gap-1">
+            {lead.lastEscalatedAt && <Flame size={12} className="text-red-400 shrink-0" />}
+            {lead.schoolName}
+          </p>
+          <div className="flex items-center gap-1 shrink-0">
+            <ScoreBadge score={lead.score} />
+            {lead.source && (
+              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 shrink-0">
+                {SOURCE_LABELS[lead.source] || lead.source}
+              </span>
+            )}
+          </div>
         </div>
         <p className="text-xs text-gray-400 truncate">{lead.adminName}{lead.city ? ` · ${lead.city}` : ''}</p>
         {(lead.vanCount || lead.studentCount) && (
@@ -291,7 +303,8 @@ export default function LeadsPage() {
     );
   });
 
-  const byStage = (stage: LeadStatus) => filtered.filter((l) => l.status === stage);
+  const byStage = (stage: LeadStatus) =>
+    filtered.filter((l) => l.status === stage).sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
