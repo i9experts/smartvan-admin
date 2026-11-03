@@ -574,3 +574,28 @@ export const featureApi = {
   updateSchoolFeatureTier: (schoolId: string, body: { featureTier?: 'basic' | 'premium'; enabledFeatures?: string[]; disabledFeatures?: string[] }) =>
     api.patch(`/school/${schoolId}/feature-tier`, body),
 };
+
+export interface WebsiteAnalyticsOverview {
+  configured: boolean;
+  setupMessage?: string;
+  error?: string;
+  rangeDays?: number;
+  summary?: {
+    totalUsers: number;
+    sessions: number;
+    pageViews: number;
+    avgSessionDurationSeconds: number;
+    bounceRatePercent: number;
+  };
+  trend?: { date: string; users: number; sessions: number; pageViews: number }[];
+  topPages?: { path: string; views: number }[];
+  trafficSources?: { channel: string; sessions: number }[];
+  deviceBreakdown?: { device: string; users: number }[];
+  countryBreakdown?: { country: string; users: number }[];
+  realtimeActiveUsers?: number;
+}
+
+export const websiteAnalyticsApi = {
+  getOverview: (days = 28) =>
+    api.get<{ message: string; data: WebsiteAnalyticsOverview }>('/website-analytics/overview', { params: { days } }),
+};

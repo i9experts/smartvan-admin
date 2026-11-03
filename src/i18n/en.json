@@ -34,7 +34,8 @@
     "appVersions": "App Versions",
     "campaigns": "Campaigns",
     "partners": "Partners",
-    "salesForecast": "Sales Forecast"
+    "salesForecast": "Sales Forecast",
+    "websiteAnalytics": "Website Analytics"
   },
   "common": {
     "save": "Save",
