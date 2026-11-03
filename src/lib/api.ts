@@ -265,7 +265,44 @@ export const leadsApi = {
   assign: (id: string, employeeId: string | null) =>
     api.patch<{ message: string; data: Lead }>(`/school/leads/${id}/assign`, { employeeId }),
   getLeaderboard: () => api.get<{ message: string; data: LeaderboardRow[] }>('/school/leads/leaderboard'),
+  getForecast: () => api.get<{ message: string; data: SalesForecast }>('/school/leads/forecast'),
 };
+
+export interface SalesForecastFunnelStage {
+  stage: string;
+  currentCount: number;
+  everReachedCount: number;
+  wonFromHereRate: number | null;
+  avgDaysInStage: number | null;
+}
+
+export interface SalesForecastPipelineStage {
+  stage: string;
+  openCount: number;
+  probabilityPercent: number;
+  expectedWins: number;
+}
+
+export interface SalesForecastTrendWeek {
+  weekStart: string;
+  created: number;
+  won: number;
+}
+
+export interface SalesForecastSourcePerformance {
+  source: string;
+  total: number;
+  won: number;
+  conversionRate: number;
+}
+
+export interface SalesForecast {
+  funnel: SalesForecastFunnelStage[];
+  weightedPipeline: { totalExpectedWins: number; byStage: SalesForecastPipelineStage[] };
+  avgDaysNewToWon: number | null;
+  trend: SalesForecastTrendWeek[];
+  sourcePerformance: SalesForecastSourcePerformance[];
+}
 
 export interface Campaign {
   _id: string;

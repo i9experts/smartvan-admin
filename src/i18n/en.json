@@ -33,7 +33,8 @@
     "parentIntelligence": "Parent Intelligence",
     "appVersions": "App Versions",
     "campaigns": "Campaigns",
-    "partners": "Partners"
+    "partners": "Partners",
+    "salesForecast": "Sales Forecast"
   },
   "common": {
     "save": "Save",

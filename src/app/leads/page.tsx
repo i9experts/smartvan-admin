@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, Search, Building2, ChevronRight, Plus, Upload, RefreshCw, X, Trophy, UserCircle2, Flame } from 'lucide-react';
+import { Users, Search, Building2, ChevronRight, Plus, Upload, RefreshCw, X, Trophy, UserCircle2, Flame, Radar } from 'lucide-react';
 import { leadsApi, employeeApi, Lead, LeadStatus, LeaderboardRow } from '@/lib/api';
 
 const STAGES: { key: LeadStatus; label: string; color: string }[] = [
@@ -320,6 +320,12 @@ export default function LeadsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Link
+            href="/sales-forecast"
+            className="flex items-center gap-1.5 text-sm font-medium px-3.5 py-2 rounded-xl border border-gray-200 bg-white text-[#1B3B69] hover:bg-gray-50"
+          >
+            <Radar size={14} /> Forecast
+          </Link>
           <button
             onClick={() => syncStalled.mutate()}
             disabled={syncStalled.isPending}

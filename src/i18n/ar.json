@@ -33,7 +33,8 @@
     "parentIntelligence": "بيانات أولياء الأمور",
     "appVersions": "إصدارات التطبيق",
     "campaigns": "الحملات",
-    "partners": "الشركاء"
+    "partners": "الشركاء",
+    "salesForecast": "توقعات المبيعات"
   },
   "common": {
     "save": "حفظ",
