@@ -3,8 +3,8 @@
 import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, Search, Building2, ChevronRight, Plus, Upload, RefreshCw, X } from 'lucide-react';
-import { leadsApi, Lead, LeadStatus } from '@/lib/api';
+import { Users, Search, Building2, ChevronRight, Plus, Upload, RefreshCw, X, Trophy, UserCircle2 } from 'lucide-react';
+import { leadsApi, employeeApi, Lead, LeadStatus, LeaderboardRow } from '@/lib/api';
 
 const STAGES: { key: LeadStatus; label: string; color: string }[] = [
   { key: 'new', label: 'New', color: '#1B3B69' },
@@ -52,10 +52,14 @@ function normalizeImportRow(row: Record<string, any>): Record<string, any> {
   return out;
 }
 
-function LeadCard({ lead }: { lead: Lead }) {
+function LeadCard({ lead, salesReps }: { lead: Lead; salesReps: { _id: string; name: string }[] }) {
   const qc = useQueryClient();
   const moveStage = useMutation({
     mutationFn: (status: LeadStatus) => leadsApi.updateStatus(lead._id, status),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['leads'] }),
+  });
+  const assign = useMutation({
+    mutationFn: (employeeId: string) => leadsApi.assign(lead._id, employeeId || null),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['leads'] }),
   });
 
@@ -88,6 +92,46 @@ function LeadCard({ lead }: { lead: Lead }) {
         <Link href={`/leads/${lead._id}`} className="text-gray-300 hover:text-[#1B3B69] shrink-0">
           <ChevronRight size={16} />
         </Link>
+      </div>
+      {salesReps.length > 0 && (
+        <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-gray-100">
+          <UserCircle2 size={13} className="text-gray-300 shrink-0" />
+          <select
+            value={lead.assignedTo || ''}
+            disabled={assign.isPending}
+            onChange={(e) => assign.mutate(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+            className="flex-1 text-xs border-none bg-transparent text-gray-500 outline-none"
+          >
+            <option value="">Unassigned</option>
+            {salesReps.map((r) => <option key={r._id} value={r._id}>{r.name}</option>)}
+          </select>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LeaderboardStrip({ rows }: { rows: LeaderboardRow[] }) {
+  if (rows.length === 0) return null;
+  return (
+    <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-5">
+      <p className="text-sm font-semibold text-gray-800 flex items-center gap-1.5 mb-3"><Trophy size={15} className="text-amber-500" /> Leaderboard — Won This Month</p>
+      <div className="flex gap-3 overflow-x-auto pb-1">
+        {rows.map((r, i) => (
+          <div key={r.employeeId} className="flex-shrink-0 w-44 bg-gray-50 rounded-xl p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-gray-700 truncate">{i === 0 && r.wonThisMonth > 0 ? '🏆 ' : ''}{r.name}</span>
+              <span className="text-xs text-gray-400">#{i + 1}</span>
+            </div>
+            <p className="text-xl font-bold text-[#1B3B69] mt-1">{r.wonThisMonth}{r.target > 0 && <span className="text-xs text-gray-400 font-normal"> / {r.target}</span>}</p>
+            {r.target > 0 && (
+              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden mt-1.5">
+                <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${Math.min(r.progressPercent || 0, 100)}%` }} />
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -184,6 +228,22 @@ export default function LeadsPage() {
     queryFn: () => leadsApi.getAll(),
     select: (res) => res.data.data,
     staleTime: 30_000,
+  });
+
+  const { data: employees } = useQuery({
+    queryKey: ['employees'],
+    queryFn: () => employeeApi.getAll(),
+    select: (res: any) => (res.data?.data ?? []) as { _id: string; name: string; permissions: string[]; status: string }[],
+    staleTime: 60_000,
+  });
+  const salesReps = (employees ?? []).filter((e) => e.status === 'active' && e.permissions.includes('manage_leads'));
+
+  const { data: leaderboard } = useQuery({
+    queryKey: ['leads-leaderboard'],
+    queryFn: () => leadsApi.getLeaderboard(),
+    select: (res) => res.data.data,
+    staleTime: 30_000,
+    enabled: salesReps.length > 0,
   });
 
   const syncStalled = useMutation({
@@ -286,6 +346,8 @@ export default function LeadsPage() {
       )}
       {importResult && <ImportResultBanner result={importResult} onClose={() => setImportResult(null)} />}
 
+      {leaderboard && <LeaderboardStrip rows={leaderboard} />}
+
       <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-5 flex items-center gap-3">
         <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 flex-1 min-w-48 max-w-sm">
           <Search size={15} className="text-gray-400" />
@@ -327,7 +389,7 @@ export default function LeadsPage() {
                       No leads
                     </div>
                   ) : (
-                    stageLeads.map((lead) => <LeadCard key={lead._id} lead={lead} />)
+                    stageLeads.map((lead) => <LeadCard key={lead._id} lead={lead} salesReps={salesReps} />)
                   )}
                 </div>
               </div>

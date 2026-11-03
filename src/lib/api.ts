@@ -211,6 +211,23 @@ export interface Lead {
   activity: LeadActivityEntry[];
   tasks: LeadTaskEntry[];
   createdAt: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  campaignId?: string;
+  assignedTo?: string;
+  wonAt?: string;
+}
+
+export interface LeaderboardRow {
+  employeeId: string;
+  name: string;
+  email: string;
+  target: number;
+  wonThisMonth: number;
+  totalAssigned: number;
+  totalWon: number;
+  progressPercent: number | null;
 }
 
 export interface LeadEmailTemplate {
@@ -241,6 +258,31 @@ export const leadsApi = {
       { rows },
     ),
   syncStalledSchools: () => api.post<{ message: string; data: { created: number } }>('/school/leads/sync-stalled-schools', {}),
+  assign: (id: string, employeeId: string | null) =>
+    api.patch<{ message: string; data: Lead }>(`/school/leads/${id}/assign`, { employeeId }),
+  getLeaderboard: () => api.get<{ message: string; data: LeaderboardRow[] }>('/school/leads/leaderboard'),
+};
+
+export interface Campaign {
+  _id: string;
+  name: string;
+  channel?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign: string;
+  spend: number;
+  currency: string;
+  startDate?: string;
+  endDate?: string;
+  status: 'active' | 'paused' | 'ended';
+  metrics: { signups: number; trials: number; won: number; costPerWon: number | null };
+}
+
+export const campaignsApi = {
+  getAll: () => api.get<{ message: string; data: Campaign[] }>('/school/campaigns'),
+  create: (body: Partial<Campaign>) => api.post<{ message: string; data: Campaign }>('/school/campaigns', body),
+  update: (id: string, body: Partial<Campaign>) => api.patch<{ message: string; data: Campaign }>(`/school/campaigns/${id}`, body),
+  remove: (id: string) => api.delete(`/school/campaigns/${id}`),
 };
 
 export const employeeApi = {
@@ -248,7 +290,7 @@ export const employeeApi = {
   getAll: () => api.get('/employee/all'),
   create: (data: { name: string; email: string; password: string; permissions: string[] }) =>
     api.post('/employee/create', data),
-  update: (id: string, data: { name?: string; permissions?: string[]; status?: string }) =>
+  update: (id: string, data: { name?: string; permissions?: string[]; status?: string; monthlyTarget?: number }) =>
     api.patch(`/employee/${id}`, data),
   remove: (id: string) => api.delete(`/employee/${id}`),
   login: (email: string, password: string) => api.post('/employee/login', { email, password }),

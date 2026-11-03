@@ -11,6 +11,7 @@ interface Employee {
   email: string;
   permissions: string[];
   status: string;
+  monthlyTarget?: number;
 }
 
 const PERMISSION_LABELS: Record<string, string> = {
@@ -22,6 +23,7 @@ const PERMISSION_LABELS: Record<string, string> = {
   manage_tickets: 'Manage Tickets',
   view_schools: 'View Schools',
   manage_schools: 'Manage Schools',
+  manage_leads: 'Manage Leads (Sales)',
 };
 
 async function fetchEmployees(): Promise<Employee[]> {
@@ -90,6 +92,24 @@ function AddEmployeeModal({ availablePermissions, onClose, onSuccess }: { availa
   );
 }
 
+function TargetInput({ employee }: { employee: Employee }) {
+  const qc = useQueryClient();
+  const [value, setValue] = useState(String(employee.monthlyTarget ?? 0));
+  const save = useMutation({
+    mutationFn: (v: number) => employeeApi.update(employee._id, { monthlyTarget: v }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['employees'] }),
+  });
+  return (
+    <input
+      type="number"
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      onBlur={() => { const n = Number(value) || 0; if (n !== (employee.monthlyTarget ?? 0)) save.mutate(n); }}
+      className="w-16 text-xs border border-gray-200 rounded-lg px-2 py-1 text-gray-600 outline-none focus:border-[#1B3B69]"
+    />
+  );
+}
+
 export default function EmployeesPage() {
   const qc = useQueryClient();
   const [showAddModal, setShowAddModal] = useState(false);
@@ -137,17 +157,18 @@ export default function EmployeesPage() {
               <th className="p-4 font-medium">Name</th>
               <th className="p-4 font-medium">Email</th>
               <th className="p-4 font-medium">Permissions</th>
+              <th className="p-4 font-medium">Monthly Target</th>
               <th className="p-4 font-medium">Status</th>
               <th className="p-4 font-medium"></th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={5} className="p-8 text-center text-gray-400">Loading…</td></tr>
+              <tr><td colSpan={6} className="p-8 text-center text-gray-400">Loading…</td></tr>
             ) : isError ? (
-              <tr><td colSpan={5} className="p-8 text-center text-red-500">Failed to load employees. Please refresh.</td></tr>
+              <tr><td colSpan={6} className="p-8 text-center text-red-500">Failed to load employees. Please refresh.</td></tr>
             ) : employees.length === 0 ? (
-              <tr><td colSpan={5} className="p-8 text-center text-gray-400">No employees yet</td></tr>
+              <tr><td colSpan={6} className="p-8 text-center text-gray-400">No employees yet</td></tr>
             ) : (
               employees.map((emp) => (
                 <tr key={emp._id} className="border-b border-gray-50">
@@ -161,6 +182,15 @@ export default function EmployeesPage() {
                         </span>
                       ))}
                     </div>
+                  </td>
+                  <td className="p-4">
+                    {emp.permissions.includes('manage_leads') ? (
+                      <div className="flex items-center gap-1 text-xs text-gray-500">
+                        <TargetInput employee={emp} /> leads/mo
+                      </div>
+                    ) : (
+                      <span className="text-xs text-gray-300">—</span>
+                    )}
                   </td>
                   <td className="p-4">
                     <button
