@@ -206,6 +206,10 @@ export const bannerApi = {
   update: (id: string, banner: any) => api.patch(`/promotion-banner/${id}`, banner),
   remove: (id: string) => api.delete(`/promotion-banner/${id}`),
 };
+export const appVersionApi = {
+  getAll: () => api.get('/admin/app-versions'),
+  update: (id: string, body: any) => api.patch(`/admin/app-versions/${id}`, body),
+};
 export const auditLogApi = {
   getRecent: () => api.get('/audit-log/recent'),
 };

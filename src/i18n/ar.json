@@ -30,7 +30,8 @@
     "institutions": "المؤسسات",
     "billingSubscriptions": "الفواتير والاشتراكات",
     "appsModules": "التطبيقات والوحدات",
-    "parentIntelligence": "بيانات أولياء الأمور"
+    "parentIntelligence": "بيانات أولياء الأمور",
+    "appVersions": "إصدارات التطبيق"
   },
   "common": {
     "save": "حفظ",

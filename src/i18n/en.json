@@ -30,7 +30,8 @@
     "institutions": "Institutions",
     "billingSubscriptions": "Billing & Subscriptions",
     "appsModules": "Apps & Modules",
-    "parentIntelligence": "Parent Intelligence"
+    "parentIntelligence": "Parent Intelligence",
+    "appVersions": "App Versions"
   },
   "common": {
     "save": "Save",

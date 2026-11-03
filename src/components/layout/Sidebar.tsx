@@ -7,7 +7,7 @@ import {
   LayoutDashboard, MapPin, School, Bus, Users, Route,
   Bell, BarChart3, Receipt, Wrench, Settings, LogOut, MessageSquare, History,
   Image as ImageIcon, AlertTriangle, HelpCircle, QrCode, ClipboardCheck, Star, Sparkles, Lock,
-  Building2, CreditCard, LayoutGrid, Users2,
+  Building2, CreditCard, LayoutGrid, Users2, Smartphone,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -43,6 +43,7 @@ const navItems: { labelKey: string; href: string; icon: any; roles: ("admin" | "
   { labelKey: "nav.team", href: "/team", icon: Users, roles: ["admin"] },
   { labelKey: "nav.support", href: "/support", icon: HelpCircle, roles: ["admin"] },
   { labelKey: "nav.schoolLeads", href: "/leads", icon: Users, roles: ["superadmin"] },
+  { labelKey: "nav.appVersions", href: "/app-versions", icon: Smartphone, roles: ["superadmin"] },
   { labelKey: "nav.banners", href: "/banners", icon: ImageIcon, roles: ["superadmin"] },
   { labelKey: "nav.employees", href: "/employees", icon: Users, roles: ["superadmin"] },
   { labelKey: "nav.tickets", href: "/tickets", icon: MessageSquare, roles: ["superadmin"] },
