@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, Search, Building2, ChevronRight } from 'lucide-react';
+import { Users, Search, Building2, ChevronRight, Plus, Upload, RefreshCw, X } from 'lucide-react';
 import { leadsApi, Lead, LeadStatus } from '@/lib/api';
 
 const STAGES: { key: LeadStatus; label: string; color: string }[] = [
@@ -15,6 +15,43 @@ const STAGES: { key: LeadStatus; label: string; color: string }[] = [
   { key: 'lost', label: 'Lost', color: '#EB5757' },
 ];
 
+const SOURCE_LABELS: Record<string, string> = {
+  website: 'Website',
+  contact_us: 'Contact Us',
+  manual: 'Manual',
+  import: 'Import',
+  stalled_trial: 'Stalled Trial',
+  parent_demand: 'Parent Demand',
+};
+
+// Maps common spreadsheet header spellings to the field names the backend
+// expects — lets people import without rewriting their own column headers.
+const IMPORT_HEADER_ALIASES: Record<string, string> = {
+  school: 'schoolName', schoolname: 'schoolName', 'school name': 'schoolName',
+  type: 'schoolType', schooltype: 'schoolType', 'school type': 'schoolType',
+  admin: 'adminName', adminname: 'adminName', 'admin name': 'adminName', contact: 'adminName', 'contact name': 'adminName',
+  title: 'designation', role: 'designation',
+  email: 'email', 'e-mail': 'email',
+  phone: 'phone', phonenumber: 'phone', 'phone number': 'phone', mobile: 'phone',
+  country: 'country',
+  city: 'city',
+  address: 'address',
+  vans: 'vanCount', vancount: 'vanCount', 'van count': 'vanCount', 'no of vans': 'vanCount',
+  students: 'studentCount', studentcount: 'studentCount', 'student count': 'studentCount',
+  plan: 'plan',
+  currency: 'currency',
+  notes: 'challenges', challenges: 'challenges',
+};
+
+function normalizeImportRow(row: Record<string, any>): Record<string, any> {
+  const out: Record<string, any> = {};
+  for (const [key, value] of Object.entries(row)) {
+    const normalized = IMPORT_HEADER_ALIASES[key.trim().toLowerCase()];
+    if (normalized) out[normalized] = value;
+  }
+  return out;
+}
+
 function LeadCard({ lead }: { lead: Lead }) {
   const qc = useQueryClient();
   const moveStage = useMutation({
@@ -25,8 +62,15 @@ function LeadCard({ lead }: { lead: Lead }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-3.5 shadow-sm hover:shadow-md transition-shadow">
       <Link href={`/leads/${lead._id}`} className="block">
-        <p className="font-semibold text-gray-800 text-sm truncate">{lead.schoolName}</p>
-        <p className="text-xs text-gray-400 truncate">{lead.adminName} · {lead.city}</p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="font-semibold text-gray-800 text-sm truncate">{lead.schoolName}</p>
+          {lead.source && (
+            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 shrink-0">
+              {SOURCE_LABELS[lead.source] || lead.source}
+            </span>
+          )}
+        </div>
+        <p className="text-xs text-gray-400 truncate">{lead.adminName}{lead.city ? ` · ${lead.city}` : ''}</p>
         {(lead.vanCount || lead.studentCount) && (
           <p className="text-xs text-gray-400 mt-1">{lead.vanCount || '—'} vans · {lead.studentCount || '—'} students</p>
         )}
@@ -49,8 +93,91 @@ function LeadCard({ lead }: { lead: Lead }) {
   );
 }
 
+function AddLeadModal({ onClose }: { onClose: () => void }) {
+  const qc = useQueryClient();
+  const [form, setForm] = useState({
+    schoolName: '', adminName: '', email: '', phone: '', city: '', country: '', vanCount: '', studentCount: '',
+  });
+
+  const create = useMutation({
+    mutationFn: () => leadsApi.create(form),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['leads'] }); onClose(); },
+  });
+
+  const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((f) => ({ ...f, [key]: e.target.value }));
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-gray-900">Add Lead</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={18} /></button>
+        </div>
+        <div className="space-y-3">
+          <input placeholder="School name *" value={form.schoolName} onChange={set('schoolName')}
+            className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2 outline-none focus:border-[#1B3B69]" />
+          <input placeholder="Contact name *" value={form.adminName} onChange={set('adminName')}
+            className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2 outline-none focus:border-[#1B3B69]" />
+          <input placeholder="Email *" type="email" value={form.email} onChange={set('email')}
+            className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2 outline-none focus:border-[#1B3B69]" />
+          <input placeholder="Phone" value={form.phone} onChange={set('phone')}
+            className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2 outline-none focus:border-[#1B3B69]" />
+          <div className="flex gap-2">
+            <input placeholder="City" value={form.city} onChange={set('city')}
+              className="flex-1 text-sm border border-gray-200 rounded-xl px-3 py-2 outline-none focus:border-[#1B3B69]" />
+            <input placeholder="Country" value={form.country} onChange={set('country')}
+              className="flex-1 text-sm border border-gray-200 rounded-xl px-3 py-2 outline-none focus:border-[#1B3B69]" />
+          </div>
+          <div className="flex gap-2">
+            <input placeholder="Vans" value={form.vanCount} onChange={set('vanCount')}
+              className="flex-1 text-sm border border-gray-200 rounded-xl px-3 py-2 outline-none focus:border-[#1B3B69]" />
+            <input placeholder="Students" value={form.studentCount} onChange={set('studentCount')}
+              className="flex-1 text-sm border border-gray-200 rounded-xl px-3 py-2 outline-none focus:border-[#1B3B69]" />
+          </div>
+        </div>
+        {create.isError && <p className="text-xs text-red-500 mt-2">Couldn&apos;t save — check the required fields.</p>}
+        <button
+          onClick={() => create.mutate()}
+          disabled={!form.schoolName.trim() || !form.adminName.trim() || !form.email.trim() || create.isPending}
+          className="mt-4 w-full text-sm font-semibold px-4 py-2.5 rounded-xl bg-[#1B3B69] text-white disabled:opacity-40"
+        >
+          {create.isPending ? 'Adding…' : 'Add Lead'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ImportResultBanner({ result, onClose }: { result: { created: number; merged: number; failed: { row: number; reason: string }[] }; onClose: () => void }) {
+  return (
+    <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-5">
+      <div className="flex items-start justify-between">
+        <p className="text-sm text-gray-700">
+          <span className="font-semibold text-emerald-600">{result.created} added</span>
+          {' · '}
+          <span className="font-semibold text-amber-600">{result.merged} merged into existing leads</span>
+          {result.failed.length > 0 && <>{' · '}<span className="font-semibold text-red-500">{result.failed.length} skipped</span></>}
+        </p>
+        <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={16} /></button>
+      </div>
+      {result.failed.length > 0 && (
+        <ul className="mt-2 text-xs text-gray-400 space-y-0.5">
+          {result.failed.slice(0, 10).map((f, i) => <li key={i}>Row {f.row}: {f.reason}</li>)}
+          {result.failed.length > 10 && <li>…and {result.failed.length - 10} more</li>}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 export default function LeadsPage() {
+  const qc = useQueryClient();
   const [search, setSearch] = useState('');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [importResult, setImportResult] = useState<{ created: number; merged: number; failed: { row: number; reason: string }[] } | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['leads'],
@@ -59,6 +186,39 @@ export default function LeadsPage() {
     staleTime: 30_000,
   });
 
+  const syncStalled = useMutation({
+    mutationFn: () => leadsApi.syncStalledSchools(),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ['leads'] });
+      setImportResult({ created: res.data.data.created, merged: 0, failed: [] });
+    },
+  });
+
+  const importMutation = useMutation({
+    mutationFn: (rows: Record<string, any>[]) => leadsApi.import(rows),
+    onSuccess: (res) => { qc.invalidateQueries({ queryKey: ['leads'] }); setImportResult(res.data.data); },
+    onError: () => setImportError('Import failed — please check the file and try again.'),
+  });
+
+  const handleFile = async (file: File) => {
+    setImportError(null);
+    try {
+      const XLSX = await import('xlsx');
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf);
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rawRows = XLSX.utils.sheet_to_json<Record<string, any>>(sheet);
+      const rows = rawRows.map(normalizeImportRow).filter((r) => r.schoolName || r.adminName || r.email);
+      if (rows.length === 0) {
+        setImportError('No recognizable rows found — check the column headers (School Name, Contact Name, Email, Phone, City, Country…).');
+        return;
+      }
+      importMutation.mutate(rows);
+    } catch {
+      setImportError('Could not read that file — please upload a .xlsx or .csv file.');
+    }
+  };
+
   const leads = data ?? [];
   const filtered = leads.filter((l) => {
     if (!search.trim()) return true;
@@ -66,7 +226,7 @@ export default function LeadsPage() {
     return (
       l.schoolName.toLowerCase().includes(q) ||
       l.email.toLowerCase().includes(q) ||
-      l.city.toLowerCase().includes(q) ||
+      (l.city || '').toLowerCase().includes(q) ||
       l.adminName.toLowerCase().includes(q)
     );
   });
@@ -75,14 +235,56 @@ export default function LeadsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#1B3B69] flex items-center gap-2">
-          <Users size={24} /> School Leads
-        </h1>
-        <p className="text-gray-500 text-sm mt-1">
-          Pipeline from first contact to a paying school — click a card for notes, tasks and email.
-        </p>
+      {showAddModal && <AddLeadModal onClose={() => setShowAddModal(false)} />}
+
+      <div className="mb-6 flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-[#1B3B69] flex items-center gap-2">
+            <Users size={24} /> School Leads
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
+            Pipeline from first contact to a paying school — click a card for notes, tasks and email.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => syncStalled.mutate()}
+            disabled={syncStalled.isPending}
+            title="Pull in schools with real vans but no active subscription"
+            className="flex items-center gap-1.5 text-sm font-medium px-3.5 py-2 rounded-xl border border-gray-200 bg-white text-[#1B3B69] hover:bg-gray-50 disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={syncStalled.isPending ? 'animate-spin' : ''} /> Sync stalled schools
+          </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={importMutation.isPending}
+            className="flex items-center gap-1.5 text-sm font-medium px-3.5 py-2 rounded-xl border border-gray-200 bg-white text-[#1B3B69] hover:bg-gray-50 disabled:opacity-50"
+          >
+            <Upload size={14} /> {importMutation.isPending ? 'Importing…' : 'Import'}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls,.csv"
+            className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ''; }}
+          />
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-1.5 text-sm font-semibold px-3.5 py-2 rounded-xl bg-[#1B3B69] text-white"
+          >
+            <Plus size={14} /> Add Lead
+          </button>
+        </div>
       </div>
+
+      {importError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 mb-4 text-sm flex items-center justify-between">
+          {importError}
+          <button onClick={() => setImportError(null)}><X size={14} /></button>
+        </div>
+      )}
+      {importResult && <ImportResultBanner result={importResult} onClose={() => setImportResult(null)} />}
 
       <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-5 flex items-center gap-3">
         <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 flex-1 min-w-48 max-w-sm">
