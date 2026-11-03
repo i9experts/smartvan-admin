@@ -31,7 +31,8 @@
     "billingSubscriptions": "الفواتير والاشتراكات",
     "appsModules": "التطبيقات والوحدات",
     "parentIntelligence": "بيانات أولياء الأمور",
-    "appVersions": "إصدارات التطبيق"
+    "appVersions": "إصدارات التطبيق",
+    "campaigns": "الحملات"
   },
   "common": {
     "save": "حفظ",

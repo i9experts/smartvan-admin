@@ -7,7 +7,7 @@ import {
   ArrowLeft, Mail, Phone, MapPin, Building2, User, Clock, Check,
   PhoneCall, MessageCircle, Video, StickyNote, Send, Plus, CheckCircle2,
 } from 'lucide-react';
-import { leadsApi, LeadStatus, LeadActivityEntry } from '@/lib/api';
+import { leadsApi, employeeApi, LeadStatus, LeadActivityEntry } from '@/lib/api';
 
 const STAGES: { key: LeadStatus; label: string; color: string }[] = [
   { key: 'new', label: 'New', color: '#1B3B69' },
@@ -55,10 +55,23 @@ export default function LeadDetailPage() {
     staleTime: 5 * 60_000,
   });
 
+  const { data: employees } = useQuery({
+    queryKey: ['employees'],
+    queryFn: () => employeeApi.getAll(),
+    select: (res: any) => (res.data?.data ?? []) as { _id: string; name: string; permissions: string[]; status: string }[],
+    staleTime: 60_000,
+  });
+  const salesReps = (employees ?? []).filter((e) => e.status === 'active' && e.permissions.includes('manage_leads'));
+
   const invalidate = () => qc.invalidateQueries({ queryKey: ['lead', id] });
 
   const moveStage = useMutation({
     mutationFn: (status: LeadStatus) => leadsApi.updateStatus(id, status),
+    onSuccess: invalidate,
+  });
+
+  const assign = useMutation({
+    mutationFn: (employeeId: string) => leadsApi.assign(id, employeeId || null),
     onSuccess: invalidate,
   });
 
@@ -149,6 +162,17 @@ export default function LeadDetailPage() {
             >
               {STAGES.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
             </select>
+            {salesReps.length > 0 && (
+              <select
+                value={lead.assignedTo || ''}
+                disabled={assign.isPending}
+                onChange={(e) => assign.mutate(e.target.value)}
+                className="text-sm border border-gray-200 rounded-xl px-3 py-1.5 text-gray-600 bg-gray-50 outline-none"
+              >
+                <option value="">Unassigned</option>
+                {salesReps.map((r) => <option key={r._id} value={r._id}>{r.name}</option>)}
+              </select>
+            )}
           </div>
         </div>
 
