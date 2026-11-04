@@ -167,6 +167,7 @@ export const schoolApi = {
   createInstitution: (body: { schoolName: string; adminName: string; email: string; phone: string; address?: string; featureTier?: 'basic' | 'premium' }) =>
     api.post('/school/create-institution', body),
   getAppsModulesOverview: () => api.get('/school/apps-modules-overview'),
+  getAppsModulesByInstitution: () => api.get('/school/apps-modules-by-institution'),
 };
 
 export type LeadStatus = 'new' | 'contacted' | 'demo' | 'trial' | 'won' | 'lost';
