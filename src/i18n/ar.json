@@ -35,7 +35,9 @@
     "campaigns": "الحملات",
     "partners": "الشركاء",
     "salesForecast": "توقعات المبيعات",
-    "websiteAnalytics": "تحليلات الموقع"
+    "websiteAnalytics": "تحليلات الموقع",
+    "revenueAnalytics": "تحليلات الإيرادات",
+    "institutionHealth": "صحة المؤسسات"
   },
   "common": {
     "save": "حفظ",

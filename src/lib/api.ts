@@ -167,6 +167,7 @@ export const schoolApi = {
   createInstitution: (body: { schoolName: string; adminName: string; email: string; phone: string; address?: string; featureTier?: 'basic' | 'premium' }) =>
     api.post('/school/create-institution', body),
   getAppsModulesOverview: () => api.get('/school/apps-modules-overview'),
+  getAppsModulesByInstitution: () => api.get('/school/apps-modules-by-institution'),
 };
 
 export type LeadStatus = 'new' | 'contacted' | 'demo' | 'trial' | 'won' | 'lost';
@@ -598,4 +599,58 @@ export interface WebsiteAnalyticsOverview {
 export const websiteAnalyticsApi = {
   getOverview: (days = 28) =>
     api.get<{ message: string; data: WebsiteAnalyticsOverview }>('/website-analytics/overview', { params: { days } }),
+};
+
+export interface RevenueInstitution {
+  schoolId: string;
+  schoolName: string;
+  currency: string;
+  tier: string;
+  monthlyRevenue: number;
+  vanBilling: number;
+  premium: number;
+  atRisk: boolean;
+}
+
+export interface RevenueAnalyticsOverview {
+  totals: { mrrByCurrency: Record<string, number>; arrByCurrency: Record<string, number> };
+  byTier: { basic: number; premium: number };
+  premiumActiveCount: number;
+  vanBillingMrrByCurrency: Record<string, number>;
+  premiumMrrByCurrency: Record<string, number>;
+  atRiskMrrByCurrency: Record<string, number>;
+  topInstitutions: RevenueInstitution[];
+  trend: { date: string; mrrByCurrency: Record<string, number> }[];
+}
+
+export const revenueAnalyticsApi = {
+  getOverview: () => api.get<{ message: string; data: RevenueAnalyticsOverview }>('/revenue-analytics/overview'),
+};
+
+export interface InstitutionHealth {
+  schoolId: string;
+  schoolName: string;
+  score: number;
+  riskTier: 'healthy' | 'at_risk' | 'critical';
+  isNew: boolean;
+  signals: {
+    engagementPercent: number;
+    activeUsers: number;
+    totalUsers: number;
+    openTickets: number;
+    avgResolutionHours: number | null;
+    billingStatus: string;
+    premiumStatus: string;
+    autoRenew: boolean;
+  };
+}
+
+export interface InstitutionHealthOverview {
+  summary: { healthy: number; atRisk: number; critical: number; avgScore: number };
+  institutions: InstitutionHealth[];
+}
+
+export const institutionHealthApi = {
+  getOverview: () =>
+    api.get<{ message: string; data: InstitutionHealthOverview }>('/institution-health/overview'),
 };

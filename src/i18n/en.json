@@ -35,7 +35,9 @@
     "campaigns": "Campaigns",
     "partners": "Partners",
     "salesForecast": "Sales Forecast",
-    "websiteAnalytics": "Website Analytics"
+    "websiteAnalytics": "Website Analytics",
+    "revenueAnalytics": "Revenue Analytics",
+    "institutionHealth": "Institution Health"
   },
   "common": {
     "save": "Save",
