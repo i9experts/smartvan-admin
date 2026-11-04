@@ -625,3 +625,31 @@ export interface RevenueAnalyticsOverview {
 export const revenueAnalyticsApi = {
   getOverview: () => api.get<{ message: string; data: RevenueAnalyticsOverview }>('/revenue-analytics/overview'),
 };
+
+export interface InstitutionHealth {
+  schoolId: string;
+  schoolName: string;
+  score: number;
+  riskTier: 'healthy' | 'at_risk' | 'critical';
+  isNew: boolean;
+  signals: {
+    engagementPercent: number;
+    activeUsers: number;
+    totalUsers: number;
+    openTickets: number;
+    avgResolutionHours: number | null;
+    billingStatus: string;
+    premiumStatus: string;
+    autoRenew: boolean;
+  };
+}
+
+export interface InstitutionHealthOverview {
+  summary: { healthy: number; atRisk: number; critical: number; avgScore: number };
+  institutions: InstitutionHealth[];
+}
+
+export const institutionHealthApi = {
+  getOverview: () =>
+    api.get<{ message: string; data: InstitutionHealthOverview }>('/institution-health/overview'),
+};
