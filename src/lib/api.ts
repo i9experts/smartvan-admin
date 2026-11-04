@@ -599,3 +599,29 @@ export const websiteAnalyticsApi = {
   getOverview: (days = 28) =>
     api.get<{ message: string; data: WebsiteAnalyticsOverview }>('/website-analytics/overview', { params: { days } }),
 };
+
+export interface RevenueInstitution {
+  schoolId: string;
+  schoolName: string;
+  currency: string;
+  tier: string;
+  monthlyRevenue: number;
+  vanBilling: number;
+  premium: number;
+  atRisk: boolean;
+}
+
+export interface RevenueAnalyticsOverview {
+  totals: { mrrByCurrency: Record<string, number>; arrByCurrency: Record<string, number> };
+  byTier: { basic: number; premium: number };
+  premiumActiveCount: number;
+  vanBillingMrrByCurrency: Record<string, number>;
+  premiumMrrByCurrency: Record<string, number>;
+  atRiskMrrByCurrency: Record<string, number>;
+  topInstitutions: RevenueInstitution[];
+  trend: { date: string; mrrByCurrency: Record<string, number> }[];
+}
+
+export const revenueAnalyticsApi = {
+  getOverview: () => api.get<{ message: string; data: RevenueAnalyticsOverview }>('/revenue-analytics/overview'),
+};
